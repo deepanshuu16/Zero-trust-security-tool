@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: zero-trust-security-tool
+    runtime: python
+    plan: free
+    buildCommand: ""
+    startCommand: python app.py

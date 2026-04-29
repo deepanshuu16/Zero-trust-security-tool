@@ -1,0 +1,9 @@
+{
+  "name": "zero-trust-security-tool",
+  "version": "1.0.0",
+  "description": "Zero trust security demo with admin, employee, guest roles, and rotating OTP verification.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

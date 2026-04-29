@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zero Trust Security Tool</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-left"></div>
+    <div class="background-orb orb-right"></div>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">ZT</div>
+          <div>
+            <p class="brand-name">Zero Trust Security Tool</p>
+            <p class="brand-subtitle">Identity-aware access for every user session</p>
+          </div>
+        </div>
+        <div class="topbar-pill">Live Demo Environment</div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy-block">
+          <p class="eyebrow">Adaptive Verification</p>
+          <h1>Professional zero-trust access control for admins, employees, and guests</h1>
+          <p class="hero-copy">
+            Secure every sign-in with role-aware isolation, OTP verification, and session-based access checks designed to
+            feel like a modern internal security console.
+          </p>
+
+          <div class="hero-actions">
+            <a class="hero-link" href="#login-form">Start Secure Login</a>
+            <span class="hero-hint">Fresh OTP issued on login and regeneration</span>
+          </div>
+
+          <div class="hero-metrics">
+            <article class="metric-card">
+              <span class="metric-label">Access Zones</span>
+              <strong>3</strong>
+              <p>Admin, employee, and guest environments remain separated.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Verification</span>
+              <strong>OTP</strong>
+              <p>Every login starts with a newly generated one-time passcode.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Security Model</span>
+              <strong>Zero Trust</strong>
+              <p>Access is granted only after identity and session verification.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Context Signals</span>
+              <strong>IP + Device</strong>
+              <p>Policy decisions now use IP, device profile, browser, and network zone.</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="hero-aside">
+          <div class="aside-panel credential-panel">
+            <div class="panel-heading">
+              <p class="eyebrow muted">Demo Identities</p>
+              <h2>Credential Vault</h2>
+            </div>
+            <div class="credential-list">
+              <div class="credential-row">
+                <span>Admin</span>
+                <strong>admin / Admin@123</strong>
+              </div>
+              <div class="credential-row">
+                <span>Employee</span>
+                <strong>employee / Employee@123</strong>
+              </div>
+              <div class="credential-row">
+                <span>Guest</span>
+                <strong>guest / Guest@123</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="aside-panel trust-panel">
+            <div class="trust-grid">
+              <div>
+                <span class="trust-label">OTP Status</span>
+                <strong id="otp-value">Not generated yet</strong>
+              </div>
+              <div>
+                <span class="trust-label">Session Status</span>
+                <strong id="session-status">No verified user yet.</strong>
+              </div>
+              <div>
+                <span class="trust-label">Trust Score</span>
+                <strong id="trust-score">Pending</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <main class="workspace">
+        <section class="panel workflow-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Access Workflow</p>
+            <h2>Identity verification pipeline</h2>
+          </div>
+
+          <div class="workflow-grid">
+            <article class="step-card">
+              <div class="step-number">01</div>
+              <h3>Sign In</h3>
+              <p>Authenticate the selected identity before session creation.</p>
+              <form id="login-form" class="stack">
+                <label>
+                  Username
+                  <input id="username" name="username" placeholder="admin" required />
+                </label>
+                <label>
+                  Password
+                  <input id="password" name="password" type="password" placeholder="Admin@123" required />
+                </label>
+                <button type="submit">Login and Generate OTP</button>
+              </form>
+              <p id="login-message" class="message"></p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-number">02</div>
+              <h3>Verify OTP</h3>
+              <p>Confirm session trust with a fresh one-time code before access.</p>
+              <div class="otp-display">
+                <span>Current Demo OTP</span>
+                <strong id="otp-display-value">Not generated yet</strong>
+              </div>
+              <form id="otp-form" class="stack">
+                <label>
+                  Enter OTP
+                  <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
+                </label>
+                <button type="submit">Verify OTP</button>
+              </form>
+              <button id="regenerate-btn" class="secondary" type="button">Generate a Different OTP</button>
+              <p id="otp-message" class="message"></p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel access-panel">
+          <div class="section-header">
+            <div class="section-title">
+              <p class="eyebrow muted">Protected Areas</p>
+              <h2>Role-specific access surfaces</h2>
+            </div>
+            <button id="logout-btn" class="secondary" type="button">Logout</button>
+          </div>
+
+          <div class="security-grid">
+            <article class="telemetry-card">
+              <h3>Session Telemetry</h3>
+              <div class="telemetry-list">
+                <div class="telemetry-row"><span>IP Address</span><strong id="ip-address">Pending</strong></div>
+                <div class="telemetry-row"><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
+                <div class="telemetry-row"><span>Device Type</span><strong id="device-type">Pending</strong></div>
+                <div class="telemetry-row"><span>Browser</span><strong id="browser-name">Pending</strong></div>
+                <div class="telemetry-row"><span>Operating System</span><strong id="os-name">Pending</strong></div>
+              </div>
+            </article>
+
+            <article class="telemetry-card">
+              <h3>Policy Evaluation</h3>
+              <div class="telemetry-list">
+                <div class="telemetry-row"><span>Trust Status</span><strong id="trust-status">Pending</strong></div>
+                <div class="telemetry-row"><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
+                <div class="telemetry-row"><span>Session Created</span><strong id="session-created">Pending</strong></div>
+                <div class="telemetry-row"><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
+                <div class="telemetry-row"><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
+              </div>
+            </article>
+
+            <article class="telemetry-card telemetry-card-wide">
+              <h3>Trust Reasons</h3>
+              <ul id="trust-reasons" class="insight-list">
+                <li>Session analysis will appear here after login.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div id="admin-monitor" class="admin-monitor hidden">
+            <div class="section-title">
+              <p class="eyebrow muted">Admin Monitor</p>
+              <h2>Who is logging in as employee or guest</h2>
+            </div>
+            <div id="admin-activity-list" class="activity-list">
+              <article class="activity-card empty-state">
+                <h3>No activity yet</h3>
+                <p>Recent employee and guest login events will appear here for the admin.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="role-columns">
+            <article id="admin-section" class="role-card hidden role-admin">
+              <div class="role-icon">A</div>
+              <h3>Admin Section</h3>
+              <p>Reserved for high-trust management and security decisions.</p>
+              <ul id="admin-list"></ul>
+            </article>
+
+            <article id="employee-section" class="role-card hidden role-employee">
+              <div class="role-icon">E</div>
+              <h3>Employee Section</h3>
+              <p>Provides verified staff members with internal operational access.</p>
+              <ul id="employee-list"></ul>
+            </article>
+
+            <article id="guest-section" class="role-card hidden role-guest">
+              <div class="role-icon">G</div>
+              <h3>Guest Section</h3>
+              <p>Delivers isolated, limited access for visitors and temporary users.</p>
+              <ul id="guest-list"></ul>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
