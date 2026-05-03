@@ -3,64 +3,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zero Trust Security Tool</title>
+    <title>SecureVault Zero Trust</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="background-orb orb-left"></div>
     <div class="background-orb orb-right"></div>
+    <div class="background-grid"></div>
 
     <div class="page-shell">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-mark">ZT</div>
+          <div class="brand-mark">SV</div>
           <div>
-            <p class="brand-name">Zero Trust Security Tool</p>
-            <p class="brand-subtitle">Identity-aware access for every user session</p>
+            <p class="brand-name">SecureVault Zero Trust</p>
+            <p class="brand-subtitle">Continuous verification for identities, devices, and sessions</p>
           </div>
         </div>
-        <div class="topbar-pill">Live Demo Environment</div>
+        <div class="topbar-actions">
+          <a class="topbar-link" href="#operations">SOC View</a>
+          <a class="topbar-link" href="#architecture">Architecture</a>
+          <div class="topbar-pill">Live Threat Simulation</div>
+        </div>
       </header>
 
       <section class="hero">
         <div class="hero-copy-block">
-          <p class="eyebrow">Adaptive Verification</p>
-          <h1>Professional zero-trust access control for admins, employees, and guests</h1>
+          <p class="eyebrow">Never Trust. Always Verify.</p>
+          <h1>Secure data access with a Zero Trust control plane that feels like a real security product</h1>
           <p class="hero-copy">
-            Secure every sign-in with role-aware isolation, OTP verification, and session-based access checks designed to
-            feel like a modern internal security console.
+            SecureVault combines adaptive OTP verification, least-privilege role access, device-aware trust scoring,
+            admin monitoring, and attack simulation into a polished Zero Trust demo you can present with confidence.
           </p>
 
           <div class="hero-actions">
             <a class="hero-link" href="#login-form">Start Secure Login</a>
-            <span class="hero-hint">Fresh OTP issued on login and regeneration</span>
+            <a class="hero-link secondary-link" href="#simulator">Launch Attack Simulation</a>
           </div>
 
           <div class="hero-metrics">
             <article class="metric-card">
-              <span class="metric-label">Access Zones</span>
-              <strong>3</strong>
-              <p>Admin, employee, and guest environments remain separated.</p>
-            </article>
-            <article class="metric-card">
               <span class="metric-label">Verification</span>
-              <strong>OTP</strong>
-              <p>Every login starts with a newly generated one-time passcode.</p>
+              <strong>OTP + Context</strong>
+              <p>Every session is re-evaluated using role, device, and browser signals.</p>
             </article>
             <article class="metric-card">
-              <span class="metric-label">Security Model</span>
-              <strong>Zero Trust</strong>
-              <p>Access is granted only after identity and session verification.</p>
+              <span class="metric-label">Access Model</span>
+              <strong>Least Privilege</strong>
+              <p>Admin, employee, and guest zones stay isolated by role and policy intent.</p>
             </article>
             <article class="metric-card">
-              <span class="metric-label">Context Signals</span>
-              <strong>IP + Device</strong>
-              <p>Policy decisions now use IP, device profile, browser, and network zone.</p>
+              <span class="metric-label">Operations</span>
+              <strong>SOC Dashboard</strong>
+              <p>Monitor login attempts, suspicious events, policy decisions, and trust posture.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Simulation</span>
+              <strong>Attack Lab</strong>
+              <p>Trigger brute-force, token theft, and unusual-location scenarios for demos.</p>
             </article>
           </div>
         </div>
 
         <aside class="hero-aside">
+          <div class="aside-panel trust-panel hero-health">
+            <div class="panel-heading">
+              <p class="eyebrow muted">Live Posture</p>
+              <h2>Security Health Console</h2>
+            </div>
+            <div class="posture-score">
+              <span>Security Score</span>
+              <strong id="security-posture-score">92</strong>
+            </div>
+            <div class="health-bars">
+              <div class="health-row">
+                <span>Identity Assurance</span>
+                <div class="bar"><div id="identity-bar" class="bar-fill"></div></div>
+              </div>
+              <div class="health-row">
+                <span>Session Monitoring</span>
+                <div class="bar"><div id="monitoring-bar" class="bar-fill warning"></div></div>
+              </div>
+              <div class="health-row">
+                <span>Attack Resistance</span>
+                <div class="bar"><div id="resistance-bar" class="bar-fill danger"></div></div>
+              </div>
+            </div>
+          </div>
+
           <div class="aside-panel credential-panel">
             <div class="panel-heading">
               <p class="eyebrow muted">Demo Identities</p>
@@ -82,7 +112,7 @@
             </div>
           </div>
 
-          <div class="aside-panel trust-panel">
+          <div class="aside-panel status-panel">
             <div class="trust-grid">
               <div>
                 <span class="trust-label">OTP Status</span>
@@ -102,6 +132,72 @@
       </section>
 
       <main class="workspace">
+        <section id="operations" class="panel operations-panel">
+          <div class="section-header">
+            <div class="section-title">
+              <p class="eyebrow muted">SOC Dashboard</p>
+              <h2>Operational security view</h2>
+            </div>
+            <div class="panel-chip">Continuous verification enabled</div>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="kpi-card">
+              <span class="metric-label">Active Sessions</span>
+              <strong id="kpi-active-sessions">0</strong>
+              <p>Current verified identities in this demo environment.</p>
+            </article>
+            <article class="kpi-card">
+              <span class="metric-label">Suspicious Events</span>
+              <strong id="kpi-suspicious-events">0</strong>
+              <p>Behavior or attack simulations that require analyst review.</p>
+            </article>
+            <article class="kpi-card">
+              <span class="metric-label">Blocked Actions</span>
+              <strong id="kpi-blocked-actions">0</strong>
+              <p>Denied operations triggered by Zero Trust controls.</p>
+            </article>
+            <article class="kpi-card">
+              <span class="metric-label">Risk Level</span>
+              <strong id="kpi-risk-level">Low</strong>
+              <p>Dynamic environment severity based on active incidents.</p>
+            </article>
+          </div>
+
+          <div class="operations-grid">
+            <article class="telemetry-card terminal-card">
+              <div class="terminal-header">
+                <span></span><span></span><span></span>
+              </div>
+              <h3>Live Alert Feed</h3>
+              <div id="alert-feed" class="alert-feed">
+                <div class="alert-item info">
+                  <span class="alert-status"></span>
+                  <div>
+                    <strong>System ready</strong>
+                    <p>No incidents yet. Use the attack simulator below or sign in to generate activity.</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article id="simulator" class="telemetry-card">
+              <h3>Attack Simulation Lab</h3>
+              <p class="card-copy">
+                Demonstrate how the platform reacts to common Zero Trust scenarios such as brute force, token theft, and
+                unusual session context.
+              </p>
+              <div class="sim-actions">
+                <button id="simulate-bruteforce" type="button">Simulate Brute Force</button>
+                <button id="simulate-token-theft" type="button">Simulate Token Theft</button>
+                <button id="simulate-location" type="button">Simulate Unknown Location</button>
+                <button id="clear-incidents" class="secondary" type="button">Clear Simulations</button>
+              </div>
+              <div id="sim-message" class="message"></div>
+            </article>
+          </div>
+        </section>
+
         <section class="panel workflow-panel">
           <div class="section-title">
             <p class="eyebrow muted">Access Workflow</p>
@@ -205,23 +301,106 @@
             <article id="admin-section" class="role-card hidden role-admin">
               <div class="role-icon">A</div>
               <h3>Admin Section</h3>
-              <p>Reserved for high-trust management and security decisions.</p>
+              <p>Reserved for high-trust management, approvals, and live policy decisions.</p>
               <ul id="admin-list"></ul>
             </article>
 
             <article id="employee-section" class="role-card hidden role-employee">
               <div class="role-icon">E</div>
               <h3>Employee Section</h3>
-              <p>Provides verified staff members with internal operational access.</p>
+              <p>Provides verified staff members with least-privilege internal access.</p>
               <ul id="employee-list"></ul>
             </article>
 
             <article id="guest-section" class="role-card hidden role-guest">
               <div class="role-icon">G</div>
               <h3>Guest Section</h3>
-              <p>Delivers isolated, limited access for visitors and temporary users.</p>
+              <p>Delivers isolated, temporary access with stronger restrictions and monitoring.</p>
               <ul id="guest-list"></ul>
             </article>
+          </div>
+        </section>
+
+        <section id="architecture" class="panel architecture-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Zero Trust Architecture</p>
+            <h2>Policy flow and enforcement logic</h2>
+          </div>
+
+          <div class="architecture-grid">
+            <article class="arch-node">
+              <span class="arch-label">Client</span>
+              <h3>User + Device</h3>
+              <p>Identity begins with credentials, OTP verification, and browser or device context.</p>
+            </article>
+            <article class="arch-node">
+              <span class="arch-label">PEP</span>
+              <h3>Policy Enforcement Point</h3>
+              <p>Every access request is checked before users reach protected application surfaces.</p>
+            </article>
+            <article class="arch-node">
+              <span class="arch-label">PDP</span>
+              <h3>Policy Decision Point</h3>
+              <p>Trust score, role, device posture, and simulation alerts determine the decision.</p>
+            </article>
+            <article class="arch-node">
+              <span class="arch-label">Resource</span>
+              <h3>Protected Resource</h3>
+              <p>Admin, employee, and guest areas receive different visibility according to policy.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel model-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Threat Model</p>
+            <h2>Assume breach and limit lateral movement</h2>
+          </div>
+
+          <div class="threat-grid">
+            <article class="threat-card">
+              <h3>Primary Assets</h3>
+              <p>Identity records, privileged access paths, audit history, and protected internal resources.</p>
+            </article>
+            <article class="threat-card">
+              <h3>Likely Attackers</h3>
+              <p>Credential thieves, malicious insiders, bots attempting brute force, and session hijackers.</p>
+            </article>
+            <article class="threat-card">
+              <h3>Entry Points</h3>
+              <p>Login forms, OTP workflow, role elevation requests, and browser session reuse.</p>
+            </article>
+            <article class="threat-card">
+              <h3>Control Strategy</h3>
+              <p>Continuous verification, least privilege, monitoring, event logging, and step-up responses.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel disclaimer-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Demo Scope</p>
+            <h2>What this demo proves and what should come next</h2>
+          </div>
+          <div class="disclaimer-grid">
+            <div>
+              <h3>Implemented here</h3>
+              <ul class="insight-list">
+                <li>Role-based access separation</li>
+                <li>OTP-based step-up verification</li>
+                <li>Device and browser trust scoring</li>
+                <li>Admin monitoring and attack simulation</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Next production upgrades</h3>
+              <ul class="insight-list">
+                <li>Server-side token validation and session storage</li>
+                <li>OAuth or SSO with MFA</li>
+                <li>Real audit logs, rate limiting, and anomaly detection</li>
+                <li>Database-backed RBAC or ABAC policy engine</li>
+              </ul>
+            </div>
           </div>
         </section>
       </main>

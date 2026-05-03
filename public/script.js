@@ -1,12 +1,18 @@
-const STORAGE_KEY = "zero-trust-security-tool-demo";
+const STORAGE_KEY = "securevault-zero-trust-demo";
 
 const loginForm = document.getElementById("login-form");
 const otpForm = document.getElementById("otp-form");
 const logoutBtn = document.getElementById("logout-btn");
 const regenerateBtn = document.getElementById("regenerate-btn");
 
+const simulateBruteforceBtn = document.getElementById("simulate-bruteforce");
+const simulateTokenTheftBtn = document.getElementById("simulate-token-theft");
+const simulateLocationBtn = document.getElementById("simulate-location");
+const clearIncidentsBtn = document.getElementById("clear-incidents");
+
 const loginMessage = document.getElementById("login-message");
 const otpMessage = document.getElementById("otp-message");
+const simMessage = document.getElementById("sim-message");
 const otpValue = document.getElementById("otp-value");
 const otpDisplayValue = document.getElementById("otp-display-value");
 const sessionStatus = document.getElementById("session-status");
@@ -24,6 +30,15 @@ const otpUsage = document.getElementById("otp-usage");
 const trustReasons = document.getElementById("trust-reasons");
 const adminMonitor = document.getElementById("admin-monitor");
 const adminActivityList = document.getElementById("admin-activity-list");
+const alertFeed = document.getElementById("alert-feed");
+const securityPostureScore = document.getElementById("security-posture-score");
+const identityBar = document.getElementById("identity-bar");
+const monitoringBar = document.getElementById("monitoring-bar");
+const resistanceBar = document.getElementById("resistance-bar");
+const kpiActiveSessions = document.getElementById("kpi-active-sessions");
+const kpiSuspiciousEvents = document.getElementById("kpi-suspicious-events");
+const kpiBlockedActions = document.getElementById("kpi-blocked-actions");
+const kpiRiskLevel = document.getElementById("kpi-risk-level");
 
 const sections = {
   admin: document.getElementById("admin-section"),
@@ -60,36 +75,44 @@ const users = {
 
 const roleContent = {
   admin: {
-    title: "Admin Control Center",
     items: [
-      "Approve or block sensitive access requests",
-      "Review live OTP issuance metrics",
-      "Audit role-based policy decisions"
+      "Approve or block high-risk access requests",
+      "Review live OTP issuance metrics and attack activity",
+      "Monitor guest and employee sessions with policy visibility",
+      "Enforce least-privilege decisions across all roles"
     ]
   },
   employee: {
-    title: "Employee Workspace",
     items: [
-      "View assigned internal resources",
-      "Confirm device trust before access",
-      "Request temporary elevated permissions"
+      "Access internal tools only after continuous verification",
+      "Confirm device trust before opening sensitive resources",
+      "Request temporary elevation under monitored conditions",
+      "Stay restricted from administrative control surfaces"
     ]
   },
   guest: {
-    title: "Guest Access Portal",
     items: [
-      "Use time-limited visitor access",
-      "Enter shared meeting resources only",
-      "Stay isolated from internal admin systems"
+      "Use time-limited isolated access with minimal privileges",
+      "Enter approved shared resources only",
+      "Trigger stronger monitoring on suspicious behavior",
+      "Remain blocked from internal administrative systems"
     ]
   }
 };
 
+function defaultState() {
+  return {
+    session: null,
+    events: [],
+    incidents: []
+  };
+}
+
 function readState() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { session: null, events: [] };
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState();
   } catch {
-    return { session: null, events: [] };
+    return defaultState();
   }
 }
 
@@ -178,9 +201,9 @@ function buildTrustContext(user) {
 
   let score = 58;
   const reasons = [
-    "Running as a client-side live demo hosted on Vercel",
-    "Browser fingerprint gathered from the active device",
-    "Public web session requires ongoing trust evaluation"
+    "Continuous verification checks role, device, and browser context",
+    "Assume-breach posture limits access based on session risk",
+    "Public web session is treated as untrusted until proven otherwise"
   ];
 
   if (device === "Desktop") {
@@ -198,7 +221,7 @@ function buildTrustContext(user) {
     reasons.push("Employee role matches standard internal access policy");
   } else {
     score -= 8;
-    reasons.push("Guest role remains restricted by zero-trust policy");
+    reasons.push("Guest role remains restricted by Zero Trust policy");
   }
 
   score = Math.max(0, Math.min(100, score));
@@ -214,7 +237,7 @@ function buildTrustContext(user) {
   }
 
   return {
-    ipAddress: "Client-side demo",
+    ipAddress: "Browser-side live demo",
     userAgent,
     deviceType: device,
     browser,
@@ -236,7 +259,7 @@ function buildSession(user, previousSession) {
     role: user.role,
     otpVerified: false,
     otp: generateOtp(previousSession ? previousSession.otp : null),
-    createdAt: previousSession ? previousSession.createdAt : timestamp,
+    createdAt: timestamp,
     lastSeenAt: timestamp,
     otpIssuedAt: timestamp,
     otpUsageCount: previousSession ? previousSession.otpUsageCount + 1 : 1,
@@ -244,7 +267,7 @@ function buildSession(user, previousSession) {
   };
 }
 
-function recordEvent(state, session, eventType) {
+function recordEvent(state, session, eventType, extra = {}) {
   state.events.unshift({
     timestamp: nowIso(),
     eventType,
@@ -255,9 +278,23 @@ function recordEvent(state, session, eventType) {
     deviceType: session.trust.deviceType,
     browser: session.trust.browser,
     trustStatus: session.trust.status,
-    trustScore: session.trust.score
+    trustScore: session.trust.score,
+    ...extra
   });
-  state.events = state.events.slice(0, 50);
+  state.events = state.events.slice(0, 60);
+}
+
+function recordIncident(state, incident) {
+  state.incidents.unshift({
+    id: `${incident.type}-${Date.now()}`,
+    timestamp: nowIso(),
+    severity: incident.severity,
+    type: incident.type,
+    title: incident.title,
+    description: incident.description,
+    blocked: incident.blocked
+  });
+  state.incidents = state.incidents.slice(0, 20);
 }
 
 function resetTelemetry() {
@@ -372,9 +409,76 @@ function renderAdminActivity(events) {
   adminMonitor.classList.remove("hidden");
 }
 
+function renderAlertFeed(state) {
+  const feedItems = [];
+
+  state.incidents.forEach((incident) => {
+    feedItems.push({
+      severity: incident.severity,
+      title: incident.title,
+      description: `${incident.description} • ${formatTimestamp(incident.timestamp)}`
+    });
+  });
+
+  if (state.session) {
+    feedItems.push({
+      severity: "info",
+      title: `${state.session.name} session ${state.session.otpVerified ? "verified" : "awaiting OTP"}`,
+      description: `${state.session.role} access evaluated with trust status ${state.session.trust.status}.`
+    });
+  }
+
+  if (!feedItems.length) {
+    feedItems.push({
+      severity: "info",
+      title: "System ready",
+      description: "No incidents yet. Use the attack simulator below or sign in to generate activity."
+    });
+  }
+
+  alertFeed.innerHTML = "";
+  feedItems.slice(0, 6).forEach((item) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = `alert-item ${item.severity}`;
+    wrapper.innerHTML = `
+      <span class="alert-status"></span>
+      <div>
+        <strong>${item.title}</strong>
+        <p>${item.description}</p>
+      </div>
+    `;
+    alertFeed.appendChild(wrapper);
+  });
+}
+
+function renderKpis(state) {
+  const activeSessions = state.session && state.session.otpVerified ? 1 : 0;
+  const suspiciousEvents = state.incidents.length;
+  const blockedActions = state.incidents.filter((incident) => incident.blocked).length;
+  const riskLevel = suspiciousEvents >= 3 ? "Critical" : suspiciousEvents >= 2 ? "High" : suspiciousEvents >= 1 ? "Elevated" : "Low";
+
+  kpiActiveSessions.textContent = String(activeSessions);
+  kpiSuspiciousEvents.textContent = String(suspiciousEvents);
+  kpiBlockedActions.textContent = String(blockedActions);
+  kpiRiskLevel.textContent = riskLevel;
+
+  let posture = 92;
+  posture -= suspiciousEvents * 9;
+  posture -= blockedActions * 4;
+  posture = Math.max(42, posture);
+
+  securityPostureScore.textContent = String(posture);
+  identityBar.style.width = `${Math.max(40, posture)}%`;
+  monitoringBar.style.width = `${Math.max(35, 84 - suspiciousEvents * 9)}%`;
+  resistanceBar.style.width = `${Math.max(30, 78 - blockedActions * 8)}%`;
+}
+
 function renderSession() {
   const state = readState();
   const session = state.session;
+
+  renderAlertFeed(state);
+  renderKpis(state);
 
   if (!session) {
     otpValue.textContent = "Not generated yet";
@@ -405,6 +509,36 @@ function renderSession() {
   } else {
     resetAdminMonitor();
   }
+}
+
+function runSimulation(type) {
+  const state = readState();
+  const definitions = {
+    bruteForce: {
+      severity: "danger",
+      title: "Brute-force campaign detected",
+      description: "Multiple failed credential attempts triggered a rate-limit response and forced step-up verification.",
+      blocked: true
+    },
+    tokenTheft: {
+      severity: "danger",
+      title: "Potential token theft blocked",
+      description: "Session replay attempt was denied after policy mismatch between identity and device context.",
+      blocked: true
+    },
+    unknownLocation: {
+      severity: "warning",
+      title: "Unknown location triggered re-authentication",
+      description: "Policy engine downgraded trust and required additional verification for anomalous context.",
+      blocked: false
+    }
+  };
+
+  const incident = definitions[type];
+  recordIncident(state, { type, ...incident });
+  writeState(state);
+  simMessage.textContent = incident.title;
+  renderSession();
 }
 
 loginForm.addEventListener("submit", (event) => {
@@ -489,6 +623,26 @@ logoutBtn.addEventListener("click", () => {
   writeState(state);
   loginMessage.textContent = "";
   otpMessage.textContent = "";
+  renderSession();
+});
+
+simulateBruteforceBtn.addEventListener("click", () => {
+  runSimulation("bruteForce");
+});
+
+simulateTokenTheftBtn.addEventListener("click", () => {
+  runSimulation("tokenTheft");
+});
+
+simulateLocationBtn.addEventListener("click", () => {
+  runSimulation("unknownLocation");
+});
+
+clearIncidentsBtn.addEventListener("click", () => {
+  const state = readState();
+  state.incidents = [];
+  writeState(state);
+  simMessage.textContent = "Attack simulations cleared.";
   renderSession();
 });
 
