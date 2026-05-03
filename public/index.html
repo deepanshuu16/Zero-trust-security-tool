@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div id="cursor-glow" class="cursor-glow"></div>
     <div class="background-orb orb-left"></div>
     <div class="background-orb orb-right"></div>
     <div class="background-grid"></div>
@@ -29,7 +30,7 @@
 
       <section class="hero">
         <div class="hero-copy-block">
-          <p class="eyebrow">Never Trust. Always Verify.</p>
+          <p class="eyebrow">Black Ops Zero Trust</p>
           <h1>Secure data access with a Zero Trust control plane that feels like a real security product</h1>
           <p class="hero-copy">
             SecureVault combines adaptive OTP verification, least-privilege role access, device-aware trust scoring,
@@ -39,6 +40,15 @@
           <div class="hero-actions">
             <a class="hero-link" href="#login-form">Start Secure Login</a>
             <a class="hero-link secondary-link" href="#simulator">Launch Attack Simulation</a>
+          </div>
+
+          <div class="hero-trust-row">
+            <div class="live-pill">
+              <span class="live-dot"></span>
+              Threat telemetry streaming
+            </div>
+            <div class="live-pill alt-pill">Terminal-grade policy engine</div>
+            <div class="live-pill alt-pill">Continuous trust scoring</div>
           </div>
 
           <div class="hero-metrics">
@@ -66,6 +76,51 @@
         </div>
 
         <aside class="hero-aside">
+          <div class="hero-visual-panel">
+            <div class="floating-icon icon-lock">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 10V8a5 5 0 0 1 10 0v2" />
+                <rect x="5" y="10" width="14" height="10" rx="2" />
+                <circle cx="12" cy="15" r="1.5" />
+              </svg>
+            </div>
+            <div class="floating-icon icon-shield">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" />
+              </svg>
+            </div>
+            <div class="floating-icon icon-user">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5 19a7 7 0 0 1 14 0" />
+              </svg>
+            </div>
+            <div class="visual-screen">
+              <div class="visual-header">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="visual-grid">
+                <div class="visual-card">
+                  <span>Threat Score</span>
+                  <strong>14%</strong>
+                </div>
+                <div class="visual-card">
+                  <span>Secure Sessions</span>
+                  <strong>98</strong>
+                </div>
+                <div class="visual-graph">
+                  <div class="graph-line graph-line-one"></div>
+                  <div class="graph-line graph-line-two"></div>
+                </div>
+                <div class="visual-list">
+                  <div><span></span><p>Policy match confirmed</p></div>
+                  <div><span></span><p>OTP re-check completed</p></div>
+                  <div><span></span><p>Guest scope isolated</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="aside-panel trust-panel hero-health">
             <div class="panel-heading">
               <p class="eyebrow muted">Live Posture</p>
@@ -132,6 +187,49 @@
       </section>
 
       <main class="workspace">
+        <section class="panel feature-highlight-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Why It Pops</p>
+            <h2>Premium visuals with cybersecurity storytelling</h2>
+          </div>
+          <div class="feature-highlight-grid">
+            <article class="feature-highlight-card">
+              <div class="feature-icon-wrap cyan">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 6h16v12H4z" />
+                  <path d="M8 10h8M8 14h5" />
+                </svg>
+              </div>
+              <div>
+                <h3>Visual hierarchy</h3>
+              <p>High-contrast panels, glow accents, and terminal framing make the interface hit harder immediately.</p>
+              </div>
+            </article>
+            <article class="feature-highlight-card">
+              <div class="feature-icon-wrap purple">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" />
+                </svg>
+              </div>
+              <div>
+                <h3>Security feel</h3>
+              <p>Shields, locks, monitoring bars, and alert cards make the site feel like a live red-team aware SOC console.</p>
+              </div>
+            </article>
+            <article class="feature-highlight-card">
+              <div class="feature-icon-wrap green">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12h5l2-5 3 10 2-5h2" />
+                </svg>
+              </div>
+              <div>
+                <h3>Smooth motion</h3>
+              <p>Floating icon drift, scan-line glow, animated graphs, and cursor aura keep the interface alive.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section id="operations" class="panel operations-panel">
           <div class="section-header">
             <div class="section-title">
@@ -195,6 +293,55 @@
               </div>
               <div id="sim-message" class="message"></div>
             </article>
+          </div>
+        </section>
+
+        <section class="panel preview-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Dashboard Preview</p>
+            <h2>Layered visuals for a more impressive product demo</h2>
+          </div>
+          <div class="preview-grid">
+            <article class="preview-copy">
+              <p>
+                The interface now combines a premium SaaS landing page with a cybersecurity operations center look. Each
+                block uses stronger contrast, richer glow, and more cinematic layering to avoid the flat student-project
+                feel.
+              </p>
+              <ul class="insight-list">
+                <li>Animated status pills and floating trust icons</li>
+                <li>Gradient cards with dashboard-style micro charts</li>
+                <li>Alert-driven color language for risk and response</li>
+                <li>Responsive sections that still feel premium on mobile</li>
+              </ul>
+            </article>
+            <div class="preview-mockup">
+              <div class="mockup-sidebar">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="mockup-main">
+                <div class="mockup-top">
+                  <div class="mockup-chip bright"></div>
+                  <div class="mockup-chip"></div>
+                  <div class="mockup-chip"></div>
+                </div>
+                <div class="mockup-row">
+                  <div class="mockup-box tall"></div>
+                  <div class="mockup-box"></div>
+                  <div class="mockup-box"></div>
+                </div>
+                <div class="mockup-chart">
+                  <div class="mock-bar"></div>
+                  <div class="mock-bar short"></div>
+                  <div class="mock-bar tall"></div>
+                  <div class="mock-bar mid"></div>
+                  <div class="mock-bar short"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -403,7 +550,49 @@
             </div>
           </div>
         </section>
+
+        <section class="panel testimonials-panel">
+          <div class="section-title">
+            <p class="eyebrow muted">Presentation Impact</p>
+            <h2>What this style communicates instantly</h2>
+          </div>
+          <div class="testimonial-grid">
+            <article class="testimonial-card">
+              <p>
+                “This looks like a modern cybersecurity SaaS product instead of a plain demo. The alerting and trust
+                visuals make the idea easy to understand fast.”
+              </p>
+              <strong>Design Review</strong>
+            </article>
+            <article class="testimonial-card">
+              <p>
+                “The attack simulation buttons and Zero Trust architecture view give you strong talking points during a
+                viva or project presentation.”
+              </p>
+              <strong>Project Feedback</strong>
+            </article>
+            <article class="testimonial-card">
+              <p>
+                “The stronger gradients, floating icons, and dashboard depth add the wow factor people expect from a
+                security product demo.”
+              </p>
+              <strong>Demo Impression</strong>
+            </article>
+          </div>
+        </section>
       </main>
+
+      <footer class="site-footer">
+        <div>
+          <p class="eyebrow muted">SecureVault</p>
+          <h2>Zero Trust, reimagined as a sharper live demo</h2>
+        </div>
+        <div class="footer-links">
+          <a href="#operations">Operations</a>
+          <a href="#simulator">Simulation</a>
+          <a href="#architecture">Architecture</a>
+        </div>
+      </footer>
     </div>
 
     <script src="/script.js"></script>

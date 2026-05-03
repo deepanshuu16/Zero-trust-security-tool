@@ -39,6 +39,7 @@ const kpiActiveSessions = document.getElementById("kpi-active-sessions");
 const kpiSuspiciousEvents = document.getElementById("kpi-suspicious-events");
 const kpiBlockedActions = document.getElementById("kpi-blocked-actions");
 const kpiRiskLevel = document.getElementById("kpi-risk-level");
+const cursorGlow = document.getElementById("cursor-glow");
 
 const sections = {
   admin: document.getElementById("admin-section"),
@@ -644,6 +645,22 @@ clearIncidentsBtn.addEventListener("click", () => {
   writeState(state);
   simMessage.textContent = "Attack simulations cleared.";
   renderSession();
+});
+
+window.addEventListener("mousemove", (event) => {
+  if (!cursorGlow) {
+    return;
+  }
+
+  cursorGlow.style.opacity = "1";
+  cursorGlow.style.left = `${event.clientX}px`;
+  cursorGlow.style.top = `${event.clientY}px`;
+});
+
+window.addEventListener("mouseleave", () => {
+  if (cursorGlow) {
+    cursorGlow.style.opacity = "0";
+  }
 });
 
 window.addEventListener("storage", () => {
