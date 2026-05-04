@@ -13,6 +13,7 @@
     <div class="background-grid"></div>
 
     <div class="page-shell">
+      <div id="public-view">
       <header class="topbar">
         <div class="brand">
           <div class="brand-mark">SV</div>
@@ -593,6 +594,196 @@
           <a href="#architecture">Architecture</a>
         </div>
       </footer>
+      </div>
+
+      <section id="app-view" class="app-view hidden">
+        <div class="app-shell">
+          <aside class="app-sidebar">
+            <div class="app-sidebar-brand">
+              <div class="brand-mark">SV</div>
+              <div>
+                <p class="brand-name">SecureVault Workspace</p>
+                <p class="brand-subtitle">Private employee environment</p>
+              </div>
+            </div>
+
+            <div class="app-sidebar-menu">
+              <div class="app-nav-card active">
+                <span>01</span>
+                <div>
+                  <strong>Control Deck</strong>
+                  <p>Overview, trust posture, and secure actions.</p>
+                </div>
+              </div>
+              <div class="app-nav-card">
+                <span>02</span>
+                <div>
+                  <strong>Secret Vault</strong>
+                  <p>Set your private key and unlock sensitive storage.</p>
+                </div>
+              </div>
+              <div class="app-nav-card">
+                <span>03</span>
+                <div>
+                  <strong>Document Hub</strong>
+                  <p>Upload work files into your protected employee space.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-sidebar-status">
+              <p class="eyebrow muted">Workspace Status</p>
+              <strong id="workspace-status-label">Awaiting access</strong>
+              <p>Verified users move into a separate private interface with stronger visuals and focused tools.</p>
+            </div>
+          </aside>
+
+          <div class="app-main">
+            <header class="app-topbar">
+              <div>
+                <p class="eyebrow">Authenticated View</p>
+                <h1 id="workspace-heading">Welcome to your secure workspace</h1>
+                <p id="workspace-subheading" class="hero-copy">
+                  Your role-aware workspace appears here after OTP verification.
+                </p>
+              </div>
+              <button id="workspace-logout-btn" class="secondary" type="button">Exit Workspace</button>
+            </header>
+
+            <div class="workspace-hero-panel">
+              <div class="workspace-hero-copy">
+                <div class="hero-badge-row">
+                  <div class="live-pill">
+                    <span class="live-dot"></span>
+                    Private session active
+                  </div>
+                  <div id="workspace-role-chip" class="live-pill alt-pill">Employee mode</div>
+                </div>
+                <h2>3D-style secure employee deck with private storage and work uploads</h2>
+                <p>
+                  This post-login area is intentionally different from the public page. It is more focused, more immersive,
+                  and built for actual task flow instead of presentation-only browsing.
+                </p>
+              </div>
+
+              <div class="workspace-3d-stack">
+                <div class="tilt-card card-layer-one">
+                  <span>Trust Score</span>
+                  <strong id="workspace-trust-score">0</strong>
+                </div>
+                <div class="tilt-card card-layer-two">
+                  <span>Vault State</span>
+                  <strong id="workspace-vault-state">Locked</strong>
+                </div>
+                <div class="tilt-card card-layer-three">
+                  <span>Docs Stored</span>
+                  <strong id="workspace-doc-count">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="workspace-grid">
+              <article class="workspace-card vault-card">
+                <div class="workspace-card-header">
+                  <div>
+                    <p class="eyebrow muted">Secret Vault</p>
+                    <h3>Set a private key that only you know</h3>
+                  </div>
+                  <div id="vault-state-pill" class="state-pill locked">Locked</div>
+                </div>
+
+                <p class="card-copy">
+                  Create your personal vault key once, then use it to unlock secure storage before opening protected
+                  documents.
+                </p>
+
+                <div class="vault-grid">
+                  <label>
+                    Set New Vault Key
+                    <input id="vault-key-input" type="password" placeholder="Create your secret key" />
+                  </label>
+                  <button id="set-vault-key-btn" type="button">Save Vault Key</button>
+                </div>
+
+                <div class="vault-grid">
+                  <label>
+                    Unlock Vault
+                    <input id="vault-unlock-input" type="password" placeholder="Enter your saved key" />
+                  </label>
+                  <button id="unlock-vault-btn" class="secondary" type="button">Unlock Vault</button>
+                </div>
+
+                <p id="vault-message" class="message"></p>
+              </article>
+
+              <article class="workspace-card docs-card">
+                <div class="workspace-card-header">
+                  <div>
+                    <p class="eyebrow muted">Document Hub</p>
+                    <h3>Upload your employee work and files</h3>
+                  </div>
+                  <div class="state-pill neutral">Encrypted Demo Storage</div>
+                </div>
+
+                <p class="card-copy">
+                  Upload work documents into your employee space. In this demo, files stay in browser storage for the
+                  signed-in user.
+                </p>
+
+                <div class="upload-controls">
+                  <input id="document-upload-input" type="file" />
+                  <button id="upload-document-btn" type="button">Upload Document</button>
+                </div>
+
+                <p id="document-message" class="message"></p>
+                <div id="document-list" class="document-list">
+                  <div class="empty-docs">No uploaded documents yet.</div>
+                </div>
+              </article>
+            </div>
+
+            <div class="workspace-grid secondary-workspace-grid">
+              <article class="workspace-card employee-tools-card">
+                <div class="workspace-card-header">
+                  <div>
+                    <p class="eyebrow muted">Employee Tools</p>
+                    <h3>Focused work features after login</h3>
+                  </div>
+                </div>
+                <div class="employee-tools-grid">
+                  <div class="tool-tile">
+                    <strong>Private Notes</strong>
+                    <p>Keep personal employee-sensitive material separated from public browsing.</p>
+                  </div>
+                  <div class="tool-tile">
+                    <strong>Key-Gated Vault</strong>
+                    <p>Access stays blocked until your custom Secret Vault key is entered correctly.</p>
+                  </div>
+                  <div class="tool-tile">
+                    <strong>Role Workspace</strong>
+                    <p>The environment changes by role, trust, and secure session state after verification.</p>
+                  </div>
+                </div>
+              </article>
+
+              <article class="workspace-card session-card">
+                <div class="workspace-card-header">
+                  <div>
+                    <p class="eyebrow muted">Session Snapshot</p>
+                    <h3>Live secure workspace telemetry</h3>
+                  </div>
+                </div>
+                <div class="workspace-session-list">
+                  <div><span>User Role</span><strong id="workspace-role-label">Pending</strong></div>
+                  <div><span>Vault Access</span><strong id="workspace-vault-label">Pending</strong></div>
+                  <div><span>Stored Files</span><strong id="workspace-doc-label">0</strong></div>
+                  <div><span>Workspace Mode</span><strong>3D Secure Deck</strong></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script src="/script.js"></script>
