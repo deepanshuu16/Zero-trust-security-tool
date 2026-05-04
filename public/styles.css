@@ -1248,301 +1248,6 @@ input:focus {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.app-view {
-  margin-top: 18px;
-}
-
-.app-shell {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 22px;
-  min-height: 85vh;
-  perspective: 1800px;
-}
-
-.app-sidebar,
-.app-main {
-  border-radius: 30px;
-  border: 1px solid rgba(76, 255, 142, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-    rgba(2, 8, 5, 0.88);
-  box-shadow: var(--shadow);
-}
-
-.app-sidebar {
-  padding: 22px;
-  display: grid;
-  align-content: start;
-  gap: 24px;
-}
-
-.app-sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.app-sidebar-menu,
-.employee-tools-grid {
-  display: grid;
-  gap: 14px;
-}
-
-.app-nav-card,
-.tool-tile {
-  padding: 16px;
-  border-radius: 22px;
-  border: 1px solid rgba(76, 255, 142, 0.1);
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.app-nav-card {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 14px;
-  align-items: start;
-}
-
-.app-nav-card span {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: rgba(66, 255, 140, 0.1);
-  color: #b8ffcf;
-  font-weight: 800;
-}
-
-.app-nav-card.active {
-  box-shadow: 0 0 0 1px rgba(66, 255, 140, 0.08), 0 16px 36px rgba(0, 0, 0, 0.34);
-}
-
-.app-nav-card p,
-.app-sidebar-status p,
-.tool-tile p,
-.workspace-card p,
-.workspace-session-list span,
-.document-meta {
-  color: var(--muted);
-}
-
-.app-sidebar-status {
-  padding: 18px;
-  border-radius: 22px;
-  border: 1px solid rgba(76, 255, 142, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.app-sidebar-status strong {
-  display: block;
-  margin: 10px 0 8px;
-  font-size: 1.25rem;
-}
-
-.app-main {
-  padding: 24px;
-  display: grid;
-  gap: 22px;
-  align-content: start;
-}
-
-.app-topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 18px;
-}
-
-.workspace-hero-panel {
-  display: grid;
-  grid-template-columns: 1.2fr 0.9fr;
-  gap: 18px;
-  padding: 24px;
-  border-radius: 28px;
-  border: 1px solid rgba(76, 255, 142, 0.12);
-  background:
-    radial-gradient(circle at top right, rgba(66, 255, 140, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-    rgba(255, 255, 255, 0.025);
-}
-
-.workspace-hero-copy h2 {
-  font-size: clamp(1.8rem, 3vw, 2.9rem);
-  margin-bottom: 12px;
-}
-
-.hero-badge-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.workspace-3d-stack {
-  position: relative;
-  min-height: 260px;
-}
-
-.tilt-card {
-  position: absolute;
-  width: 210px;
-  min-height: 130px;
-  padding: 18px;
-  border-radius: 24px;
-  border: 1px solid rgba(76, 255, 142, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
-    rgba(5, 16, 10, 0.88);
-  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.46);
-  transform-style: preserve-3d;
-}
-
-.tilt-card strong {
-  display: block;
-  margin-top: 10px;
-  font-size: 2rem;
-}
-
-.card-layer-one {
-  top: 0;
-  left: 8%;
-  transform: rotateY(-12deg) rotateX(7deg);
-}
-
-.card-layer-two {
-  top: 58px;
-  left: 28%;
-  transform: rotateY(10deg) rotateX(-6deg);
-}
-
-.card-layer-three {
-  top: 126px;
-  left: 14%;
-  transform: rotateY(-7deg) rotateX(6deg);
-}
-
-.workspace-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.workspace-card {
-  padding: 22px;
-  border-radius: 26px;
-  border: 1px solid rgba(76, 255, 142, 0.12);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-    rgba(255, 255, 255, 0.025);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
-}
-
-.workspace-card-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: start;
-  margin-bottom: 14px;
-}
-
-.state-pill {
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.state-pill.locked {
-  background: rgba(255, 77, 109, 0.14);
-  color: #ffb8c5;
-}
-
-.state-pill.unlocked {
-  background: rgba(66, 255, 140, 0.14);
-  color: #bdffd1;
-}
-
-.state-pill.neutral {
-  background: rgba(247, 201, 72, 0.12);
-  color: #ffe7a4;
-}
-
-.vault-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: end;
-  margin-top: 14px;
-}
-
-.upload-controls {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: center;
-  margin-top: 16px;
-}
-
-.document-list {
-  display: grid;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.document-item {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(76, 255, 142, 0.1);
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.document-item strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.document-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.document-actions a {
-  color: #b8ffcf;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.empty-docs {
-  padding: 18px;
-  border-radius: 18px;
-  border: 1px dashed rgba(76, 255, 142, 0.16);
-  color: var(--muted);
-}
-
-.workspace-session-list {
-  display: grid;
-  gap: 12px;
-}
-
-.workspace-session-list div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(76, 255, 142, 0.08);
-}
-
-.workspace-session-list strong {
-  text-align: right;
-}
-
 .site-footer {
   display: flex;
   justify-content: space-between;
@@ -1641,10 +1346,7 @@ li + li {
   .disclaimer-grid,
   .feature-highlight-grid,
   .testimonial-grid,
-  .preview-grid,
-  .workspace-grid,
-  .workspace-hero-panel,
-  .app-shell {
+  .preview-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1654,10 +1356,6 @@ li + li {
 
   h1 {
     max-width: none;
-  }
-
-  .workspace-3d-stack {
-    min-height: 360px;
   }
 }
 
@@ -1675,10 +1373,7 @@ li + li {
   .credential-row,
   .posture-score,
   .topbar-actions,
-  .site-footer,
-  .app-topbar,
-  .workspace-card-header,
-  .workspace-session-list div {
+  .site-footer {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1702,19 +1397,5 @@ li + li {
 
   .preview-mockup {
     grid-template-columns: 1fr;
-  }
-
-  .vault-grid,
-  .upload-controls {
-    grid-template-columns: 1fr;
-  }
-
-  .tilt-card {
-    position: relative;
-    width: 100%;
-    left: 0;
-    top: 0;
-    transform: none;
-    margin-bottom: 14px;
   }
 }
