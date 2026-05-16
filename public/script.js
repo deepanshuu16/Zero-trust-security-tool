@@ -1,26 +1,32 @@
-const STORAGE_KEY = "secureu-ecosystem";
+const STORAGE_KEY = "secureu-zero-trust-platform";
 
 const users = {
-  admin: { username: "admin", password: "Admin@123", role: "admin", name: "Campus Admin" },
-  employee: { username: "employee", password: "Employee@123", role: "student", name: "Student Member" },
+  admin: { username: "admin", password: "Admin@123", role: "admin", name: "Platform Administrator" },
+  employee: { username: "employee", password: "Employee@123", role: "employee", name: "Operations Employee" },
+  analyst: { username: "analyst", password: "Analyst@123", role: "analyst", name: "Security Analyst" },
   guest: { username: "guest", password: "Guest@123", role: "guest", name: "Guest Visitor" }
 };
 
 const roleContent = {
   admin: [
-    "Monitor student usage patterns and suspicious activity signals",
-    "Review which security tools students use most often",
-    "Track awareness progress across shared demo accounts"
+    "Full access to identity, monitoring, settings, and platform controls",
+    "Can review users, devices, alerts, and audit logs across the platform",
+    "Can adjust verification policies and continuous monitoring rules"
   ],
-  student: [
-    "Scan risky links before opening them",
-    "Analyze password strength and improve account safety",
-    "Review scam messages and learn safer online habits"
+  employee: [
+    "Limited access to security tools, personal score, and recommendations",
+    "Can scan links, check passwords, review risk posture, and upload files",
+    "Cannot access organization-wide monitoring or full audit controls"
+  ],
+  analyst: [
+    "Monitoring-first access to threat feeds, live sessions, and audit logs",
+    "Can review suspicious behavior, device trust, and platform alerts",
+    "Cannot change platform-wide identity settings like a full admin"
   ],
   guest: [
-    "Access beginner-friendly safety checks and awareness content",
-    "Use the learning tools without platform monitoring controls",
-    "Explore simple digital safety guidance in a limited environment"
+    "Minimal access to awareness tools and limited guided protection flows",
+    "Can review basic checks and educational content only",
+    "Cannot access sensitive dashboards or organization-level telemetry"
   ]
 };
 
@@ -41,11 +47,22 @@ function defaultState() {
   return {
     session: null,
     events: [],
+    logs: [],
     challengeSolved: false,
+    failedAttempts: 0,
+    settings: {
+      emailOtp: true,
+      phoneOtp: false,
+      googleAuth: true,
+      biometric: false,
+      deviceFingerprinting: true,
+      continuousAuth: true
+    },
     toolHistory: {
       link: null,
       password: null,
-      scam: null
+      scam: null,
+      file: null
     }
   };
 }
@@ -56,8 +73,10 @@ function readState() {
     return {
       ...defaultState(),
       ...parsed,
+      settings: { ...defaultState().settings, ...(parsed?.settings || {}) },
       toolHistory: { ...defaultState().toolHistory, ...(parsed?.toolHistory || {}) },
-      events: Array.isArray(parsed?.events) ? parsed.events : []
+      events: Array.isArray(parsed?.events) ? parsed.events : [],
+      logs: Array.isArray(parsed?.logs) ? parsed.logs : []
     };
   } catch {
     return defaultState();
@@ -104,6 +123,20 @@ function summarizeDevice(agent) {
   return "Desktop";
 }
 
+function stableNumber(input) {
+  return Array.from(input).reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
+}
+
+function activeVerificationMethods(settings) {
+  const methods = ["Password"];
+  if (settings.emailOtp) methods.push("Email OTP");
+  if (settings.phoneOtp) methods.push("Phone OTP");
+  if (settings.googleAuth) methods.push("Google Auth");
+  if (settings.biometric) methods.push("Biometric");
+  if (settings.deviceFingerprinting) methods.push("Device Fingerprint");
+  return methods;
+}
+
 function generateOtp(previousOtp) {
   let otp = "";
   do {
@@ -112,62 +145,118 @@ function generateOtp(previousOtp) {
   return otp;
 }
 
-function buildTrustContext(role) {
+function analyzeRisk(role, state) {
   const userAgent = navigator.userAgent || "Unknown Agent";
   const browser = summarizeBrowser(userAgent);
   const os = summarizeOS(userAgent);
   const device = summarizeDevice(userAgent);
-  let score = 68;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown timezone";
+  const locale = navigator.language || "Unknown locale";
+  const fingerprint = `FP-${stableNumber(`${userAgent}-${timezone}-${locale}`).toString(16).slice(0, 8).toUpperCase()}`;
+  const signalSeed = stableNumber(`${role}-${timezone}-${locale}-${browser}-${device}`);
+
+  const vpnDetected = signalSeed % 5 === 0;
+  const suspiciousBrowserChange = signalSeed % 7 === 0;
+  const impossibleTravel = signalSeed % 11 === 0 && state.failedAttempts > 0;
+  const newDevice = signalSeed % 3 === 0;
+
+  let riskScore = 22;
   const reasons = [
-    "This demo uses role, device type, and browser context to estimate a simple trust score.",
-    "The platform keeps access limited until login and OTP verification are complete."
+    "The platform continuously evaluates user identity, device context, and session behavior."
   ];
 
   if (device === "Desktop") {
-    score += 8;
-    reasons.push("Desktop usage is treated as slightly lower risk for study and work tasks.");
+    riskScore += 4;
+    reasons.push("Desktop device profile is generally more stable for long work sessions.");
   } else {
-    score -= 4;
-    reasons.push("Mobile access is flexible, but it should be used carefully for sensitive tasks.");
+    riskScore += 12;
+    reasons.push("Mobile sessions are treated as slightly higher risk for sensitive actions.");
   }
 
   if (role === "admin") {
-    score -= 6;
-    reasons.push("Admin sessions need stronger monitoring because they can see more platform activity.");
-  } else if (role === "student") {
-    score += 4;
-    reasons.push("Student mode unlocks the full safety toolkit with limited platform risk.");
+    riskScore += 18;
+    reasons.push("Admin accounts require stricter monitoring because they hold wider access.");
+  } else if (role === "analyst") {
+    riskScore += 12;
+    reasons.push("Analyst sessions have elevated visibility into monitoring data.");
+  } else if (role === "guest") {
+    riskScore += 16;
+    reasons.push("Guest sessions stay restricted because identity assurance is weaker.");
   } else {
-    score -= 8;
-    reasons.push("Guest mode keeps access limited and guidance-focused.");
+    riskScore += 8;
+    reasons.push("Employee sessions receive standard policy checks with limited platform access.");
   }
 
-  let status = "Guided Access";
-  let decision = "Basic tools are available with monitoring and OTP protection.";
+  if (state.failedAttempts > 0) {
+    riskScore += Math.min(16, state.failedAttempts * 4);
+    reasons.push("Recent failed login attempts increase the session risk profile.");
+  }
 
-  if (score >= 78) {
-    status = "Trusted";
-    decision = "Full role access is available inside the platform.";
-  } else if (score < 62) {
-    status = "Restricted";
-    decision = "Use only limited features until trust improves.";
+  if (vpnDetected) {
+    riskScore += 10;
+    reasons.push("The session appears to be using a VPN-like network pattern, so extra checks are recommended.");
+  }
+
+  if (suspiciousBrowserChange) {
+    riskScore += 12;
+    reasons.push("The browser fingerprint looks inconsistent with the baseline pattern.");
+  }
+
+  if (impossibleTravel) {
+    riskScore += 18;
+    reasons.push("The platform detected an impossible-travel style scenario in the simulated policy engine.");
+  }
+
+  if (newDevice) {
+    riskScore += 8;
+    reasons.push("This device appears new to the session history and needs trust validation.");
+  }
+
+  let riskLevel = "Low";
+  if (riskScore >= 70) riskLevel = "High";
+  else if (riskScore >= 45) riskLevel = "Medium";
+
+  let threatLevel = "Guarded";
+  if (riskLevel === "High") threatLevel = "Critical";
+  else if (riskLevel === "Medium") threatLevel = "Elevated";
+
+  let deviceTrust = "Trusted";
+  if (riskLevel === "High") deviceTrust = "Dangerous";
+  else if (riskLevel === "Medium" || newDevice) deviceTrust = "Unknown";
+
+  let decision = "Access granted with active monitoring.";
+  if (riskLevel === "High") {
+    decision = "High-risk session. Force stronger verification and limit access surfaces.";
+  } else if (riskLevel === "Medium") {
+    decision = "Medium-risk session. Keep access monitored and require step-up verification for risky actions.";
   }
 
   return {
-    score: Math.max(0, Math.min(100, score)),
-    status,
-    decision,
     browser,
     os,
     device,
-    networkZone: "Public Web Session",
-    ipAddress: "Browser-side demo context",
+    timezone,
+    locale,
+    fingerprint,
+    vpnDetected,
+    suspiciousBrowserChange,
+    impossibleTravel,
+    newDevice,
+    riskScore,
+    riskLevel,
+    threatLevel,
+    deviceTrust,
+    decision,
     reasons
   };
 }
 
-function buildSession(user, previousSession) {
+function buildSession(user, previousSession, state) {
   const createdAt = nowIso();
+  const risk = analyzeRisk(user.role, state);
+  const methods = activeVerificationMethods(state.settings);
+  const trustScore = Math.max(0, 100 - risk.riskScore + (methods.length - 1) * 2);
+
   return {
     username: user.username,
     name: user.name,
@@ -177,14 +266,37 @@ function buildSession(user, previousSession) {
     createdAt,
     lastSeenAt: createdAt,
     otpUsageCount: previousSession ? previousSession.otpUsageCount + 1 : 1,
-    trust: buildTrustContext(user.role)
+    nextReviewAt: new Date(Date.now() + 3 * 60 * 1000).toISOString(),
+    trust: {
+      score: Math.max(0, Math.min(100, trustScore)),
+      status: risk.riskLevel === "High" ? "Restricted" : risk.riskLevel === "Medium" ? "Elevated Review" : "Trusted",
+      decision: risk.decision,
+      browser: risk.browser,
+      os: risk.os,
+      device: risk.device,
+      networkZone: "Public Web Session",
+      ipAddress: "Browser-side demo context",
+      deviceFingerprint: risk.fingerprint,
+      deviceTrust: risk.deviceTrust,
+      riskLevel: risk.riskLevel,
+      threatLevel: risk.threatLevel,
+      verificationMethods: methods,
+      vpnDetected: risk.vpnDetected,
+      suspiciousBrowserChange: risk.suspiciousBrowserChange,
+      impossibleTravel: risk.impossibleTravel,
+      newDevice: risk.newDevice,
+      timezone: risk.timezone,
+      locale: risk.locale,
+      reasons: risk.reasons
+    }
   };
 }
 
-function recordEvent(state, session, type) {
+function recordEvent(state, session, type, detail) {
   state.events.unshift({
     timestamp: nowIso(),
     type,
+    detail,
     username: session.username,
     name: session.name,
     role: session.role,
@@ -192,24 +304,67 @@ function recordEvent(state, session, type) {
     browser: session.trust.browser,
     device: session.trust.device
   });
-  state.events = state.events.slice(0, 20);
+  state.events = state.events.slice(0, 40);
+}
+
+function recordLog(state, level, title, detail, category = "monitoring") {
+  state.logs.unshift({
+    timestamp: nowIso(),
+    level,
+    title,
+    detail,
+    category
+  });
+  state.logs = state.logs.slice(0, 80);
+}
+
+function seedLogs(state) {
+  if (state.logs.length) return;
+  recordLog(state, "info", "Platform ready", "Zero Trust monitoring engine is active in demo mode.", "system");
+  recordLog(state, "success", "Policy baseline loaded", "Default verification methods and risk policies are available.", "policy");
+}
+
+function ensureContinuousReview(state) {
+  if (!state.session || !state.session.otpVerified || !state.settings.continuousAuth) return;
+
+  const now = Date.now();
+  const nextReviewAt = new Date(state.session.nextReviewAt || 0).getTime();
+  if (Number.isNaN(nextReviewAt) || now < nextReviewAt) return;
+
+  const user = Object.values(users).find((item) => item.username === state.session.username);
+  if (!user) return;
+
+  const previousScore = state.session.trust.score;
+  const refreshed = buildSession(user, state.session, state);
+  refreshed.otpVerified = state.session.otpVerified;
+  refreshed.otp = null;
+  refreshed.createdAt = state.session.createdAt;
+  refreshed.lastSeenAt = nowIso();
+  state.session = refreshed;
+
+  if (refreshed.trust.riskLevel === "High") {
+    recordLog(state, "warning", "Continuous re-check raised risk", "Session moved into high-risk mode and would require step-up verification.", "session");
+  } else {
+    recordLog(state, "info", "Continuous re-check completed", `Trust score moved from ${previousScore} to ${refreshed.trust.score}.`, "session");
+  }
 }
 
 function scoreSummary(score) {
-  if (score >= 85) return "Excellent. You are following strong personal safety habits.";
-  if (score >= 70) return "Good. A few small changes can make you noticeably safer online.";
-  if (score >= 55) return "Fair. You are protected in some areas, but there are still weak points.";
-  return "Needs attention. Review passwords, suspicious messages, and risky links soon.";
+  if (score >= 85) return "Excellent. Identity, device trust, and monitoring signals are strong.";
+  if (score >= 70) return "Good. The session is healthy, but a few extra protections would help.";
+  if (score >= 55) return "Fair. Some controls are active, but risk remains visible.";
+  return "Needs attention. This session would need stronger verification and tighter policy control.";
 }
 
 function calculateOverallScore(state) {
   const session = state.session;
   if (!session || !session.otpVerified) return 0;
   let score = session.trust.score;
-  if (state.toolHistory.link && state.toolHistory.link.score <= 35) score += 4;
-  if (state.toolHistory.password && state.toolHistory.password.score >= 75) score += 6;
-  if (state.toolHistory.scam && state.toolHistory.scam.score <= 30) score += 4;
-  if (state.challengeSolved) score += 8;
+  if (state.toolHistory.link && state.toolHistory.link.score <= 35) score += 3;
+  if (state.toolHistory.password && state.toolHistory.password.score >= 75) score += 5;
+  if (state.toolHistory.scam && state.toolHistory.scam.score <= 30) score += 3;
+  if (state.toolHistory.file && state.toolHistory.file.label === "Clean") score += 3;
+  if (state.challengeSolved) score += 6;
   return Math.max(0, Math.min(100, score));
 }
 
@@ -384,127 +539,248 @@ function setResult(labelEl, scoreEl, reasonsEl, result, prefix) {
   updateList(reasonsEl, result.reasons);
 }
 
-function renderHomeWidgets(state) {
-  const heroScore = document.getElementById("hero-score");
-  const homeSummary = document.getElementById("home-score-summary");
-  if (heroScore) {
-    const score = state.session?.otpVerified ? calculateOverallScore(state) : 82;
-    heroScore.textContent = String(score);
-  }
-  if (homeSummary) {
-    homeSummary.textContent = state.session?.otpVerified
-      ? scoreSummary(calculateOverallScore(state))
-      : "Sign in to generate your own personalized security score and recommendations.";
-  }
+async function analyzeFile(file) {
+  const buffer = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  const hash = Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+  const riskyExtension = /\.(exe|apk|js|bat|scr|msi)$/i.test(file.name);
+  const label = riskyExtension ? "Review Needed" : "Clean";
+  const score = riskyExtension ? 62 : 18;
+  const reasons = [
+    `SHA-256 hash generated: ${hash.slice(0, 18)}...`,
+    riskyExtension
+      ? "The file extension can carry executable risk and should be reviewed before sharing."
+      : "The file type looks lower risk in this demo scanner."
+  ];
+  return { label, score, reasons, hash };
+}
 
-  const homeSession = document.getElementById("home-session-status");
-  if (homeSession) {
-    homeSession.textContent = state.session?.otpVerified
-      ? `${state.session.name} is verified and can continue into the platform dashboard.`
-      : "No verified session yet. Use the quick login below to explore the product.";
-  }
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+}
+
+function setHTML(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.innerHTML = value;
+}
+
+function renderHomeWidgets(state) {
+  seedLogs(state);
+  ensureContinuousReview(state);
+  const session = state.session;
+  const score = session?.otpVerified ? calculateOverallScore(state) : 82;
+  setText("hero-score", String(score));
+  setText(
+    "home-score-summary",
+    session?.otpVerified ? scoreSummary(score) : "Sign in to generate your own personalized security score and recommendations."
+  );
+  setText(
+    "home-session-status",
+    session?.otpVerified
+      ? `${session.name} is verified with ${session.trust.verificationMethods.join(", ")}.`
+      : "No verified session yet. Use the quick login below to explore the platform."
+  );
 }
 
 function renderDashboardPage(state) {
-  const workspaceRoot = document.getElementById("dashboard-shell");
-  if (!workspaceRoot) return;
+  const shell = document.getElementById("dashboard-shell");
+  if (!shell) return;
 
+  seedLogs(state);
+  ensureContinuousReview(state);
   const session = state.session;
   const verified = Boolean(session && session.otpVerified);
-  const sidebarStatus = document.getElementById("sidebar-session-status");
-  const sidebarScore = document.getElementById("sidebar-security-score");
-  const sidebarSummary = document.getElementById("sidebar-score-summary");
-  const dashboardStatus = document.getElementById("dashboard-session-status");
-  const dashboardName = document.getElementById("dashboard-name");
-  const dashboardRole = document.getElementById("dashboard-role");
-  const dashboardTrust = document.getElementById("dashboard-trust");
-  const dashboardDevice = document.getElementById("dashboard-device");
-  const dashboardBrowser = document.getElementById("dashboard-browser");
-  const dashboardZone = document.getElementById("dashboard-zone");
-  const dashboardOtp = document.getElementById("dashboard-otp-count");
-  const recentLink = document.getElementById("recent-link-result");
-  const recentPassword = document.getElementById("recent-password-result");
-  const recentScam = document.getElementById("recent-scam-result");
-  const dashboardTips = document.getElementById("dashboard-tips");
-  const adminFeed = document.getElementById("admin-feed");
+
+  const metricDefaults = {
+    "sidebar-session-status": "No verified session",
+    "sidebar-security-score": "0",
+    "sidebar-score-summary": "Login from the home page to generate a real dashboard.",
+    "dashboard-session-status": "Please verify OTP from the home page first.",
+    "dashboard-name": "Pending",
+    "dashboard-role": "Pending",
+    "dashboard-trust": "Pending",
+    "dashboard-device": "Pending",
+    "dashboard-browser": "Pending",
+    "dashboard-zone": "Pending",
+    "dashboard-otp-count": "0"
+  };
 
   if (!verified) {
-    if (sidebarStatus) sidebarStatus.textContent = "No verified session";
-    if (sidebarScore) sidebarScore.textContent = "0";
-    if (sidebarSummary) sidebarSummary.textContent = "Login from the home page to generate a real dashboard.";
-    if (dashboardStatus) dashboardStatus.textContent = "Please verify OTP from the home page first.";
-    if (dashboardName) dashboardName.textContent = "Pending";
-    if (dashboardRole) dashboardRole.textContent = "Pending";
-    if (dashboardTrust) dashboardTrust.textContent = "Pending";
-    if (dashboardDevice) dashboardDevice.textContent = "Pending";
-    if (dashboardBrowser) dashboardBrowser.textContent = "Pending";
-    if (dashboardZone) dashboardZone.textContent = "Pending";
-    if (dashboardOtp) dashboardOtp.textContent = "0";
-    if (recentLink) recentLink.textContent = "No scans yet";
-    if (recentPassword) recentPassword.textContent = "No scans yet";
-    if (recentScam) recentScam.textContent = "No scans yet";
-    updateList(dashboardTips, [
+    Object.entries(metricDefaults).forEach(([id, value]) => setText(id, value));
+    setText("metric-active-users", "0");
+    setText("metric-blocked-attacks", String(state.logs.filter((item) => item.level === "warning").length));
+    setText("metric-suspicious-devices", "0");
+    setText("metric-system-health", "98%");
+    setText("metric-threat-level", "Low");
+    setText("metric-device-trust", "Pending");
+    setText("metric-session-risk", "Pending");
+    setText("metric-verification-stack", "Pending");
+    setText("recent-link-result", state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "No scans yet");
+    setText("recent-password-result", state.toolHistory.password ? `${state.toolHistory.password.label} (${state.toolHistory.password.score}/100)` : "No scans yet");
+    setText("recent-scam-result", state.toolHistory.scam ? `${state.toolHistory.scam.label} (${state.toolHistory.scam.score}/100)` : "No scans yet");
+    setText("recent-file-result", state.toolHistory.file ? `${state.toolHistory.file.label} (${state.toolHistory.file.score}/100)` : "No scans yet");
+    updateList(document.getElementById("dashboard-role-list"), ["Verify a user session to see role-specific access guidance."]);
+    updateList(document.getElementById("dashboard-tips"), [
       "Start with a quick login from the home page.",
       "Use the tools page to scan a suspicious link or message.",
-      "Return here for personalized recommendations."
+      "Return here for personalized recommendations and risk posture."
     ]);
-    if (adminFeed) {
-      adminFeed.innerHTML = '<div class="feed-item"><strong>No activity yet</strong><span>Admin data appears after verified usage.</span></div>';
-    }
+    renderActivityFeed(state.logs);
+    renderAdminFeed(state, false);
     return;
   }
 
   const overallScore = calculateOverallScore(state);
-  if (sidebarStatus) sidebarStatus.textContent = `${session.name} verified`;
-  if (sidebarScore) sidebarScore.textContent = String(overallScore);
-  if (sidebarSummary) sidebarSummary.textContent = scoreSummary(overallScore);
-  if (dashboardStatus) dashboardStatus.textContent = `${session.name} is verified and using ${session.role} access.`;
-  if (dashboardName) dashboardName.textContent = session.name;
-  if (dashboardRole) dashboardRole.textContent = session.role;
-  if (dashboardTrust) dashboardTrust.textContent = `${session.trust.status} (${session.trust.score}/100)`;
-  if (dashboardDevice) dashboardDevice.textContent = session.trust.device;
-  if (dashboardBrowser) dashboardBrowser.textContent = session.trust.browser;
-  if (dashboardZone) dashboardZone.textContent = session.trust.networkZone;
-  if (dashboardOtp) dashboardOtp.textContent = String(session.otpUsageCount);
-  if (recentLink) recentLink.textContent = state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "Not scanned yet";
-  if (recentPassword) {
-    recentPassword.textContent = state.toolHistory.password
-      ? `${state.toolHistory.password.label} (${state.toolHistory.password.score}/100)`
-      : "Not checked yet";
-  }
-  if (recentScam) {
-    recentScam.textContent = state.toolHistory.scam ? `${state.toolHistory.scam.label} (${state.toolHistory.scam.score}/100)` : "Not analyzed yet";
-  }
+  setText("sidebar-session-status", `${session.name} verified`);
+  setText("sidebar-security-score", String(overallScore));
+  setText("sidebar-score-summary", scoreSummary(overallScore));
+  setText("dashboard-session-status", `${session.name} is verified and monitored under ${session.role} policy.`);
+  setText("dashboard-name", session.name);
+  setText("dashboard-role", session.role);
+  setText("dashboard-trust", `${session.trust.status} (${session.trust.score}/100)`);
+  setText("dashboard-device", `${session.trust.device} | ${session.trust.os}`);
+  setText("dashboard-browser", session.trust.browser);
+  setText("dashboard-zone", session.trust.networkZone);
+  setText("dashboard-otp-count", String(session.otpUsageCount));
 
-  const tips = [...session.trust.reasons];
-  if (!state.toolHistory.link) tips.push("Use the phishing checker before opening internship, scholarship, or payment links.");
-  if (!state.toolHistory.password) tips.push("Run the password analyzer to understand how crack-resistant your password really is.");
-  if (!state.toolHistory.scam) tips.push("Paste suspicious messages into the scam detector before replying.");
-  if (!state.challengeSolved) tips.push("Complete the daily challenge in Learning Hub to improve awareness and score.");
-  updateList(dashboardTips, tips);
+  setText("metric-active-users", "124");
+  setText("metric-blocked-attacks", String(7 + state.logs.filter((item) => item.level === "warning").length));
+  setText("metric-suspicious-devices", session.trust.deviceTrust === "Trusted" ? "1" : "3");
+  setText("metric-system-health", `${Math.max(88, overallScore)}%`);
+  setText("metric-threat-level", session.trust.threatLevel);
+  setText("metric-device-trust", session.trust.deviceTrust);
+  setText("metric-session-risk", session.trust.riskLevel);
+  setText("metric-verification-stack", session.trust.verificationMethods.join(" + "));
 
-  if (adminFeed) {
-    if (session.role !== "admin") {
-      adminFeed.innerHTML = '<div class="feed-item"><strong>Admin only</strong><span>This monitoring view is available only for admin login.</span></div>';
-    } else if (!state.events.filter((item) => item.role !== "admin").length) {
-      adminFeed.innerHTML = '<div class="feed-item"><strong>No student or guest events yet</strong><span>Activity appears after other users sign in.</span></div>';
-    } else {
-      adminFeed.innerHTML = "";
-      state.events
-        .filter((item) => item.role !== "admin")
-        .forEach((item) => {
-          const row = document.createElement("div");
-          row.className = "feed-item";
-          row.innerHTML = `<strong>${item.name}</strong><span>${item.role} | ${item.browser} | ${item.device} | ${formatTimestamp(item.timestamp)}</span>`;
-          adminFeed.appendChild(row);
-        });
-    }
-  }
+  setText("recent-link-result", state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "Not scanned yet");
+  setText(
+    "recent-password-result",
+    state.toolHistory.password ? `${state.toolHistory.password.label} (${state.toolHistory.password.score}/100)` : "Not checked yet"
+  );
+  setText("recent-scam-result", state.toolHistory.scam ? `${state.toolHistory.scam.label} (${state.toolHistory.scam.score}/100)` : "Not analyzed yet");
+  setText("recent-file-result", state.toolHistory.file ? `${state.toolHistory.file.label} (${state.toolHistory.file.score}/100)` : "Not scanned yet");
 
-  const dashboardRoleList = document.getElementById("dashboard-role-list");
-  if (dashboardRoleList) {
-    updateList(dashboardRoleList, roleContent[session.role]);
+  const recommendations = [...session.trust.reasons];
+  recommendations.push(`Device fingerprint: ${session.trust.deviceFingerprint}`);
+  if (!state.toolHistory.link) recommendations.push("Use the phishing checker before opening internship, scholarship, or payment links.");
+  if (!state.toolHistory.password) recommendations.push("Run the password analyzer to understand how crack-resistant your password really is.");
+  if (!state.toolHistory.scam) recommendations.push("Paste suspicious messages into the scam detector before replying.");
+  if (!state.toolHistory.file) recommendations.push("Use the file scanner before trusting files shared through chat, email, or campus groups.");
+  if (!state.challengeSolved) recommendations.push("Complete the daily challenge in Learning Hub to improve awareness and score.");
+  updateList(document.getElementById("dashboard-tips"), recommendations);
+  updateList(document.getElementById("dashboard-role-list"), roleContent[session.role]);
+
+  renderActivityFeed(state.logs);
+  renderAdminFeed(state, session.role === "admin" || session.role === "analyst");
+  renderThreatMap(session);
+}
+
+function renderActivityFeed(logs) {
+  const target = document.getElementById("live-activity-feed");
+  if (!target) return;
+  target.innerHTML = "";
+  logs.slice(0, 6).forEach((log) => {
+    const row = document.createElement("div");
+    row.className = "feed-item";
+    row.innerHTML = `<strong>[${formatTimestamp(log.timestamp)}] ${log.title}</strong><span>${log.detail}</span>`;
+    target.appendChild(row);
+  });
+}
+
+function renderAdminFeed(state, canView) {
+  const target = document.getElementById("admin-feed");
+  if (!target) return;
+  if (!canView) {
+    target.innerHTML = '<div class="feed-item"><strong>Restricted</strong><span>Admin and analyst roles can view full monitoring data.</span></div>';
+    return;
   }
+  target.innerHTML = "";
+  const visible = state.events.length ? state.events : [{ name: "No activity yet", role: "system", browser: "Pending", device: "Pending", timestamp: nowIso() }];
+  visible.slice(0, 8).forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "feed-item";
+    row.innerHTML = `<strong>${item.name}</strong><span>${item.role} | ${item.browser} | ${item.device} | ${formatTimestamp(item.timestamp)}</span>`;
+    target.appendChild(row);
+  });
+}
+
+function renderThreatMap(session) {
+  setText("map-location", session ? `${session.trust.locale} | ${session.trust.timezone}` : "Pending");
+  setText("map-vpn", session ? (session.trust.vpnDetected ? "VPN-like pattern detected" : "No VPN signal in demo") : "Pending");
+  setText("map-travel", session ? (session.trust.impossibleTravel ? "Impossible travel flagged" : "No travel conflict detected") : "Pending");
+}
+
+function renderToolsSnapshot(state) {
+  setText("tool-summary-link", state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "Waiting for scan");
+  setText(
+    "tool-summary-password",
+    state.toolHistory.password ? `${state.toolHistory.password.label} (${state.toolHistory.password.score}/100)` : "Waiting for scan"
+  );
+  setText("tool-summary-scam", state.toolHistory.scam ? `${state.toolHistory.scam.label} (${state.toolHistory.scam.score}/100)` : "Waiting for scan");
+  setText("tool-summary-file", state.toolHistory.file ? `${state.toolHistory.file.label} (${state.toolHistory.file.score}/100)` : "Waiting for scan");
+}
+
+function renderThreatPage(state) {
+  const feed = document.getElementById("threat-feed");
+  if (!feed) return;
+  feed.innerHTML = "";
+  const source = state.logs.slice(0, 8);
+  source.forEach((log) => {
+    const card = document.createElement("article");
+    card.className = "news-card";
+    card.innerHTML = `<span class="pill ${log.level === "warning" ? "warning" : log.level === "success" ? "success" : ""}">${log.category}</span><h3>${log.title}</h3><p>${log.detail}</p>`;
+    feed.appendChild(card);
+  });
+}
+
+function renderAuditLogsPage(state) {
+  const list = document.getElementById("audit-log-list");
+  if (!list) return;
+  setText("log-total-events", String(state.logs.length));
+  setText("log-blocked-events", String(state.logs.filter((log) => log.level === "warning").length));
+  setText("log-auth-events", String(state.logs.filter((log) => log.category === "auth").length));
+  list.innerHTML = "";
+  state.logs.slice(0, 20).forEach((log) => {
+    const row = document.createElement("div");
+    row.className = "feed-item";
+    row.innerHTML = `<strong>${log.title}</strong><span>${formatTimestamp(log.timestamp)} | ${log.category} | ${log.detail}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function renderSettingsPage(state) {
+  const form = document.getElementById("settings-form");
+  if (!form) return;
+  const settings = state.settings;
+  const fields = [
+    ["setting-email-otp", settings.emailOtp],
+    ["setting-phone-otp", settings.phoneOtp],
+    ["setting-google-auth", settings.googleAuth],
+    ["setting-biometric", settings.biometric],
+    ["setting-device-fingerprint", settings.deviceFingerprinting],
+    ["setting-continuous-auth", settings.continuousAuth]
+  ];
+  fields.forEach(([id, value]) => {
+    const field = document.getElementById(id);
+    if (field) field.checked = value;
+  });
+  const summary = activeVerificationMethods(settings).join(", ");
+  setText("settings-summary", `Active verification stack: ${summary}`);
+}
+
+function renderScorePage(state) {
+  const target = document.getElementById("score-overview");
+  if (!target) return;
+  const session = state.session;
+  if (!session || !session.otpVerified) {
+    target.innerHTML = "<strong>Score unavailable</strong><p>Verify a session to calculate a Zero Trust posture score.</p>";
+    return;
+  }
+  const overallScore = calculateOverallScore(state);
+  target.innerHTML = `<strong>${overallScore}/100</strong><p>${scoreSummary(overallScore)}</p>`;
 }
 
 function initDashboardTabs() {
@@ -513,18 +789,11 @@ function initDashboardTabs() {
   if (!tabButtons.length || !views.length) return;
 
   const setView = (name) => {
-    tabButtons.forEach((button) => {
-      button.classList.toggle("active", button.dataset.dashboardView === name);
-    });
-    views.forEach((view) => {
-      view.classList.toggle("active", view.dataset.dashboardPanel === name);
-    });
+    tabButtons.forEach((button) => button.classList.toggle("active", button.dataset.dashboardView === name));
+    views.forEach((view) => view.classList.toggle("active", view.dataset.dashboardPanel === name));
   };
 
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", () => setView(button.dataset.dashboardView));
-  });
-
+  tabButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.dashboardView)));
   setView("overview");
 }
 
@@ -547,16 +816,22 @@ function initLoginFlow() {
       const username = data.get("username");
       const password = data.get("password");
       const user = users[username];
+      const state = readState();
 
       if (!user || user.password !== password) {
+        state.failedAttempts += 1;
+        recordLog(state, "warning", "Failed login attempt", `Rejected credential attempt for username ${username || "unknown"}.`, "auth");
+        writeState(state);
         if (loginMessage) loginMessage.textContent = "Invalid credentials.";
+        renderAll();
         return;
       }
 
-      const state = readState();
+      state.failedAttempts = 0;
       const previous = state.session && state.session.username === user.username ? state.session : null;
-      state.session = buildSession(user, previous);
-      recordEvent(state, state.session, "login-issued");
+      state.session = buildSession(user, previous, state);
+      recordEvent(state, state.session, "login-issued", "Primary login accepted");
+      recordLog(state, "info", "Primary identity verified", `${state.session.name} passed password verification and received an OTP challenge.`, "auth");
       writeState(state);
 
       if (otpDisplay) otpDisplay.textContent = state.session.otp;
@@ -579,15 +854,20 @@ function initLoginFlow() {
 
       const otpValue = document.getElementById("otp-input")?.value;
       if (otpValue !== session.otp) {
+        recordLog(state, "warning", "OTP verification failed", `A bad OTP was entered for ${session.name}.`, "auth");
+        writeState(state);
         if (otpMessage) otpMessage.textContent = "Incorrect OTP.";
+        renderAll();
         return;
       }
 
       session.otpVerified = true;
       session.otp = null;
       session.lastSeenAt = nowIso();
+      session.nextReviewAt = new Date(Date.now() + 3 * 60 * 1000).toISOString();
       state.session = session;
-      recordEvent(state, session, "otp-verified");
+      recordEvent(state, session, "otp-verified", "Step-up verification completed");
+      recordLog(state, "success", "MFA verification completed", `${session.name} completed the ${session.trust.verificationMethods.join(" + ")} flow.`, "auth");
       writeState(state);
 
       if (otpDisplay) otpDisplay.textContent = "Used";
@@ -611,6 +891,7 @@ function initLoginFlow() {
       session.lastSeenAt = nowIso();
       session.otpUsageCount += 1;
       state.session = session;
+      recordLog(state, "info", "New OTP issued", `A replacement OTP was generated for ${session.name}.`, "auth");
       writeState(state);
 
       if (otpDisplay) otpDisplay.textContent = session.otp;
@@ -622,6 +903,9 @@ function initLoginFlow() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       const state = readState();
+      if (state.session) {
+        recordLog(state, "info", "Session closed", `${state.session.name} signed out of the platform.`, "session");
+      }
       state.session = null;
       writeState(state);
       renderAll();
@@ -633,6 +917,7 @@ function initToolsPage() {
   const linkForm = document.getElementById("link-form");
   const passwordForm = document.getElementById("password-form");
   const scamForm = document.getElementById("scam-form");
+  const fileForm = document.getElementById("file-form");
   const generateBtn = document.getElementById("generate-passphrase-btn");
 
   if (linkForm) {
@@ -642,16 +927,10 @@ function initToolsPage() {
       const result = analyzeLink(input.value.trim());
       const state = readState();
       state.toolHistory.link = result;
+      recordLog(state, result.score >= 65 ? "warning" : "info", "Link scan completed", `Result: ${result.label} for ${result.host || "supplied URL"}.`, "scan");
       writeState(state);
-      setResult(
-        document.getElementById("link-risk-label"),
-        document.getElementById("link-risk-score"),
-        document.getElementById("link-reasons"),
-        result,
-        "Risk score"
-      );
-      const message = document.getElementById("link-message");
-      if (message) message.textContent = `Scan complete for ${result.host || "the supplied link"}.`;
+      setResult(document.getElementById("link-risk-label"), document.getElementById("link-risk-score"), document.getElementById("link-reasons"), result, "Risk score");
+      setText("link-message", `Scan complete for ${result.host || "the supplied link"}.`);
       renderAll();
     });
   }
@@ -663,26 +942,18 @@ function initToolsPage() {
       const result = analyzePassword(input.value);
       const state = readState();
       state.toolHistory.password = result;
+      recordLog(state, result.score < 45 ? "warning" : "info", "Password analysis completed", `Password health evaluated as ${result.label}.`, "scan");
       writeState(state);
-      setResult(
-        document.getElementById("password-risk-label"),
-        document.getElementById("password-risk-score"),
-        document.getElementById("password-reasons"),
-        result,
-        "Strength score"
-      );
-      const message = document.getElementById("password-message");
-      if (message) message.textContent = "Password analysis complete.";
+      setResult(document.getElementById("password-risk-label"), document.getElementById("password-risk-score"), document.getElementById("password-reasons"), result, "Strength score");
+      setText("password-message", "Password analysis complete.");
       renderAll();
     });
   }
 
   if (generateBtn) {
     generateBtn.addEventListener("click", () => {
-      const target = document.getElementById("generated-passphrase");
-      if (target) target.textContent = generatePassphrase();
-      const message = document.getElementById("password-message");
-      if (message) message.textContent = "Passphrase generated. Use it as inspiration for a safer login.";
+      setText("generated-passphrase", generatePassphrase());
+      setText("password-message", "Passphrase generated. Use it as inspiration for a safer login.");
     });
   }
 
@@ -693,16 +964,31 @@ function initToolsPage() {
       const result = analyzeScam(input.value.trim());
       const state = readState();
       state.toolHistory.scam = result;
+      recordLog(state, result.score >= 70 ? "warning" : "info", "Scam analysis completed", `Message risk was scored as ${result.label}.`, "scan");
       writeState(state);
-      setResult(
-        document.getElementById("scam-risk-label"),
-        document.getElementById("scam-risk-score"),
-        document.getElementById("scam-reasons"),
-        result,
-        "Scam probability"
-      );
-      const message = document.getElementById("scam-message");
-      if (message) message.textContent = "Scam analysis complete.";
+      setResult(document.getElementById("scam-risk-label"), document.getElementById("scam-risk-score"), document.getElementById("scam-reasons"), result, "Scam probability");
+      setText("scam-message", "Scam analysis complete.");
+      renderAll();
+    });
+  }
+
+  if (fileForm) {
+    fileForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const fileInput = document.getElementById("file-input");
+      const file = fileInput?.files?.[0];
+      if (!file) {
+        setText("file-message", "Choose a file first.");
+        return;
+      }
+
+      const result = await analyzeFile(file);
+      const state = readState();
+      state.toolHistory.file = result;
+      recordLog(state, result.score >= 60 ? "warning" : "success", "File scan completed", `File ${file.name} reviewed with status ${result.label}.`, "scan");
+      writeState(state);
+      setResult(document.getElementById("file-risk-label"), document.getElementById("file-risk-score"), document.getElementById("file-reasons"), result, "File risk");
+      setText("file-message", `Scan complete for ${file.name}.`);
       renderAll();
     });
   }
@@ -714,13 +1000,14 @@ function initLearningPage() {
       const state = readState();
       const correct = button.dataset.correct === "true";
       state.challengeSolved = correct;
+      recordLog(state, correct ? "success" : "warning", "Learning challenge answered", correct ? "User selected the safest action in the phishing scenario." : "User missed the safest action in the phishing scenario.", "learning");
       writeState(state);
-      const feedback = document.getElementById("challenge-feedback");
-      if (feedback) {
-        feedback.textContent = correct
+      setText(
+        "challenge-feedback",
+        correct
           ? "Correct. OTPs should never be shared, even if the request looks official."
-          : "Not quite. The safest move is to refuse and verify the sender another way.";
-      }
+          : "Not quite. The safest move is to refuse and verify the sender another way."
+      );
       renderAll();
     });
   });
@@ -752,10 +1039,49 @@ function initAssistantPage() {
   });
 }
 
+function initSettingsPage() {
+  const form = document.getElementById("settings-form");
+  if (!form) return;
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const state = readState();
+    state.settings.emailOtp = Boolean(document.getElementById("setting-email-otp")?.checked);
+    state.settings.phoneOtp = Boolean(document.getElementById("setting-phone-otp")?.checked);
+    state.settings.googleAuth = Boolean(document.getElementById("setting-google-auth")?.checked);
+    state.settings.biometric = Boolean(document.getElementById("setting-biometric")?.checked);
+    state.settings.deviceFingerprinting = Boolean(document.getElementById("setting-device-fingerprint")?.checked);
+    state.settings.continuousAuth = Boolean(document.getElementById("setting-continuous-auth")?.checked);
+
+    if (state.session) {
+      const user = Object.values(users).find((item) => item.username === state.session.username);
+      if (user) {
+        const refreshed = buildSession(user, state.session, state);
+        refreshed.otpVerified = state.session.otpVerified;
+        refreshed.otp = state.session.otp;
+        refreshed.createdAt = state.session.createdAt;
+        state.session = refreshed;
+      }
+    }
+
+    recordLog(state, "success", "Settings updated", `Verification stack changed to ${activeVerificationMethods(state.settings).join(", ")}.`, "policy");
+    writeState(state);
+    setText("settings-message", "Settings saved in demo storage.");
+    renderAll();
+  });
+}
+
 function renderAll() {
   const state = readState();
+  seedLogs(state);
+  ensureContinuousReview(state);
+  writeState(state);
   renderHomeWidgets(state);
   renderDashboardPage(state);
+  renderToolsSnapshot(state);
+  renderThreatPage(state);
+  renderAuditLogsPage(state);
+  renderSettingsPage(state);
+  renderScorePage(state);
 }
 
 window.addEventListener("storage", renderAll);
@@ -766,5 +1092,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initToolsPage();
   initLearningPage();
   initAssistantPage();
+  initSettingsPage();
   renderAll();
 });

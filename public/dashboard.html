@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SecureU | Dashboard</title>
+    <title>SecureU | Security Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,29 +17,32 @@
       <header class="site-header">
         <a class="brand" href="/index.html">
           <span class="brand-mark">SU</span>
-          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Zero Trust Monitoring Console</small></span>
         </a>
         <nav class="site-nav">
           <a href="/index.html">Home</a>
-          <a href="/tools.html">Security Tools</a>
+          <a href="/tools.html">Tools</a>
           <a class="active" href="/dashboard.html">Dashboard</a>
-          <a href="/assistant.html">AI Assistant</a>
-          <a href="/learning.html">Learning Hub</a>
-          <a href="/news.html">Threat News</a>
-          <a href="/about.html">About</a>
+          <a href="/threat-intelligence.html">Threat Intel</a>
+          <a href="/audit-logs.html">Audit Logs</a>
+          <a href="/settings.html">Settings</a>
+          <a href="/docs.html">Docs</a>
         </nav>
       </header>
 
       <main>
         <section class="page-hero">
           <article class="hero-card">
-            <span class="eyebrow">Personalized overview</span>
-            <h1>A dashboard with real context, not fake metrics.</h1>
-            <p>See your security score, recent scans, role-based access, and practical next steps after using the platform tools.</p>
+            <span class="eyebrow">Live Zero Trust Dashboard</span>
+            <h1>Identity, device trust, alerts, and session monitoring in one view.</h1>
+            <p>
+              This dashboard surfaces role-based access, active verification methods, risk levels, suspicious devices, and a
+              live activity stream so the platform feels more like a real security console.
+            </p>
           </article>
           <aside class="scan-card">
-            <span class="pill">Dashboard promise</span>
-            <p>Only meaningful signals are shown here: verified session details, tool results, and actionable recommendations.</p>
+            <span class="pill">Session Control</span>
+            <p>Continuous verification reviews the session repeatedly and would trigger step-up checks on risky actions.</p>
             <button id="logout-btn" class="secondary" type="button">Logout</button>
           </aside>
         </section>
@@ -47,7 +50,7 @@
         <section id="dashboard-shell" class="dashboard-shell">
           <aside class="dashboard-sidebar">
             <div class="dashboard-card">
-              <span class="pill">Session</span>
+              <span class="pill">Verified Session</span>
               <strong id="sidebar-session-status">No verified session</strong>
             </div>
 
@@ -58,11 +61,11 @@
             </div>
 
             <div class="dashboard-card">
-              <span class="pill">Views</span>
+              <span class="pill">Dashboard Views</span>
               <div class="dashboard-nav">
                 <button class="secondary active" type="button" data-dashboard-view="overview">Overview</button>
-                <button class="secondary" type="button" data-dashboard-view="recent">Recent Scans</button>
-                <button class="secondary" type="button" data-dashboard-view="tips">Recommendations</button>
+                <button class="secondary" type="button" data-dashboard-view="telemetry">Telemetry</button>
+                <button class="secondary" type="button" data-dashboard-view="activity">Live Activity</button>
                 <button class="secondary" type="button" data-dashboard-view="admin">Admin Monitor</button>
               </div>
             </div>
@@ -72,34 +75,34 @@
             <section class="dashboard-view active" data-dashboard-panel="overview">
               <div class="dashboard-grid">
                 <article class="dashboard-card dashboard-metric">
-                  <span class="pill">Status</span>
-                  <strong id="dashboard-session-status">Please verify OTP from the home page first.</strong>
+                  <span class="pill">Threat Level</span>
+                  <strong id="metric-threat-level">Low</strong>
+                  <p id="dashboard-session-status">Please verify OTP from the home page first.</p>
                 </article>
                 <article class="dashboard-card dashboard-metric">
-                  <span class="pill">Role Access</span>
-                  <strong id="dashboard-role">Pending</strong>
+                  <span class="pill success">Active Users</span>
+                  <strong id="metric-active-users">0</strong>
+                  <p>Simulated active sessions across the platform.</p>
                 </article>
                 <article class="dashboard-card dashboard-metric">
-                  <span class="pill">Trust Level</span>
-                  <strong id="dashboard-trust">Pending</strong>
-                </article>
-              </div>
-
-              <div class="dashboard-grid">
-                <article class="dashboard-card dashboard-metric">
-                  <span class="pill success">Retention Signal</span>
-                  <strong>Daily Safety Loop</strong>
-                  <p>Use tools, review your score, complete lessons, and come back for better digital habits.</p>
+                  <span class="pill warning">Blocked Attacks</span>
+                  <strong id="metric-blocked-attacks">0</strong>
+                  <p>High-risk or failed actions contained by policy.</p>
                 </article>
                 <article class="dashboard-card dashboard-metric">
-                  <span class="pill warning">Scalability Path</span>
-                  <strong>API + Cache Ready</strong>
-                  <p>This product direction supports future services, queues, caching, and real-time scan pipelines.</p>
+                  <span class="pill">Suspicious Devices</span>
+                  <strong id="metric-suspicious-devices">0</strong>
+                  <p>Devices needing re-verification or trust review.</p>
                 </article>
                 <article class="dashboard-card dashboard-metric">
-                  <span class="pill">Monetization Path</span>
-                  <strong>Freemium + Campus</strong>
-                  <p>Free utility grows usage, premium adds deeper analysis, and colleges unlock awareness programs.</p>
+                  <span class="pill success">System Health</span>
+                  <strong id="metric-system-health">98%</strong>
+                  <p>Operational posture of this demo environment.</p>
+                </article>
+                <article class="dashboard-card dashboard-metric">
+                  <span class="pill">Verification Stack</span>
+                  <strong id="metric-verification-stack">Pending</strong>
+                  <p>Identity factors active for the current session.</p>
                 </article>
               </div>
 
@@ -108,6 +111,8 @@
                   <h3>Account Context</h3>
                   <div class="data-list">
                     <div class="data-row"><span>Name</span><strong id="dashboard-name">Pending</strong></div>
+                    <div class="data-row"><span>Role Access</span><strong id="dashboard-role">Pending</strong></div>
+                    <div class="data-row"><span>Trust Level</span><strong id="dashboard-trust">Pending</strong></div>
                     <div class="data-row"><span>Browser</span><strong id="dashboard-browser">Pending</strong></div>
                     <div class="data-row"><span>Device</span><strong id="dashboard-device">Pending</strong></div>
                     <div class="data-row"><span>Zone</span><strong id="dashboard-zone">Pending</strong></div>
@@ -123,41 +128,59 @@
                 </article>
 
                 <article class="dashboard-card">
-                  <h3>Security Progress</h3>
+                  <h3>Risk Snapshot</h3>
                   <div class="data-list">
-                    <div class="data-row"><span>Link Checks</span><strong id="recent-link-result">No scans yet</strong></div>
-                    <div class="data-row"><span>Password Checks</span><strong id="recent-password-result">No scans yet</strong></div>
-                    <div class="data-row"><span>Scam Reviews</span><strong id="recent-scam-result">No scans yet</strong></div>
+                    <div class="data-row"><span>Session Risk</span><strong id="metric-session-risk">Pending</strong></div>
+                    <div class="data-row"><span>Device Trust</span><strong id="metric-device-trust">Pending</strong></div>
+                    <div class="data-row"><span>Recent Link Scan</span><strong id="recent-link-result">No scans yet</strong></div>
+                    <div class="data-row"><span>Password Health</span><strong id="recent-password-result">No scans yet</strong></div>
+                    <div class="data-row"><span>Scam Review</span><strong id="recent-scam-result">No scans yet</strong></div>
+                    <div class="data-row"><span>File Scan</span><strong id="recent-file-result">No scans yet</strong></div>
                   </div>
                 </article>
               </div>
             </section>
 
-            <section class="dashboard-view" data-dashboard-panel="recent">
-              <article class="dashboard-card">
-                <h3>Recent scan summaries</h3>
-                <div class="recent-list">
-                  <div class="recent-item"><span>Last Link Scan</span><strong id="recent-link-result-duplicate">No scans yet</strong></div>
-                  <div class="recent-item"><span>Last Password Check</span><strong id="recent-password-result-duplicate">No scans yet</strong></div>
-                  <div class="recent-item"><span>Last Scam Review</span><strong id="recent-scam-result-duplicate">No scans yet</strong></div>
-                </div>
-              </article>
+            <section class="dashboard-view" data-dashboard-panel="telemetry">
+              <div class="recent-grid">
+                <article class="dashboard-card">
+                  <h3>Live Recommendations</h3>
+                  <ul id="dashboard-tips" class="clean-list">
+                    <li>Start with a quick login from the home page.</li>
+                  </ul>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Zero Trust Network Map</h3>
+                  <div class="data-list">
+                    <div class="data-row"><span>Location Context</span><strong id="map-location">Pending</strong></div>
+                    <div class="data-row"><span>VPN Detection</span><strong id="map-vpn">Pending</strong></div>
+                    <div class="data-row"><span>Impossible Travel</span><strong id="map-travel">Pending</strong></div>
+                  </div>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Score Logic</h3>
+                  <p>
+                    Trust score combines identity factors, role sensitivity, device posture, and scan behavior into a clearer
+                    security posture view.
+                  </p>
+                </article>
+              </div>
             </section>
 
-            <section class="dashboard-view" data-dashboard-panel="tips">
+            <section class="dashboard-view" data-dashboard-panel="activity">
               <article class="dashboard-card">
-                <h3>Personalized recommendations</h3>
-                <ul id="dashboard-tips" class="clean-list">
-                  <li>Start with a quick login from the home page.</li>
-                  <li>Use the tools page to scan a suspicious link or message.</li>
-                  <li>Return here for personalized recommendations.</li>
-                </ul>
+                <h3>Real-time Activity Stream</h3>
+                <div id="live-activity-feed" class="admin-feed">
+                  <div class="feed-item"><strong>Waiting for activity</strong><span>Live logs will appear after login and tool usage.</span></div>
+                </div>
               </article>
             </section>
 
             <section class="dashboard-view" data-dashboard-panel="admin">
               <article class="dashboard-card">
-                <h3>Admin monitor</h3>
+                <h3>Admin and Analyst Monitor</h3>
                 <div id="admin-feed" class="admin-feed">
                   <div class="feed-item"><strong>No activity yet</strong><span>Admin data appears after verified usage.</span></div>
                 </div>
@@ -171,33 +194,16 @@
         <div class="footer-row">
           <div>
             <strong>SecureU Dashboard</strong>
-            <p class="muted">Useful metrics, recent scans, and recommendations without fake analytics.</p>
+            <p class="muted">A live console for trust posture, verification methods, and simulated enterprise monitoring.</p>
           </div>
           <nav class="footer-nav">
             <a href="/tools.html">Run Tools</a>
-            <a href="/learning.html">Go to Learning Hub</a>
+            <a href="/audit-logs.html">View Audit Logs</a>
+            <a href="/settings.html">Open Settings</a>
           </nav>
         </div>
       </footer>
     </div>
     <script src="/script.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const sync = (sourceId, targetId) => {
-          const source = document.getElementById(sourceId);
-          const target = document.getElementById(targetId);
-          if (source && target) {
-            const observer = new MutationObserver(() => {
-              target.textContent = source.textContent;
-            });
-            target.textContent = source.textContent;
-            observer.observe(source, { childList: true, subtree: true, characterData: true });
-          }
-        };
-        sync("recent-link-result", "recent-link-result-duplicate");
-        sync("recent-password-result", "recent-password-result-duplicate");
-        sync("recent-scam-result", "recent-scam-result-duplicate");
-      });
-    </script>
   </body>
 </html>

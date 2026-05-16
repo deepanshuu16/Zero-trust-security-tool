@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Audit Logs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Audit and Access Logs</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/threat-intelligence.html">Threat Intel</a>
+          <a class="active" href="/audit-logs.html">Audit Logs</a>
+          <a href="/settings.html">Settings</a>
+          <a href="/docs.html">Docs</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Audit visibility</span>
+            <h1>Authentication, policy, and monitoring events in one place.</h1>
+            <p>Enterprise-style security products always expose log history. This page helps the demo feel much more complete.</p>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="dashboard-card dashboard-metric">
+            <span class="pill">Total Events</span>
+            <strong id="log-total-events">0</strong>
+          </article>
+          <article class="dashboard-card dashboard-metric">
+            <span class="pill warning">Blocked or Warning Events</span>
+            <strong id="log-blocked-events">0</strong>
+          </article>
+          <article class="dashboard-card dashboard-metric">
+            <span class="pill">Auth Events</span>
+            <strong id="log-auth-events">0</strong>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="section-header">
+            <span class="eyebrow">Recent Logs</span>
+            <h2>Latest activity</h2>
+          </div>
+          <div id="audit-log-list" class="admin-feed">
+            <div class="feed-item"><strong>No logs yet</strong><span>Events will appear after users interact with the platform.</span></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Audit Logs</strong>
+            <p class="muted">Logs improve realism, explainability, and platform trust.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/settings.html">Settings</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

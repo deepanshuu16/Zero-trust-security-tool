@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Threat Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Threat Intelligence View</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a class="active" href="/threat-intelligence.html">Threat Intel</a>
+          <a href="/audit-logs.html">Audit Logs</a>
+          <a href="/settings.html">Settings</a>
+          <a href="/docs.html">Docs</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Threat intelligence</span>
+            <h1>Known attack patterns, live alerts, and current platform signals.</h1>
+            <p>This page makes the platform feel more like a small SOC by collecting live event cards and highlighting attack types.</p>
+          </article>
+        </section>
+
+        <section class="news-grid">
+          <article class="news-card">
+            <span class="pill danger">Attack Type</span>
+            <h3>Credential phishing</h3>
+            <p>Fake internship portals, account verification pages, and scholarship bait sites target student accounts heavily.</p>
+          </article>
+          <article class="news-card">
+            <span class="pill warning">Attack Type</span>
+            <h3>Social engineering</h3>
+            <p>Urgent requests, OTP theft, payment manipulation, and fake recruiter messages remain the most common pattern.</p>
+          </article>
+          <article class="news-card">
+            <span class="pill">Attack Type</span>
+            <h3>Unsafe file delivery</h3>
+            <p>Executable files and disguised downloads are a common route for device compromise and data theft.</p>
+          </article>
+        </section>
+
+        <section class="grid-section">
+          <div class="section-header">
+            <span class="eyebrow">Live Demo Feed</span>
+            <h2>Threat and policy signals from the platform</h2>
+          </div>
+          <div id="threat-feed" class="news-grid">
+            <article class="news-card">
+              <span class="pill">system</span>
+              <h3>Waiting for logs</h3>
+              <p>Threat intelligence cards will update as users sign in and use the platform.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Threat Intel</strong>
+            <p class="muted">Threat visibility improves trust and makes the platform feel active instead of static.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/audit-logs.html">Audit Logs</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

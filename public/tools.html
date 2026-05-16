@@ -17,41 +17,44 @@
       <header class="site-header">
         <a class="brand" href="/index.html">
           <span class="brand-mark">SU</span>
-          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Security Tools Suite</small></span>
         </a>
         <nav class="site-nav">
           <a href="/index.html">Home</a>
-          <a class="active" href="/tools.html">Security Tools</a>
+          <a class="active" href="/tools.html">Tools</a>
           <a href="/dashboard.html">Dashboard</a>
-          <a href="/assistant.html">AI Assistant</a>
-          <a href="/learning.html">Learning Hub</a>
-          <a href="/news.html">Threat News</a>
-          <a href="/about.html">About</a>
+          <a href="/threat-intelligence.html">Threat Intel</a>
+          <a href="/audit-logs.html">Audit Logs</a>
+          <a href="/settings.html">Settings</a>
+          <a href="/docs.html">Docs</a>
         </nav>
       </header>
 
       <main>
         <section class="page-hero">
           <article class="hero-card">
-            <span class="eyebrow">Core toolkit</span>
-            <h1>Dedicated tools for everyday online safety.</h1>
-            <p>Instead of hiding everything in dashboard widgets, SecureU gives each student-focused safety tool its own space.</p>
+            <span class="eyebrow">Practical security actions</span>
+            <h1>Dedicated tools for scanning, analyzing, and reviewing digital risk.</h1>
+            <p>
+              These tools connect into the wider Zero Trust platform so results can influence score, recommendations, activity
+              streams, and risk posture instead of living in isolation.
+            </p>
           </article>
           <aside class="scan-card">
-            <span class="pill success">What this page solves</span>
-            <p>Paste a link, test a password, or analyze a suspicious message. These are the practical actions students actually need.</p>
+            <span class="pill success">Tool Summary</span>
+            <div class="data-list">
+              <div class="data-row"><span>Link Scan</span><strong id="tool-summary-link">Waiting for scan</strong></div>
+              <div class="data-row"><span>Password Health</span><strong id="tool-summary-password">Waiting for scan</strong></div>
+              <div class="data-row"><span>Scam Review</span><strong id="tool-summary-scam">Waiting for scan</strong></div>
+              <div class="data-row"><span>File Scan</span><strong id="tool-summary-file">Waiting for scan</strong></div>
+            </div>
           </aside>
         </section>
 
         <section class="grid-section">
-          <div class="section-header">
-            <span class="eyebrow">Tool Pages</span>
-            <h2>Use one tool at a time with clearer results</h2>
-          </div>
-
           <div class="tools-grid">
             <article class="tool-card">
-              <h3>Phishing Checker</h3>
+              <h3>Phishing URL Detector</h3>
               <form id="link-form" class="stack">
                 <label>
                   Paste a URL
@@ -61,7 +64,6 @@
               </form>
               <p id="link-message" class="message"></p>
             </article>
-
             <article class="tool-card result-box">
               <span class="pill">Link Result</span>
               <strong id="link-risk-label">Waiting for a scan</strong>
@@ -72,7 +74,7 @@
             </article>
 
             <article class="tool-card">
-              <h3>Password Analyzer</h3>
+              <h3>Password Health System</h3>
               <form id="password-form" class="stack">
                 <label>
                   Test a password
@@ -89,7 +91,6 @@
               </div>
               <p id="password-message" class="message"></p>
             </article>
-
             <article class="tool-card result-box">
               <span class="pill">Password Result</span>
               <strong id="password-risk-label">Waiting for analysis</strong>
@@ -100,7 +101,7 @@
             </article>
 
             <article class="tool-card">
-              <h3>AI Scam Detector</h3>
+              <h3>AI Scam Analyzer</h3>
               <form id="scam-form" class="stack">
                 <label>
                   Paste a message or email
@@ -110,13 +111,32 @@
               </form>
               <p id="scam-message" class="message"></p>
             </article>
-
             <article class="tool-card result-box">
               <span class="pill">Scam Result</span>
               <strong id="scam-risk-label">Waiting for analysis</strong>
               <p id="scam-risk-score">Scam probability: --</p>
               <ul id="scam-reasons" class="clean-list">
                 <li>SecureU will look for urgency, manipulation, payment pressure, and suspicious language.</li>
+              </ul>
+            </article>
+
+            <article class="tool-card">
+              <h3>File Security Scanner</h3>
+              <form id="file-form" class="stack">
+                <label>
+                  Upload a file
+                  <input id="file-input" type="file" required />
+                </label>
+                <button class="primary" type="submit">Scan File</button>
+              </form>
+              <p id="file-message" class="message"></p>
+            </article>
+            <article class="tool-card result-box">
+              <span class="pill">File Result</span>
+              <strong id="file-risk-label">Waiting for scan</strong>
+              <p id="file-risk-score">File risk: --</p>
+              <ul id="file-reasons" class="clean-list">
+                <li>SecureU will generate a hash and flag riskier file types in this demo scanner.</li>
               </ul>
             </article>
           </div>
@@ -126,13 +146,13 @@
       <footer class="footer-band">
         <div class="footer-row">
           <div>
-            <strong>SecureU</strong>
-            <p class="muted">Dedicated tools create better product structure, clearer value, and stronger retention.</p>
+            <strong>SecureU Tools</strong>
+            <p class="muted">Practical tools become stronger when they connect into shared logs, scores, and monitoring.</p>
           </div>
           <nav class="footer-nav">
             <a href="/dashboard.html">Dashboard</a>
-            <a href="/privacy.html">Privacy & Security</a>
-            <a href="/contact.html">Contact</a>
+            <a href="/threat-intelligence.html">Threat Intel</a>
+            <a href="/audit-logs.html">Audit Logs</a>
           </nav>
         </div>
       </footer>

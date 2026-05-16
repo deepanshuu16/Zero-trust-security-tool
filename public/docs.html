@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Platform Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Platform Documentation</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/threat-intelligence.html">Threat Intel</a>
+          <a href="/audit-logs.html">Audit Logs</a>
+          <a href="/settings.html">Settings</a>
+          <a class="active" href="/docs.html">Docs</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Architecture and docs</span>
+            <h1>How the platform is designed to work.</h1>
+            <p>Documentation makes the product feel more serious by explaining the architecture, APIs, policies, and scaling path.</p>
+          </article>
+        </section>
+
+        <section class="architecture-strip">
+          <article class="architecture-card">
+            <strong>Suggested Frontend</strong>
+            <p>Next.js, Tailwind CSS, and motion only where it supports clarity, not decoration.</p>
+          </article>
+          <article class="architecture-card">
+            <strong>Suggested Backend</strong>
+            <p>Node.js or FastAPI, API gateway, authentication services, rate limiting, and queue-backed scans.</p>
+          </article>
+          <article class="architecture-card">
+            <strong>Suggested Data Layer</strong>
+            <p>PostgreSQL, Redis, secure sessions, device history, audit logs, and scan result caching.</p>
+          </article>
+        </section>
+
+        <section class="grid-section">
+          <div class="section-header">
+            <span class="eyebrow">Example APIs</span>
+            <h2>Product interfaces that make the system feel real</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>/api/auth/login</h3>
+              <p>Primary sign-in, MFA challenge setup, and verification method selection.</p>
+            </article>
+            <article class="feature-card">
+              <h3>/api/security/analyze</h3>
+              <p>Phishing, scam, password, file, and device checks routed through shared analysis services.</p>
+            </article>
+            <article class="feature-card">
+              <h3>/api/device/verify</h3>
+              <p>Device trust, fingerprint updates, suspicious changes, and continuous session review actions.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Docs</strong>
+            <p class="muted">Documentation pages improve technical credibility and product depth.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/privacy.html">Privacy & Security</a>
+            <a href="/pricing.html">Pricing</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Security Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Security Settings</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/threat-intelligence.html">Threat Intel</a>
+          <a href="/audit-logs.html">Audit Logs</a>
+          <a class="active" href="/settings.html">Settings</a>
+          <a href="/docs.html">Docs</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="split-section">
+          <article class="panel">
+            <span class="eyebrow">Verification Controls</span>
+            <h1>Manage the demo Zero Trust stack.</h1>
+            <p class="section-copy">Use these toggles to change how the platform verifies identity and reviews session trust.</p>
+          </article>
+          <article class="panel">
+            <span class="eyebrow">Current Summary</span>
+            <h2 id="settings-summary">Active verification stack: Password</h2>
+            <p class="section-copy">These settings are saved in browser storage so you can demonstrate configuration changes across pages.</p>
+          </article>
+        </section>
+
+        <section class="panel">
+          <form id="settings-form" class="stack">
+            <label><input id="setting-email-otp" type="checkbox" /> Enable Email OTP</label>
+            <label><input id="setting-phone-otp" type="checkbox" /> Enable Phone OTP</label>
+            <label><input id="setting-google-auth" type="checkbox" /> Enable Google Auth</label>
+            <label><input id="setting-biometric" type="checkbox" /> Enable Biometric Verification</label>
+            <label><input id="setting-device-fingerprint" type="checkbox" /> Enable Device Fingerprinting</label>
+            <label><input id="setting-continuous-auth" type="checkbox" /> Enable Continuous Authentication Reviews</label>
+            <button class="primary" type="submit">Save Security Settings</button>
+          </form>
+          <p id="settings-message" class="message"></p>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Settings</strong>
+            <p class="muted">Settings panels make the platform feel configurable and enterprise-aware.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/docs.html">Docs</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>
