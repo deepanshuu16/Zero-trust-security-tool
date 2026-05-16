@@ -27,6 +27,13 @@ Important production values:
 - `PUBLIC_APP_URL`
 - `ALLOWED_ORIGINS`
 
+Recommended production CORS allowlist:
+
+- `https://zero-trust-security-tool.vercel.app`
+- `https://www.zero-trust-security-tool.vercel.app`
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
+
 ## API Routes
 
 - `GET /api/csrf-token`

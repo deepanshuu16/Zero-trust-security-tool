@@ -565,16 +565,33 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || PUBLIC_APP_URL).split(",").map((origin) => origin.trim());
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Origin not allowed."));
-    },
-    credentials: true
-  })
+const defaultAllowedOrigins = [
+  "https://zero-trust-security-tool.vercel.app",
+  "https://www.zero-trust-security-tool.vercel.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  PUBLIC_APP_URL
+];
+const allowedOrigins = Array.from(
+  new Set(
+    (process.env.ALLOWED_ORIGINS || defaultAllowedOrigins.join(","))
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  )
 );
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`Origin not allowed: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "CSRF-Token", "X-CSRF-Token"],
+  optionsSuccessStatus: 204
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use("/api", async (request, response, next) => {
   try {
