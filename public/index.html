@@ -7,19 +7,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body>
+  <body class="premium-home">
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <div class="cyber-backdrop" aria-hidden="true">
+      <span class="mesh mesh-a"></span>
+      <span class="mesh mesh-b"></span>
+      <span class="scan-beam"></span>
+    </div>
+
     <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="/index.html">
-          <span class="brand-mark">SU</span>
+          <span class="brand-mark">ZT</span>
           <span class="brand-copy">
             <strong>SecureU</strong>
-            <small>AI-Powered Digital Safety Platform</small>
+            <small>Zero Trust Security Platform</small>
           </span>
         </a>
         <nav class="site-nav">
@@ -34,85 +41,160 @@
       </header>
 
       <main>
-        <section class="page-hero">
-          <article class="hero-card">
-            <span class="eyebrow">Zero Trust for students and teams</span>
-            <h1>A security ecosystem with identity, device trust, monitoring, and practical protection tools.</h1>
-            <p>
-              SecureU combines phishing checks, scam analysis, password health, file review, device trust, session risk scoring,
-              and continuous verification into one cleaner security platform.
+        <section class="hero-os section-reveal">
+          <article class="hero-copy">
+            <span class="eyebrow">AI-powered continuous verification</span>
+            <h1>Zero Trust Security Platform</h1>
+            <p class="hero-subtitle">
+              AI-powered real-time cybersecurity ecosystem for continuous verification and adaptive protection.
             </p>
+            <p id="hero-typing" class="typing-line">Securing access...</p>
             <div class="hero-actions">
-              <a class="button-primary" href="/dashboard.html">Open Security Dashboard</a>
-              <a class="button-secondary" href="/tools.html">Run Security Tools</a>
+              <a class="button-primary" href="#quick-access">Get Started</a>
+              <a class="button-secondary" href="/dashboard.html">Live Demo</a>
             </div>
-
-            <div class="hero-proof">
-              <div class="info-card">
-                <h3 class="card-title">Identity Verification Engine</h3>
-                <p>Email OTP, phone OTP, Google Auth, biometrics, and device fingerprinting can be represented in one policy stack.</p>
+            <div class="hero-stats">
+              <div>
+                <strong class="counter" data-count="1200000">0</strong>
+                <span>Requests Secured</span>
               </div>
-              <div class="info-card">
-                <h3 class="card-title">Continuous Verification</h3>
-                <p>Sessions are reviewed repeatedly instead of being trusted forever after the first login.</p>
+              <div>
+                <strong><span class="counter" data-count="98.7">0</span>%</strong>
+                <span>Threat Detection</span>
               </div>
-              <div class="info-card">
-                <h3 class="card-title">Live Monitoring</h3>
-                <p>Threat level, blocked attacks, suspicious devices, and access decisions stay visible across the product.</p>
+              <div>
+                <strong><span class="counter" data-count="54000">0</span></strong>
+                <span>Active Sessions</span>
               </div>
             </div>
           </article>
 
-          <aside class="hero-visual">
-            <div class="scan-card">
-              <span class="pill">Platform snapshot</span>
-              <strong id="hero-score">82</strong>
-              <p id="home-score-summary">Sign in to generate your own personalized Zero Trust posture score.</p>
+          <aside class="hero-command-center">
+            <div class="globe-stage">
+              <canvas id="cyber-globe" width="520" height="520" aria-label="Animated cybersecurity globe"></canvas>
+              <div class="orbit orbit-one"></div>
+              <div class="orbit orbit-two"></div>
+              <div class="live-chip chip-a">Blocked API probe</div>
+              <div class="live-chip chip-b">Identity verified</div>
             </div>
-
-            <div class="visual-stack">
-              <div class="feature-card">
-                <h3>Threat level</h3>
-                <p>See whether the environment is guarded, elevated, or critical based on session risk.</p>
+            <div class="dashboard-preview">
+              <div class="preview-header">
+                <span class="pill success">Live dashboard</span>
+                <span class="status-dot"></span>
               </div>
-              <div class="feature-card">
-                <h3>Active roles</h3>
-                <p>Admin, employee, analyst, and guest users each receive different access surfaces.</p>
+              <div class="preview-score">
+                <span>Trust posture</span>
+                <strong id="hero-score">82</strong>
               </div>
-              <div class="feature-card">
-                <h3>Enterprise path</h3>
-                <p>Roadmap sections explain API layers, queues, caching, and security controls for scale.</p>
+              <p id="home-score-summary">Sign in to generate your own personalized security score and recommendations.</p>
+              <div class="terminal-feed">
+                <span>[verify] employee identity accepted</span>
+                <span>[risk] impossible travel check clear</span>
+                <span>[policy] adaptive MFA ready</span>
               </div>
             </div>
           </aside>
         </section>
 
-        <section class="grid-section">
+        <section class="monitoring-section section-reveal">
           <div class="section-header">
-            <span class="eyebrow">Core Zero Trust Workflow</span>
-            <h2>One connected system instead of isolated tools</h2>
+            <span class="eyebrow">Live Threat Monitoring</span>
+            <h2>Global attacks, blocked before access is trusted.</h2>
           </div>
-          <div class="architecture-strip">
-            <article class="architecture-card">
-              <strong>1. Identity + Device Verification</strong>
-              <p>Password login, OTP, verification stack selection, and device fingerprinting begin the flow.</p>
+          <div class="monitoring-grid">
+            <article class="attack-map panel">
+              <div class="map-grid" aria-hidden="true">
+                <span class="attack-node node-us"></span>
+                <span class="attack-node node-eu"></span>
+                <span class="attack-node node-apac"></span>
+                <span class="attack-line line-one"></span>
+                <span class="attack-line line-two"></span>
+                <span class="attack-line line-three"></span>
+              </div>
+              <div class="map-copy">
+                <span class="pill danger">Real-time attack map</span>
+                <strong class="counter" data-count="7428">0</strong>
+                <p>Threats blocked across identity, API, VPN, and device trust layers today.</p>
+              </div>
             </article>
-            <article class="architecture-card">
-              <strong>2. Session Risk Analysis</strong>
-              <p>Location, browser change, failed attempts, VPN-like signals, and impossible travel raise or lower risk.</p>
-            </article>
-            <article class="architecture-card">
-              <strong>3. Continuous Monitoring</strong>
-              <p>Threat logs, audit streams, recommendations, and repeated re-checks keep the session under review.</p>
+            <article class="threat-feed-card panel">
+              <div class="feed-head">
+                <h3>Threat Feed</h3>
+                <span class="pulse-label">Live</span>
+              </div>
+              <div class="threat-feed-list">
+                <div class="feed-item"><strong>Threat blocked from Russia</strong><span>Credential stuffing pattern stopped</span></div>
+                <div class="feed-item"><strong>Suspicious login detected</strong><span>New browser fingerprint requires MFA</span></div>
+                <div class="feed-item"><strong>VPN anomaly detected</strong><span>Risk score raised to medium</span></div>
+                <div class="feed-item"><strong>Unauthorized API request blocked</strong><span>Policy denied token replay attempt</span></div>
+              </div>
             </article>
           </div>
         </section>
 
-        <section class="split-section">
+        <section class="workflow-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Zero Trust Workflow</span>
+            <h2>Never trust. Continuously verify.</h2>
+          </div>
+          <div class="workflow-grid">
+            <article class="workflow-card"><span>01</span><h3>Identity Verification</h3><p>Password, OTP, and role checks establish the first trust boundary.</p></article>
+            <article class="workflow-card"><span>02</span><h3>Device Authentication</h3><p>Browser, OS, fingerprint, and device context are scored before access.</p></article>
+            <article class="workflow-card"><span>03</span><h3>Risk Analysis</h3><p>Behavior, failed attempts, VPN signals, and location context shape policy.</p></article>
+            <article class="workflow-card"><span>04</span><h3>Access Control</h3><p>Least-privilege views keep admin, analyst, employee, and guest users separated.</p></article>
+            <article class="workflow-card"><span>05</span><h3>Continuous Monitoring</h3><p>Sessions are reviewed repeatedly instead of being trusted after login.</p></article>
+            <article class="workflow-card"><span>06</span><h3>Threat Response</h3><p>Suspicious actions are logged, blocked, and surfaced in the security console.</p></article>
+          </div>
+        </section>
+
+        <section class="analytics-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Dashboard Analytics</span>
+            <h2>Security telemetry that makes the product feel operational.</h2>
+          </div>
+          <div class="analytics-grid">
+            <article class="dashboard-card">
+              <h3>Threat Trends</h3>
+              <canvas class="mini-chart" id="threat-trend-chart" width="520" height="260"></canvas>
+            </article>
+            <article class="dashboard-card">
+              <h3>Login Attempts</h3>
+              <canvas class="mini-chart" id="login-attempt-chart" width="520" height="260"></canvas>
+            </article>
+            <article class="dashboard-card stat-card">
+              <span class="pill success">Trusted devices</span>
+              <strong><span class="counter" data-count="987">0</span></strong>
+              <p>Known devices monitored through continuous trust scoring.</p>
+            </article>
+            <article class="dashboard-card stat-card">
+              <span class="pill warning">Risk scores</span>
+              <strong><span class="counter" data-count="37">0</span></strong>
+              <p>Average live session risk across current demo telemetry.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="ai-section section-reveal">
+          <div class="neural-network" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="section-header">
+            <span class="eyebrow">AI Security Intelligence</span>
+            <h2>Adaptive protection powered by behavior, context, and prediction.</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card"><h3>Behavioral Analysis</h3><p>Understands login patterns, session behavior, and abnormal access attempts.</p></article>
+            <article class="feature-card"><h3>AI Threat Prediction</h3><p>Flags likely attacks before they become confirmed incidents.</p></article>
+            <article class="feature-card"><h3>Device Trust Scoring</h3><p>Scores each endpoint with browser, OS, risk, and fingerprint signals.</p></article>
+            <article class="feature-card"><h3>Adaptive Authentication</h3><p>Raises or lowers verification friction based on live risk posture.</p></article>
+          </div>
+        </section>
+
+        <section id="quick-access" class="split-section section-reveal">
           <article class="panel">
             <div class="section-header">
               <span class="eyebrow">Quick Demo Access</span>
-              <h2>Login as different platform roles</h2>
+              <h2>Start a verified session</h2>
             </div>
             <div class="pill-row">
               <span class="pill">Admin: admin / Admin@123</span>
@@ -155,45 +237,38 @@
           </article>
         </section>
 
-        <section class="grid-section">
+        <section class="tools-showcase section-reveal">
           <div class="section-header">
-            <span class="eyebrow">Investor-facing depth</span>
-            <h2>Why this is more than a student dashboard</h2>
+            <span class="eyebrow">Security Tools</span>
+            <h2>Organized utilities that connect back to the security platform.</h2>
           </div>
-          <div class="feature-grid">
-            <article class="feature-card">
-              <h3>Scalable Architecture</h3>
-              <p>Designed to evolve toward API services, Redis caching, queues, databases, and AI analysis layers.</p>
-            </article>
-            <article class="feature-card">
-              <h3>Retention Loops</h3>
-              <p>Users return for score changes, security recommendations, live alerts, and learning challenges.</p>
-            </article>
-            <article class="feature-card">
-              <h3>Product Lock-In</h3>
-              <p>Device trust history, role-aware analytics, audit logs, and student-specific scam intelligence create a stronger moat.</p>
-            </article>
+          <div class="tool-category-grid">
+            <a class="tool-category" href="/tools.html"><span>AUTH</span><h3>Authentication Tools</h3><p>MFA verifier and password checker.</p></a>
+            <a class="tool-category" href="/tools.html"><span>MON</span><h3>Monitoring Tools</h3><p>Threat analyzer and session tracker.</p></a>
+            <a class="tool-category" href="/tools.html"><span>ENC</span><h3>Encryption Tools</h3><p>Hash generator and encryption tester.</p></a>
+            <a class="tool-category" href="/tools.html"><span>NET</span><h3>Network Security</h3><p>IP scanner and device analyzer.</p></a>
           </div>
         </section>
 
-        <section class="callout-band">
+        <section class="callout-band section-reveal">
           <span class="eyebrow">Platform Goal</span>
-          <h2>SecureU should feel like a cybersecurity SaaS platform, not a page of disconnected widgets.</h2>
-          <p id="home-session-status">No verified session yet. Use the login flow above to explore the full platform.</p>
+          <h2>A premium AI-powered cybersecurity operating system.</h2>
+          <p id="home-session-status">No verified session yet. Use the quick login above to explore the full platform.</p>
         </section>
       </main>
 
       <footer class="footer-band">
-        <div class="footer-row">
+        <div class="footer-row footer-rich">
           <div>
-            <strong>SecureU Platform</strong>
-            <p class="muted">Zero Trust identity, device trust, threat analytics, and practical digital safety in one product direction.</p>
+            <a class="brand footer-brand" href="/index.html"><span class="brand-mark">ZT</span><span class="brand-copy"><strong>SecureU</strong><small>Enterprise security OS</small></span></a>
+            <p class="muted">Zero Trust identity, device trust, AI analytics, and practical digital safety in one product direction.</p>
           </div>
           <nav class="footer-nav">
+            <a href="/docs.html">Documentation</a>
+            <a href="/privacy.html">Compliance</a>
             <a href="/pricing.html">Pricing</a>
-            <a href="/privacy.html">Privacy & Security</a>
-            <a href="/about.html">About</a>
-            <a href="/contact.html">Contact</a>
+            <a href="/contact.html">GitHub</a>
+            <a href="/dashboard.html">API Status</a>
           </nav>
         </div>
       </footer>

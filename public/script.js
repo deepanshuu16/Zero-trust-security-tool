@@ -713,6 +713,272 @@ function renderThreatMap(session) {
   setText("map-travel", session ? (session.trust.impossibleTravel ? "Impossible travel flagged" : "No travel conflict detected") : "Pending");
 }
 
+function initScrollReveal() {
+  const sections = Array.from(document.querySelectorAll(".section-reveal"));
+  if (!sections.length) return;
+  const reveal = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          reveal.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.16 }
+  );
+  sections.forEach((section) => reveal.observe(section));
+}
+
+function initMouseGlow() {
+  const glow = document.querySelector(".mouse-glow");
+  if (!glow) return;
+  window.addEventListener("pointermove", (event) => {
+    document.documentElement.style.setProperty("--cursor-x", `${event.clientX}px`);
+    document.documentElement.style.setProperty("--cursor-y", `${event.clientY}px`);
+  });
+}
+
+function initTypingLoop() {
+  const target = document.getElementById("hero-typing");
+  if (!target) return;
+  const phrases = ["Securing access...", "Verifying identity...", "Analyzing threats...", "Scoring device trust..."];
+  let phraseIndex = 0;
+  let charIndex = 0;
+  let deleting = false;
+
+  const tick = () => {
+    const phrase = phrases[phraseIndex];
+    target.textContent = phrase.slice(0, charIndex);
+    if (!deleting && charIndex < phrase.length) {
+      charIndex += 1;
+    } else if (deleting && charIndex > 0) {
+      charIndex -= 1;
+    } else {
+      deleting = !deleting;
+      if (!deleting) phraseIndex = (phraseIndex + 1) % phrases.length;
+    }
+    const delay = deleting ? 42 : charIndex === phrase.length ? 1200 : 72;
+    window.setTimeout(tick, delay);
+  };
+  tick();
+}
+
+function animateCounters() {
+  const counters = Array.from(document.querySelectorAll(".counter"));
+  if (!counters.length) return;
+  const counterObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || entry.target.dataset.animated) return;
+        entry.target.dataset.animated = "true";
+        const target = Number(entry.target.dataset.count || "0");
+        const isDecimal = !Number.isInteger(target);
+        const start = performance.now();
+        const duration = 1400;
+        const step = (now) => {
+          const progress = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const value = target * eased;
+          entry.target.textContent = isDecimal ? value.toFixed(1) : Math.round(value).toLocaleString();
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        counterObserver.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.35 }
+  );
+  counters.forEach((counter) => counterObserver.observe(counter));
+}
+
+function drawLineChart(canvas, points, color = "#00d1ff", fill = "rgba(0,209,255,0.14)") {
+  if (!canvas) return;
+  const context = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 28;
+  const max = Math.max(...points) + 10;
+  const min = Math.min(...points) - 8;
+  context.clearRect(0, 0, width, height);
+  context.strokeStyle = "rgba(0,209,255,0.12)";
+  context.lineWidth = 1;
+  for (let i = 0; i < 5; i += 1) {
+    const y = padding + ((height - padding * 2) / 4) * i;
+    context.beginPath();
+    context.moveTo(padding, y);
+    context.lineTo(width - padding, y);
+    context.stroke();
+  }
+
+  const coords = points.map((point, index) => {
+    const x = padding + ((width - padding * 2) / (points.length - 1)) * index;
+    const y = height - padding - ((point - min) / (max - min)) * (height - padding * 2);
+    return { x, y };
+  });
+
+  context.beginPath();
+  coords.forEach((coord, index) => {
+    if (index === 0) context.moveTo(coord.x, coord.y);
+    else context.lineTo(coord.x, coord.y);
+  });
+  context.lineTo(width - padding, height - padding);
+  context.lineTo(padding, height - padding);
+  context.closePath();
+  context.fillStyle = fill;
+  context.fill();
+
+  context.beginPath();
+  coords.forEach((coord, index) => {
+    if (index === 0) context.moveTo(coord.x, coord.y);
+    else context.lineTo(coord.x, coord.y);
+  });
+  context.strokeStyle = color;
+  context.lineWidth = 4;
+  context.shadowColor = color;
+  context.shadowBlur = 16;
+  context.stroke();
+  context.shadowBlur = 0;
+  coords.forEach((coord) => {
+    context.beginPath();
+    context.arc(coord.x, coord.y, 4, 0, Math.PI * 2);
+    context.fillStyle = color;
+    context.fill();
+  });
+}
+
+function drawBarChart(canvas, points, color = "#7c3aed") {
+  if (!canvas) return;
+  const context = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 28;
+  const max = Math.max(...points) + 10;
+  const barWidth = (width - padding * 2) / points.length - 12;
+  context.clearRect(0, 0, width, height);
+  context.strokeStyle = "rgba(0,209,255,0.12)";
+  for (let i = 0; i < 5; i += 1) {
+    const y = padding + ((height - padding * 2) / 4) * i;
+    context.beginPath();
+    context.moveTo(padding, y);
+    context.lineTo(width - padding, y);
+    context.stroke();
+  }
+  points.forEach((point, index) => {
+    const x = padding + index * (barWidth + 12);
+    const barHeight = (point / max) * (height - padding * 2);
+    const y = height - padding - barHeight;
+    const gradient = context.createLinearGradient(0, y, 0, height - padding);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(1, "rgba(0,209,255,0.24)");
+    context.fillStyle = gradient;
+    context.shadowColor = color;
+    context.shadowBlur = 12;
+    context.fillRect(x, y, barWidth, barHeight);
+    context.shadowBlur = 0;
+  });
+}
+
+function renderCharts(state = readState()) {
+  const warningCount = state.logs.filter((log) => log.level === "warning").length;
+  const successCount = state.logs.filter((log) => log.level === "success").length;
+  const trend = [18, 24 + warningCount, 20, 36, 31 + successCount, 44, 38 + warningCount, 52];
+  const logins = [42, 57, 48 + state.failedAttempts * 3, 69, 61, 73, 66, 82];
+  drawLineChart(document.getElementById("threat-trend-chart"), trend, "#00d1ff", "rgba(0,209,255,0.12)");
+  drawBarChart(document.getElementById("login-attempt-chart"), logins, "#7c3aed");
+  drawLineChart(document.getElementById("dashboard-risk-chart"), [22, 34, 29, 44, 36, 52, 41, 37 + warningCount], "#ff9f1c", "rgba(255,159,28,0.12)");
+  drawBarChart(document.getElementById("dashboard-device-chart"), [78, 88, 71, 93, 84, 97, 89, 94], "#00ffb2");
+}
+
+function initCyberGlobe() {
+  const canvas = document.getElementById("cyber-globe");
+  if (!canvas) return;
+  const context = canvas.getContext("2d");
+  const nodes = Array.from({ length: 58 }, (_, index) => ({
+    lat: -70 + Math.random() * 140,
+    lon: (index / 58) * 360 + Math.random() * 28,
+    pulse: Math.random() * Math.PI * 2
+  }));
+  let rotation = 0;
+
+  const project = (lat, lon, radius, center) => {
+    const phi = (lat * Math.PI) / 180;
+    const theta = ((lon + rotation) * Math.PI) / 180;
+    const x = center + radius * Math.cos(phi) * Math.sin(theta);
+    const y = center + radius * Math.sin(phi);
+    const z = Math.cos(phi) * Math.cos(theta);
+    return { x, y, z };
+  };
+
+  const draw = () => {
+    const size = canvas.width;
+    const center = size / 2;
+    const radius = size * 0.36;
+    context.clearRect(0, 0, size, size);
+
+    const glow = context.createRadialGradient(center, center, radius * 0.2, center, center, radius * 1.1);
+    glow.addColorStop(0, "rgba(0,209,255,0.20)");
+    glow.addColorStop(0.72, "rgba(124,58,237,0.10)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    context.fillStyle = glow;
+    context.beginPath();
+    context.arc(center, center, radius * 1.18, 0, Math.PI * 2);
+    context.fill();
+
+    context.strokeStyle = "rgba(0,209,255,0.34)";
+    context.lineWidth = 1;
+    for (let lat = -60; lat <= 60; lat += 30) {
+      context.beginPath();
+      for (let lon = 0; lon <= 360; lon += 8) {
+        const point = project(lat, lon, radius, center);
+        if (point.z < -0.18) continue;
+        if (lon === 0) context.moveTo(point.x, point.y);
+        else context.lineTo(point.x, point.y);
+      }
+      context.stroke();
+    }
+    for (let lon = 0; lon < 360; lon += 30) {
+      context.beginPath();
+      for (let lat = -80; lat <= 80; lat += 8) {
+        const point = project(lat, lon, radius, center);
+        if (point.z < -0.18) continue;
+        if (lat === -80) context.moveTo(point.x, point.y);
+        else context.lineTo(point.x, point.y);
+      }
+      context.stroke();
+    }
+
+    nodes.forEach((node, index) => {
+      const point = project(node.lat, node.lon, radius, center);
+      if (point.z < 0) return;
+      const alpha = 0.3 + point.z * 0.7;
+      const sizeMod = 2 + Math.sin(node.pulse + rotation / 18) * 1.2;
+      context.fillStyle = index % 7 === 0 ? `rgba(255,77,109,${alpha})` : `rgba(0,255,178,${alpha})`;
+      context.beginPath();
+      context.arc(point.x, point.y, sizeMod, 0, Math.PI * 2);
+      context.fill();
+    });
+
+    for (let i = 0; i < 7; i += 1) {
+      const a = nodes[i * 3];
+      const b = nodes[i * 3 + 8];
+      const p1 = project(a.lat, a.lon, radius, center);
+      const p2 = project(b.lat, b.lon, radius, center);
+      if (p1.z < 0 || p2.z < 0) continue;
+      context.strokeStyle = i % 2 ? "rgba(255,77,109,0.52)" : "rgba(0,209,255,0.52)";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.moveTo(p1.x, p1.y);
+      context.lineTo(p2.x, p2.y);
+      context.stroke();
+    }
+
+    rotation += 0.28;
+    requestAnimationFrame(draw);
+  };
+  draw();
+}
+
 function renderToolsSnapshot(state) {
   setText("tool-summary-link", state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "Waiting for scan");
   setText(
@@ -1082,11 +1348,17 @@ function renderAll() {
   renderAuditLogsPage(state);
   renderSettingsPage(state);
   renderScorePage(state);
+  renderCharts(state);
 }
 
 window.addEventListener("storage", renderAll);
 
 document.addEventListener("DOMContentLoaded", () => {
+  initMouseGlow();
+  initScrollReveal();
+  initTypingLoop();
+  animateCounters();
+  initCyberGlobe();
   initLoginFlow();
   initDashboardTabs();
   initToolsPage();

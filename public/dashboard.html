@@ -7,16 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <div class="cyber-backdrop" aria-hidden="true"><span class="mesh mesh-a"></span><span class="mesh mesh-b"></span><span class="scan-beam"></span></div>
     <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="/index.html">
-          <span class="brand-mark">SU</span>
+          <span class="brand-mark">ZT</span>
           <span class="brand-copy"><strong>SecureU</strong><small>Zero Trust Monitoring Console</small></span>
         </a>
         <nav class="site-nav">
@@ -65,6 +67,7 @@
               <div class="dashboard-nav">
                 <button class="secondary active" type="button" data-dashboard-view="overview">Overview</button>
                 <button class="secondary" type="button" data-dashboard-view="telemetry">Telemetry</button>
+                <button class="secondary" type="button" data-dashboard-view="analytics">Analytics</button>
                 <button class="secondary" type="button" data-dashboard-view="activity">Live Activity</button>
                 <button class="secondary" type="button" data-dashboard-view="admin">Admin Monitor</button>
               </div>
@@ -165,6 +168,29 @@
                     Trust score combines identity factors, role sensitivity, device posture, and scan behavior into a clearer
                     security posture view.
                   </p>
+                </article>
+              </div>
+            </section>
+
+            <section class="dashboard-view" data-dashboard-panel="analytics">
+              <div class="recent-grid">
+                <article class="dashboard-card">
+                  <h3>Risk Score Movement</h3>
+                  <canvas class="mini-chart" id="dashboard-risk-chart" width="520" height="260"></canvas>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Active Device Trust</h3>
+                  <canvas class="mini-chart" id="dashboard-device-chart" width="520" height="260"></canvas>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Analytics Summary</h3>
+                  <div class="data-list">
+                    <div class="data-row"><span>Requests Secured</span><strong>1.2M</strong></div>
+                    <div class="data-row"><span>Threat Detection</span><strong>98.7%</strong></div>
+                    <div class="data-row"><span>Active Sessions</span><strong>54K</strong></div>
+                  </div>
                 </article>
               </div>
             </section>

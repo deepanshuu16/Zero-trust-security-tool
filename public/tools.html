@@ -7,16 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body class="page-dark">
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <div class="cyber-backdrop" aria-hidden="true"><span class="mesh mesh-a"></span><span class="mesh mesh-b"></span><span class="scan-beam"></span></div>
     <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="/index.html">
-          <span class="brand-mark">SU</span>
+          <span class="brand-mark">ZT</span>
           <span class="brand-copy"><strong>SecureU</strong><small>Security Tools Suite</small></span>
         </a>
         <nav class="site-nav">
@@ -31,13 +33,12 @@
       </header>
 
       <main>
-        <section class="page-hero">
+        <section class="page-hero section-reveal">
           <article class="hero-card">
-            <span class="eyebrow">Practical security actions</span>
-            <h1>Dedicated tools for scanning, analyzing, and reviewing digital risk.</h1>
+            <span class="eyebrow">Organized security utilities</span>
+            <h1>Security tools connected to your Zero Trust posture.</h1>
             <p>
-              These tools connect into the wider Zero Trust platform so results can influence score, recommendations, activity
-              streams, and risk posture instead of living in isolation.
+              Authentication, monitoring, encryption, and network checks feed the same security score, audit trail, and risk model.
             </p>
           </article>
           <aside class="scan-card">
@@ -51,29 +52,14 @@
           </aside>
         </section>
 
-        <section class="grid-section">
+        <section class="grid-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Authentication Tools</span>
+            <h2>MFA readiness and credential strength.</h2>
+          </div>
           <div class="tools-grid">
             <article class="tool-card">
-              <h3>Phishing URL Detector</h3>
-              <form id="link-form" class="stack">
-                <label>
-                  Paste a URL
-                  <input id="link-input" type="url" placeholder="https://example.com/internship" required />
-                </label>
-                <button class="primary" type="submit">Scan Link</button>
-              </form>
-              <p id="link-message" class="message"></p>
-            </article>
-            <article class="tool-card result-box">
-              <span class="pill">Link Result</span>
-              <strong id="link-risk-label">Waiting for a scan</strong>
-              <p id="link-risk-score">Risk score: --</p>
-              <ul id="link-reasons" class="clean-list">
-                <li>SecureU will explain why a link looks safe, suspicious, or dangerous.</li>
-              </ul>
-            </article>
-
-            <article class="tool-card">
+              <span class="pill">MFA verifier</span>
               <h3>Password Health System</h3>
               <form id="password-form" class="stack">
                 <label>
@@ -99,8 +85,38 @@
                 <li>SecureU will rate length, variety, reuse risk, and common-password weakness.</li>
               </ul>
             </article>
+          </div>
+        </section>
+
+        <section class="grid-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Monitoring Tools</span>
+            <h2>Threat analyzer and session risk signals.</h2>
+          </div>
+          <div class="tools-grid">
+            <article class="tool-card">
+              <span class="pill danger">Threat analyzer</span>
+              <h3>Phishing URL Detector</h3>
+              <form id="link-form" class="stack">
+                <label>
+                  Paste a URL
+                  <input id="link-input" type="url" placeholder="https://example.com/internship" required />
+                </label>
+                <button class="primary" type="submit">Scan Link</button>
+              </form>
+              <p id="link-message" class="message"></p>
+            </article>
+            <article class="tool-card result-box">
+              <span class="pill">Link Result</span>
+              <strong id="link-risk-label">Waiting for a scan</strong>
+              <p id="link-risk-score">Risk score: --</p>
+              <ul id="link-reasons" class="clean-list">
+                <li>SecureU will explain why a link looks safe, suspicious, or dangerous.</li>
+              </ul>
+            </article>
 
             <article class="tool-card">
+              <span class="pill warning">Session tracker</span>
               <h3>AI Scam Analyzer</h3>
               <form id="scam-form" class="stack">
                 <label>
@@ -119,8 +135,17 @@
                 <li>SecureU will look for urgency, manipulation, payment pressure, and suspicious language.</li>
               </ul>
             </article>
+          </div>
+        </section>
 
+        <section class="grid-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Encryption Tools</span>
+            <h2>Hash generation and file integrity checks.</h2>
+          </div>
+          <div class="tools-grid">
             <article class="tool-card">
+              <span class="pill success">Hash generator</span>
               <h3>File Security Scanner</h3>
               <form id="file-form" class="stack">
                 <label>
@@ -139,6 +164,19 @@
                 <li>SecureU will generate a hash and flag riskier file types in this demo scanner.</li>
               </ul>
             </article>
+          </div>
+        </section>
+
+        <section class="grid-section section-reveal">
+          <div class="section-header">
+            <span class="eyebrow">Network Security</span>
+            <h2>Device analyzer and IP posture preview.</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card"><span class="pill">IP scanner</span><h3>Network Risk Preview</h3><p>Checks VPN-like signals, location context, and impossible-travel style risk in the dashboard telemetry.</p></article>
+            <article class="feature-card"><span class="pill success">Device analyzer</span><h3>Trust Fingerprint</h3><p>Browser, OS, and device type are converted into a stable fingerprint for policy decisions.</p></article>
+            <article class="feature-card"><span class="pill warning">API shield</span><h3>Request Guard</h3><p>Unauthorized requests are represented in logs and counted in blocked attack metrics.</p></article>
+            <article class="feature-card"><span class="pill danger">Session containment</span><h3>Adaptive Lockdown</h3><p>High-risk users can be restricted while low-risk users continue with monitored access.</p></article>
           </div>
         </section>
       </main>
