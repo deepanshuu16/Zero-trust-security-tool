@@ -391,80 +391,242 @@
           </div>
         </section>
 
-        <section class="panel access-panel">
+        <section id="app-workspace" class="panel app-workspace hidden">
           <div class="section-header">
             <div class="section-title">
-              <p class="eyebrow muted">Protected Areas</p>
-              <h2>Role-specific access surfaces</h2>
+              <p class="eyebrow muted">Verified Workspace</p>
+              <h2>Multi-view control center</h2>
             </div>
             <button id="logout-btn" class="secondary" type="button">Logout</button>
           </div>
 
-          <div class="security-grid">
-            <article class="telemetry-card">
-              <h3>Session Telemetry</h3>
-              <div class="telemetry-list">
-                <div class="telemetry-row"><span>IP Address</span><strong id="ip-address">Pending</strong></div>
-                <div class="telemetry-row"><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
-                <div class="telemetry-row"><span>Device Type</span><strong id="device-type">Pending</strong></div>
-                <div class="telemetry-row"><span>Browser</span><strong id="browser-name">Pending</strong></div>
-                <div class="telemetry-row"><span>Operating System</span><strong id="os-name">Pending</strong></div>
+          <div class="workspace-shell">
+            <aside class="workspace-sidebar">
+              <div class="workspace-user-card">
+                <span class="workspace-badge">Verified Session</span>
+                <h3 id="workspace-user-name">No active user</h3>
+                <p id="workspace-user-role">Login required</p>
               </div>
-            </article>
 
-            <article class="telemetry-card">
-              <h3>Policy Evaluation</h3>
-              <div class="telemetry-list">
-                <div class="telemetry-row"><span>Trust Status</span><strong id="trust-status">Pending</strong></div>
-                <div class="telemetry-row"><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
-                <div class="telemetry-row"><span>Session Created</span><strong id="session-created">Pending</strong></div>
-                <div class="telemetry-row"><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
-                <div class="telemetry-row"><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
+              <div class="workspace-nav">
+                <button class="workspace-nav-btn active" type="button" data-view="overview">Overview</button>
+                <button class="workspace-nav-btn" type="button" data-view="vault">Secret Vault</button>
+                <button class="workspace-nav-btn" type="button" data-view="documents">Document Hub</button>
+                <button class="workspace-nav-btn" type="button" data-view="access">Role Access</button>
+                <button class="workspace-nav-btn admin-only hidden" type="button" data-view="monitor">Admin Monitor</button>
               </div>
-            </article>
 
-            <article class="telemetry-card telemetry-card-wide">
-              <h3>Trust Reasons</h3>
-              <ul id="trust-reasons" class="insight-list">
-                <li>Session analysis will appear here after login.</li>
-              </ul>
-            </article>
-          </div>
+              <div class="workspace-mini-status">
+                <div>
+                  <span class="trust-label">Trust Score</span>
+                  <strong id="workspace-trust-score">Pending</strong>
+                </div>
+                <div>
+                  <span class="trust-label">Vault State</span>
+                  <strong id="vault-quick-status">Locked</strong>
+                </div>
+                <div>
+                  <span class="trust-label">Stored Files</span>
+                  <strong id="workspace-doc-count">0</strong>
+                </div>
+              </div>
+            </aside>
 
-          <div id="admin-monitor" class="admin-monitor hidden">
-            <div class="section-title">
-              <p class="eyebrow muted">Admin Monitor</p>
-              <h2>Who is logging in as employee or guest</h2>
+            <div class="workspace-stage">
+              <section class="workspace-view active" data-view-panel="overview">
+                <div class="view-header">
+                  <div>
+                    <p class="eyebrow muted">Slide 01</p>
+                    <h3>Operational Overview</h3>
+                  </div>
+                  <div class="panel-chip">Live zero trust posture</div>
+                </div>
+
+                <div class="app-kpi-grid">
+                  <article class="app-kpi-card">
+                    <span>Identity Status</span>
+                    <strong id="app-identity-status">Pending</strong>
+                    <p>Whether the active user is verified and trusted.</p>
+                  </article>
+                  <article class="app-kpi-card">
+                    <span>Policy Mode</span>
+                    <strong id="app-policy-mode">Pending</strong>
+                    <p>Current authorization outcome for this session.</p>
+                  </article>
+                  <article class="app-kpi-card">
+                    <span>Network Zone</span>
+                    <strong id="app-network-zone">Pending</strong>
+                    <p>Context classification of this browser session.</p>
+                  </article>
+                </div>
+
+                <div class="overview-grid">
+                  <article class="telemetry-card">
+                    <h3>Session Telemetry</h3>
+                    <div class="telemetry-list">
+                      <div class="telemetry-row"><span>IP Address</span><strong id="ip-address">Pending</strong></div>
+                      <div class="telemetry-row"><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
+                      <div class="telemetry-row"><span>Device Type</span><strong id="device-type">Pending</strong></div>
+                      <div class="telemetry-row"><span>Browser</span><strong id="browser-name">Pending</strong></div>
+                      <div class="telemetry-row"><span>Operating System</span><strong id="os-name">Pending</strong></div>
+                    </div>
+                  </article>
+
+                  <article class="telemetry-card">
+                    <h3>Policy Evaluation</h3>
+                    <div class="telemetry-list">
+                      <div class="telemetry-row"><span>Trust Status</span><strong id="trust-status">Pending</strong></div>
+                      <div class="telemetry-row"><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
+                      <div class="telemetry-row"><span>Session Created</span><strong id="session-created">Pending</strong></div>
+                      <div class="telemetry-row"><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
+                      <div class="telemetry-row"><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
+                    </div>
+                  </article>
+
+                  <article class="telemetry-card telemetry-card-wide">
+                    <h3>Trust Reasons</h3>
+                    <ul id="trust-reasons" class="insight-list">
+                      <li>Session analysis will appear here after login.</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="vault">
+                <div class="view-header">
+                  <div>
+                    <p class="eyebrow muted">Slide 02</p>
+                    <h3>Secret Vault</h3>
+                  </div>
+                  <div id="vault-banner" class="panel-chip">Set your private vault key</div>
+                </div>
+
+                <div class="vault-grid">
+                  <article class="step-card">
+                    <h3>Set Vault Key</h3>
+                    <p>Create a personal key for this browser-based secure vault. Only the exact key unlocks the vault later.</p>
+                    <form id="vault-set-form" class="stack">
+                      <label>
+                        Private Key
+                        <input id="vault-key-input" name="vault-key" type="password" placeholder="Set your vault key" required />
+                      </label>
+                      <button type="submit">Save Vault Key</button>
+                    </form>
+                    <p id="vault-set-message" class="message"></p>
+                  </article>
+
+                  <article class="step-card">
+                    <h3>Unlock Vault</h3>
+                    <p>Enter the same key to unlock the secret panel and reveal the stored secure note.</p>
+                    <form id="vault-unlock-form" class="stack">
+                      <label>
+                        Enter Key
+                        <input id="vault-unlock-input" name="vault-unlock" type="password" placeholder="Unlock vault" required />
+                      </label>
+                      <button type="submit">Unlock Vault</button>
+                    </form>
+                    <button id="vault-lock-btn" class="secondary" type="button">Lock Vault</button>
+                    <p id="vault-unlock-message" class="message"></p>
+                  </article>
+                </div>
+
+                <article id="vault-secret-panel" class="telemetry-card hidden">
+                  <h3>Vault Secret Note</h3>
+                  <p>This area is only visible when the correct private key is entered.</p>
+                  <div class="vault-secret-box">
+                    <strong>Protected Insight</strong>
+                    <p id="vault-secret-text">This verified user can store key-based secrets inside the SecureVault demo workspace.</p>
+                  </div>
+                </article>
+              </section>
+
+              <section class="workspace-view" data-view-panel="documents">
+                <div class="view-header">
+                  <div>
+                    <p class="eyebrow muted">Slide 03</p>
+                    <h3>Document Hub</h3>
+                  </div>
+                  <div class="panel-chip">Employee work area</div>
+                </div>
+
+                <div class="documents-grid">
+                  <article class="step-card">
+                    <h3>Upload Documents</h3>
+                    <p>Employees and admins can attach work files in this demo. Files are tracked in browser storage for presentation flow.</p>
+                    <form id="document-form" class="stack">
+                      <label>
+                        Select File
+                        <input id="document-input" name="document" type="file" />
+                      </label>
+                      <label>
+                        Work Note
+                        <input id="document-note" name="document-note" placeholder="Describe the upload" />
+                      </label>
+                      <button type="submit">Add to Hub</button>
+                    </form>
+                    <p id="document-message" class="message"></p>
+                  </article>
+
+                  <article class="telemetry-card">
+                    <h3>Stored Documents</h3>
+                    <div id="document-list" class="document-list">
+                      <article class="document-card empty-state">
+                        <h3>No documents yet</h3>
+                        <p>Uploaded files will appear here for the signed-in employee or admin.</p>
+                      </article>
+                    </div>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="access">
+                <div class="view-header">
+                  <div>
+                    <p class="eyebrow muted">Slide 04</p>
+                    <h3>Role Access Surfaces</h3>
+                  </div>
+                  <div class="panel-chip">Least privilege mapped by role</div>
+                </div>
+
+                <div class="role-columns">
+                  <article id="admin-section" class="role-card hidden role-admin">
+                    <div class="role-icon">A</div>
+                    <h3>Admin Section</h3>
+                    <p>Reserved for high-trust management, approvals, and live policy decisions.</p>
+                    <ul id="admin-list"></ul>
+                  </article>
+
+                  <article id="employee-section" class="role-card hidden role-employee">
+                    <div class="role-icon">E</div>
+                    <h3>Employee Section</h3>
+                    <p>Provides verified staff members with least-privilege internal access.</p>
+                    <ul id="employee-list"></ul>
+                  </article>
+
+                  <article id="guest-section" class="role-card hidden role-guest">
+                    <div class="role-icon">G</div>
+                    <h3>Guest Section</h3>
+                    <p>Delivers isolated, temporary access with stronger restrictions and monitoring.</p>
+                    <ul id="guest-list"></ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="monitor">
+                <div id="admin-monitor" class="admin-monitor">
+                  <div class="section-title">
+                    <p class="eyebrow muted">Slide 05</p>
+                    <h2>Who is logging in as employee or guest</h2>
+                  </div>
+                  <div id="admin-activity-list" class="activity-list">
+                    <article class="activity-card empty-state">
+                      <h3>No activity yet</h3>
+                      <p>Recent employee and guest login events will appear here for the admin.</p>
+                    </article>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div id="admin-activity-list" class="activity-list">
-              <article class="activity-card empty-state">
-                <h3>No activity yet</h3>
-                <p>Recent employee and guest login events will appear here for the admin.</p>
-              </article>
-            </div>
-          </div>
-
-          <div class="role-columns">
-            <article id="admin-section" class="role-card hidden role-admin">
-              <div class="role-icon">A</div>
-              <h3>Admin Section</h3>
-              <p>Reserved for high-trust management, approvals, and live policy decisions.</p>
-              <ul id="admin-list"></ul>
-            </article>
-
-            <article id="employee-section" class="role-card hidden role-employee">
-              <div class="role-icon">E</div>
-              <h3>Employee Section</h3>
-              <p>Provides verified staff members with least-privilege internal access.</p>
-              <ul id="employee-list"></ul>
-            </article>
-
-            <article id="guest-section" class="role-card hidden role-guest">
-              <div class="role-icon">G</div>
-              <h3>Guest Section</h3>
-              <p>Delivers isolated, temporary access with stronger restrictions and monitoring.</p>
-              <ul id="guest-list"></ul>
-            </article>
           </div>
         </section>
 

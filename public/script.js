@@ -10,6 +10,32 @@ const simulateTokenTheftBtn = document.getElementById("simulate-token-theft");
 const simulateLocationBtn = document.getElementById("simulate-location");
 const clearIncidentsBtn = document.getElementById("clear-incidents");
 
+const workspaceRoot = document.getElementById("app-workspace");
+const workspaceUserName = document.getElementById("workspace-user-name");
+const workspaceUserRole = document.getElementById("workspace-user-role");
+const workspaceTrustScore = document.getElementById("workspace-trust-score");
+const workspaceDocCount = document.getElementById("workspace-doc-count");
+const vaultQuickStatus = document.getElementById("vault-quick-status");
+const appIdentityStatus = document.getElementById("app-identity-status");
+const appPolicyMode = document.getElementById("app-policy-mode");
+const appNetworkZone = document.getElementById("app-network-zone");
+const vaultBanner = document.getElementById("vault-banner");
+const vaultSecretPanel = document.getElementById("vault-secret-panel");
+const vaultSecretText = document.getElementById("vault-secret-text");
+const vaultSetForm = document.getElementById("vault-set-form");
+const vaultUnlockForm = document.getElementById("vault-unlock-form");
+const vaultLockBtn = document.getElementById("vault-lock-btn");
+const vaultSetMessage = document.getElementById("vault-set-message");
+const vaultUnlockMessage = document.getElementById("vault-unlock-message");
+const documentForm = document.getElementById("document-form");
+const documentInput = document.getElementById("document-input");
+const documentNote = document.getElementById("document-note");
+const documentMessage = document.getElementById("document-message");
+const documentList = document.getElementById("document-list");
+const workspaceNavButtons = Array.from(document.querySelectorAll(".workspace-nav-btn"));
+const workspaceViews = Array.from(document.querySelectorAll(".workspace-view"));
+const adminOnlyNavButtons = Array.from(document.querySelectorAll(".admin-only"));
+
 const loginMessage = document.getElementById("login-message");
 const otpMessage = document.getElementById("otp-message");
 const simMessage = document.getElementById("sim-message");
@@ -101,24 +127,38 @@ const roleContent = {
   }
 };
 
+let activeWorkspaceView = "overview";
+
 function defaultState() {
   return {
     session: null,
     events: [],
-    incidents: []
+    incidents: [],
+    userData: {}
+  };
+}
+
+function normalizeState(rawState) {
+  const baseState = defaultState();
+  const nextState = rawState && typeof rawState === "object" ? rawState : {};
+  return {
+    session: nextState.session || baseState.session,
+    events: Array.isArray(nextState.events) ? nextState.events : baseState.events,
+    incidents: Array.isArray(nextState.incidents) ? nextState.incidents : baseState.incidents,
+    userData: nextState.userData && typeof nextState.userData === "object" ? nextState.userData : baseState.userData
   };
 }
 
 function readState() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState();
+    return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
   } catch {
     return defaultState();
   }
 }
 
 function writeState(nextState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeState(nextState)));
 }
 
 function nowIso() {
@@ -268,6 +308,26 @@ function buildSession(user, previousSession) {
   };
 }
 
+function getUserStore(state, username) {
+  if (!state.userData[username]) {
+    state.userData[username] = {
+      documents: [],
+      vaultKey: null,
+      vaultUnlocked: false
+    };
+  }
+  if (!Array.isArray(state.userData[username].documents)) {
+    state.userData[username].documents = [];
+  }
+  if (!Object.prototype.hasOwnProperty.call(state.userData[username], "vaultKey")) {
+    state.userData[username].vaultKey = null;
+  }
+  if (!Object.prototype.hasOwnProperty.call(state.userData[username], "vaultUnlocked")) {
+    state.userData[username].vaultUnlocked = false;
+  }
+  return state.userData[username];
+}
+
 function recordEvent(state, session, eventType, extra = {}) {
   state.events.unshift({
     timestamp: nowIso(),
@@ -296,6 +356,117 @@ function recordIncident(state, incident) {
     blocked: incident.blocked
   });
   state.incidents = state.incidents.slice(0, 20);
+}
+
+function setWorkspaceView(viewName) {
+  activeWorkspaceView = viewName;
+
+  workspaceNavButtons.forEach((button) => {
+    const isActive = button.dataset.view === viewName;
+    button.classList.toggle("active", isActive);
+  });
+
+  workspaceViews.forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.viewPanel === viewName);
+  });
+}
+
+function updateWorkspaceHeader(session, state) {
+  if (!session || !session.otpVerified) {
+    workspaceUserName.textContent = "No active user";
+    workspaceUserRole.textContent = "Login required";
+    workspaceTrustScore.textContent = "Pending";
+    workspaceDocCount.textContent = "0";
+    vaultQuickStatus.textContent = "Locked";
+    appIdentityStatus.textContent = "Pending";
+    appPolicyMode.textContent = "Pending";
+    appNetworkZone.textContent = "Pending";
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  workspaceUserName.textContent = session.name;
+  workspaceUserRole.textContent = `${session.role.toUpperCase()} workspace`;
+  workspaceTrustScore.textContent = `${session.trust.score}/100`;
+  workspaceDocCount.textContent = String(userStore.documents.length);
+  vaultQuickStatus.textContent = userStore.vaultUnlocked ? "Unlocked" : userStore.vaultKey ? "Locked" : "Not set";
+  appIdentityStatus.textContent = session.trust.status;
+  appPolicyMode.textContent = session.trust.policyDecision;
+  appNetworkZone.textContent = session.trust.networkZone;
+}
+
+function renderDocuments(session, state) {
+  documentList.innerHTML = "";
+
+  if (!session || !session.otpVerified) {
+    documentList.innerHTML = `
+      <article class="document-card empty-state">
+        <h3>Login required</h3>
+        <p>Verify a user session to work with uploaded files.</p>
+      </article>
+    `;
+    return;
+  }
+
+  if (session.role === "guest") {
+    documentList.innerHTML = `
+      <article class="document-card empty-state">
+        <h3>Guest restrictions active</h3>
+        <p>Guest accounts cannot upload work files in this least-privilege demo flow.</p>
+      </article>
+    `;
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  if (!userStore.documents.length) {
+    documentList.innerHTML = `
+      <article class="document-card empty-state">
+        <h3>No documents yet</h3>
+        <p>Uploaded files will appear here for the signed-in employee or admin.</p>
+      </article>
+    `;
+    return;
+  }
+
+  userStore.documents.forEach((documentEntry) => {
+    const card = document.createElement("article");
+    card.className = "document-card";
+    card.innerHTML = `
+      <div class="document-topline">
+        <strong>${documentEntry.fileName}</strong>
+        <span>${documentEntry.fileSize}</span>
+      </div>
+      <p>${documentEntry.note || "No note added for this upload."}</p>
+      <div class="document-meta">
+        <span>Owner: ${documentEntry.ownerRole}</span>
+        <span>${formatTimestamp(documentEntry.uploadedAt)}</span>
+      </div>
+    `;
+    documentList.appendChild(card);
+  });
+}
+
+function renderVault(session, state) {
+  if (!session || !session.otpVerified) {
+    vaultBanner.textContent = "Set your private vault key";
+    vaultQuickStatus.textContent = "Locked";
+    vaultSecretPanel.classList.add("hidden");
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  if (!userStore.vaultKey) {
+    vaultBanner.textContent = "Set your private vault key";
+  } else if (userStore.vaultUnlocked) {
+    vaultBanner.textContent = "Vault unlocked";
+  } else {
+    vaultBanner.textContent = "Vault ready to unlock";
+  }
+
+  vaultQuickStatus.textContent = userStore.vaultUnlocked ? "Unlocked" : userStore.vaultKey ? "Locked" : "Not set";
+  vaultSecretText.textContent = `${session.name} can use this vault space for browser-local confidential notes and protected demo content.`;
+  vaultSecretPanel.classList.toggle("hidden", !userStore.vaultUnlocked);
 }
 
 function resetTelemetry() {
@@ -347,7 +518,6 @@ function clearRoleSections() {
 }
 
 function resetAdminMonitor() {
-  adminMonitor.classList.add("hidden");
   adminActivityList.innerHTML = `
     <article class="activity-card empty-state">
       <h3>No activity yet</h3>
@@ -383,7 +553,6 @@ function renderAdminActivity(events) {
 
   if (!relevantEvents.length) {
     resetAdminMonitor();
-    adminMonitor.classList.remove("hidden");
     return;
   }
 
@@ -406,8 +575,6 @@ function renderAdminActivity(events) {
     `;
     adminActivityList.appendChild(card);
   });
-
-  adminMonitor.classList.remove("hidden");
 }
 
 function renderAlertFeed(state) {
@@ -417,7 +584,7 @@ function renderAlertFeed(state) {
     feedItems.push({
       severity: incident.severity,
       title: incident.title,
-      description: `${incident.description} • ${formatTimestamp(incident.timestamp)}`
+      description: `${incident.description} - ${formatTimestamp(incident.timestamp)}`
     });
   });
 
@@ -474,6 +641,37 @@ function renderKpis(state) {
   resistanceBar.style.width = `${Math.max(30, 78 - blockedActions * 8)}%`;
 }
 
+function renderWorkspace(state) {
+  const session = state.session;
+  const verified = Boolean(session && session.otpVerified);
+  workspaceRoot.classList.toggle("hidden", !verified);
+
+  if (!verified) {
+    updateWorkspaceHeader(null, state);
+    renderDocuments(null, state);
+    renderVault(null, state);
+    adminOnlyNavButtons.forEach((button) => button.classList.add("hidden"));
+    setWorkspaceView("overview");
+    return;
+  }
+
+  updateWorkspaceHeader(session, state);
+  renderVault(session, state);
+  renderDocuments(session, state);
+  renderRoleSections(session.role);
+
+  if (session.role === "admin") {
+    adminOnlyNavButtons.forEach((button) => button.classList.remove("hidden"));
+    renderAdminActivity(state.events);
+  } else {
+    adminOnlyNavButtons.forEach((button) => button.classList.add("hidden"));
+    if (activeWorkspaceView === "monitor") {
+      setWorkspaceView("overview");
+    }
+    resetAdminMonitor();
+  }
+}
+
 function renderSession() {
   const state = readState();
   const session = state.session;
@@ -488,6 +686,7 @@ function renderSession() {
     clearRoleSections();
     resetTelemetry();
     resetAdminMonitor();
+    renderWorkspace(state);
     return;
   }
 
@@ -499,17 +698,12 @@ function renderSession() {
     sessionStatus.textContent = `${session.name} signed in as ${session.role}, waiting for OTP verification.`;
     clearRoleSections();
     resetAdminMonitor();
+    renderWorkspace(state);
     return;
   }
 
   sessionStatus.textContent = `${session.name} is verified and active in the ${session.role} section.`;
-  renderRoleSections(session.role);
-
-  if (session.role === "admin") {
-    renderAdminActivity(state.events);
-  } else {
-    resetAdminMonitor();
-  }
+  renderWorkspace(state);
 }
 
 function runSimulation(type) {
@@ -558,11 +752,13 @@ loginForm.addEventListener("submit", (event) => {
 
   const state = readState();
   const session = buildSession(user, state.session && state.session.username === user.username ? state.session : null);
+  getUserStore(state, session.username);
   state.session = session;
   recordEvent(state, session, "login-issued");
   writeState(state);
 
   loginMessage.textContent = `Login accepted. Verify the fresh OTP to continue. Signed in as ${session.role}.`;
+  setWorkspaceView("overview");
   renderSession();
 });
 
@@ -593,6 +789,7 @@ otpForm.addEventListener("submit", (event) => {
 
   otpMessage.textContent = "OTP verified. Access granted by role.";
   otpInput.value = "";
+  setWorkspaceView("overview");
   renderSession();
 });
 
@@ -620,10 +817,18 @@ regenerateBtn.addEventListener("click", () => {
 
 logoutBtn.addEventListener("click", () => {
   const state = readState();
+  if (state.session) {
+    const userStore = getUserStore(state, state.session.username);
+    userStore.vaultUnlocked = false;
+  }
   state.session = null;
   writeState(state);
   loginMessage.textContent = "";
   otpMessage.textContent = "";
+  vaultSetMessage.textContent = "";
+  vaultUnlockMessage.textContent = "";
+  documentMessage.textContent = "";
+  setWorkspaceView("overview");
   renderSession();
 });
 
@@ -644,6 +849,129 @@ clearIncidentsBtn.addEventListener("click", () => {
   state.incidents = [];
   writeState(state);
   simMessage.textContent = "Attack simulations cleared.";
+  renderSession();
+});
+
+workspaceNavButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (button.classList.contains("hidden")) {
+      return;
+    }
+    setWorkspaceView(button.dataset.view);
+  });
+});
+
+vaultSetForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  vaultSetMessage.textContent = "";
+  const state = readState();
+  const session = state.session;
+
+  if (!session || !session.otpVerified) {
+    vaultSetMessage.textContent = "Verify a session first.";
+    return;
+  }
+
+  const keyValue = document.getElementById("vault-key-input").value.trim();
+  if (!keyValue) {
+    vaultSetMessage.textContent = "Enter a private key.";
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  userStore.vaultKey = keyValue;
+  userStore.vaultUnlocked = false;
+  writeState(state);
+
+  vaultSetMessage.textContent = "Vault key saved for this user in browser storage.";
+  vaultUnlockMessage.textContent = "";
+  vaultSetForm.reset();
+  renderSession();
+});
+
+vaultUnlockForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  vaultUnlockMessage.textContent = "";
+  const state = readState();
+  const session = state.session;
+
+  if (!session || !session.otpVerified) {
+    vaultUnlockMessage.textContent = "Verify a session first.";
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  if (!userStore.vaultKey) {
+    vaultUnlockMessage.textContent = "Set a vault key before unlocking.";
+    return;
+  }
+
+  const unlockValue = document.getElementById("vault-unlock-input").value;
+  if (unlockValue !== userStore.vaultKey) {
+    userStore.vaultUnlocked = false;
+    writeState(state);
+    vaultUnlockMessage.textContent = "Incorrect vault key.";
+    renderSession();
+    return;
+  }
+
+  userStore.vaultUnlocked = true;
+  writeState(state);
+  vaultUnlockMessage.textContent = "Vault unlocked successfully.";
+  vaultUnlockForm.reset();
+  renderSession();
+});
+
+vaultLockBtn.addEventListener("click", () => {
+  const state = readState();
+  const session = state.session;
+  if (!session || !session.otpVerified) {
+    vaultUnlockMessage.textContent = "Verify a session first.";
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  userStore.vaultUnlocked = false;
+  writeState(state);
+  vaultUnlockMessage.textContent = "Vault locked.";
+  renderSession();
+});
+
+documentForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  documentMessage.textContent = "";
+  const state = readState();
+  const session = state.session;
+
+  if (!session || !session.otpVerified) {
+    documentMessage.textContent = "Verify a session first.";
+    return;
+  }
+
+  if (session.role === "guest") {
+    documentMessage.textContent = "Guests cannot upload documents in this workspace.";
+    return;
+  }
+
+  const file = documentInput.files && documentInput.files[0];
+  if (!file) {
+    documentMessage.textContent = "Choose a file to add.";
+    return;
+  }
+
+  const userStore = getUserStore(state, session.username);
+  userStore.documents.unshift({
+    fileName: file.name,
+    fileSize: `${Math.max(1, Math.round(file.size / 1024))} KB`,
+    note: documentNote.value.trim(),
+    uploadedAt: nowIso(),
+    ownerRole: session.role
+  });
+  userStore.documents = userStore.documents.slice(0, 12);
+  writeState(state);
+
+  documentMessage.textContent = `${file.name} added to the document hub.`;
+  documentForm.reset();
   renderSession();
 });
 
