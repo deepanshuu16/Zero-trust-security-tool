@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | AI Security Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Security Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a class="active" href="/assistant.html">AI Assistant</a>
+          <a href="/learning.html">Learning Hub</a>
+          <a href="/news.html">Threat News</a>
+          <a href="/about.html">About</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Guided safety help</span>
+            <h1>Ask for help in plain language.</h1>
+            <p>
+              Paste a suspicious link or message and get a student-friendly explanation of what looks risky and why.
+            </p>
+          </article>
+          <aside class="scan-card">
+            <span class="pill">Good for</span>
+            <div class="tag-cloud">
+              <span>Internship emails</span>
+              <span>Scholarship links</span>
+              <span>Social media DMs</span>
+              <span>Payment requests</span>
+            </div>
+          </aside>
+        </section>
+
+        <section class="assistant-shell">
+          <div class="assistant-grid">
+            <article class="assistant-card">
+              <h3>Ask the assistant</h3>
+              <form id="assistant-form" class="stack">
+                <label>
+                  Paste a link or message
+                  <textarea
+                    id="assistant-input"
+                    rows="10"
+                    placeholder="Example: I received this internship email asking me to pay a processing fee and share my OTP."
+                    required
+                  ></textarea>
+                </label>
+                <button class="primary" type="submit">Analyze with Assistant</button>
+              </form>
+            </article>
+
+            <article class="assistant-card assistant-response">
+              <span class="pill">Assistant Response</span>
+              <h3 id="assistant-response-title">Waiting for your question</h3>
+              <p id="assistant-response-body">SecureU will explain the biggest warning signs in a simple way.</p>
+              <ul id="assistant-response-list" class="clean-list">
+                <li>Paste a message or link to begin.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Assistant</strong>
+            <p class="muted">Built to answer the question students ask most often: “Is this safe?”</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/tools.html">Try the Tools</a>
+            <a href="/privacy.html">Privacy & Security</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

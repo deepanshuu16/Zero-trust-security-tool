@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SecureU Student Safety Platform</title>
+    <title>SecureU | Student Cybersecurity Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,514 +13,210 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="topbar">
-        <a class="brand" href="#top">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
           <span class="brand-mark">SU</span>
-          <span>
+          <span class="brand-copy">
             <strong>SecureU</strong>
             <small>Student Security Platform</small>
           </span>
         </a>
-
-        <nav class="topbar-nav" aria-label="Primary">
-          <a href="#tools">Tools</a>
-          <a href="#score">Security Score</a>
-          <a href="#learn">Learning</a>
-          <a href="#login-panel">Login</a>
+        <nav class="site-nav">
+          <a class="active" href="/index.html">Home</a>
+          <a href="/tools.html">Security Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/assistant.html">AI Assistant</a>
+          <a href="/learning.html">Learning Hub</a>
+          <a href="/news.html">Threat News</a>
+          <a href="/about.html">About</a>
         </nav>
       </header>
 
       <main>
-        <section id="top" class="hero">
-          <div class="hero-copy">
-            <span class="eyebrow">Digital Safety for Students</span>
-            <h1>One simple place to check scams, links, passwords, devices, and online safety.</h1>
-            <p class="hero-text">
-              SecureU turns a technical cybersecurity demo into a practical student companion. It helps students spot phishing,
-              understand risky messages, improve password hygiene, and build safer online habits without feeling overwhelmed.
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Student-first cybersecurity</span>
+            <h1>Your personal cybersecurity companion.</h1>
+            <p>
+              Protect yourself from scams, phishing, weak passwords, and unsafe online habits with practical tools built
+              for students, creators, and beginners.
             </p>
-
             <div class="hero-actions">
-              <a class="primary-action" href="#login-panel">Open Student Dashboard</a>
-              <a class="secondary-action" href="#tools">Explore Tools</a>
+              <a class="button-primary" href="/tools.html">Start Free Security Scan</a>
+              <a class="button-secondary" href="/dashboard.html">Open Dashboard</a>
             </div>
 
-            <div class="hero-points">
-              <div class="hero-point">
-                <strong>Useful every day</strong>
-                <span>Check suspicious links, messages, and passwords before they become a problem.</span>
+            <div class="hero-proof">
+              <div class="info-card">
+                <h3 class="card-title">Useful in real life</h3>
+                <p>Check internship links, suspicious DMs, and password quality before making risky mistakes.</p>
               </div>
-              <div class="hero-point">
-                <strong>Easy to understand</strong>
-                <span>Scores, reasons, and simple advice instead of technical jargon.</span>
+              <div class="info-card">
+                <h3 class="card-title">Easy to understand</h3>
+                <p>Scores, clear explanations, and simple next steps instead of technical cybersecurity jargon.</p>
               </div>
-              <div class="hero-point">
-                <strong>Built for students</strong>
-                <span>Made for college life, internships, shared Wi-Fi, social media, and scam awareness.</span>
+              <div class="info-card">
+                <h3 class="card-title">Built for habits</h3>
+                <p>Use daily challenges, recommendations, and learning content to stay safer over time.</p>
               </div>
             </div>
-          </div>
+          </article>
 
-          <aside class="hero-panel">
-            <div class="hero-score-card">
-              <span class="card-label">Today’s Safety Snapshot</span>
-              <strong id="hero-security-score">82</strong>
-              <p>Good foundation. Review your device and password habits to push your score higher.</p>
+          <aside class="hero-visual">
+            <div class="scan-card">
+              <span class="pill">Today’s platform snapshot</span>
+              <strong id="hero-score">82</strong>
+              <p id="home-score-summary">
+                Sign in to generate your own personalized security score and recommendations.
+              </p>
             </div>
-
-            <div class="hero-mini-grid">
-              <article class="mini-card">
-                <span>Phishing Scanner</span>
-                <strong>Paste a link</strong>
-                <p>Instant risk hints for fake internship and shopping URLs.</p>
-              </article>
-              <article class="mini-card">
-                <span>Scam Detector</span>
-                <strong>Check a message</strong>
-                <p>Analyze urgency, pressure, and social engineering red flags.</p>
-              </article>
-              <article class="mini-card">
-                <span>Password Lab</span>
-                <strong>Build safer logins</strong>
-                <p>Understand strength, crack resistance, and better passphrases.</p>
-              </article>
-              <article class="mini-card">
-                <span>Learning Mode</span>
-                <strong>Practice in minutes</strong>
-                <p>Daily challenges and quick lessons made for beginners.</p>
-              </article>
+            <div class="visual-stack">
+              <div class="feature-card">
+                <h3>Phishing checks</h3>
+                <p>Spot fake scholarship, shopping, and internship links before clicking.</p>
+              </div>
+              <div class="feature-card">
+                <h3>Scam detection</h3>
+                <p>Review messages from WhatsApp, Instagram, email, and Telegram for pressure tactics.</p>
+              </div>
+              <div class="feature-card">
+                <h3>Safety dashboard</h3>
+                <p>See your score, recent scans, and recommendations in one place.</p>
+              </div>
             </div>
           </aside>
         </section>
 
-        <section class="highlights">
-          <article class="highlight-card">
-            <span class="highlight-badge">Core Mission</span>
-            <h2>A cybersecurity companion students can actually use.</h2>
-            <p>
-              This platform focuses on practical protection instead of enterprise-only jargon. It brings together scanning,
-              awareness, and personal security checkups in one place.
+        <section class="split-section">
+          <article class="panel">
+            <div class="section-header">
+              <span class="eyebrow">Why this product exists</span>
+              <h2>Students need digital safety that feels simple and useful.</h2>
+            </div>
+            <p class="section-copy">
+              Most security products are too technical, too expensive, or designed only for companies. SecureU focuses on
+              practical student problems: suspicious links, password reuse, scam messages, public Wi-Fi awareness, and
+              digital confidence.
             </p>
+            <div class="tag-cloud">
+              <span>Phishing protection</span>
+              <span>Password safety</span>
+              <span>Scam awareness</span>
+              <span>Learning challenges</span>
+              <span>Student-friendly dashboard</span>
+            </div>
           </article>
 
-          <div class="highlight-grid">
-            <article class="highlight-panel">
-              <h3>What it solves</h3>
-              <ul>
-                <li>Fake internship and scholarship links</li>
-                <li>Weak or reused passwords</li>
-                <li>Scam messages and phishing attempts</li>
-                <li>Unsafe browsing habits and shared network risks</li>
-              </ul>
+          <article class="panel">
+            <div class="section-header">
+              <span class="eyebrow">Quick Access</span>
+              <h2>Explore the platform flow</h2>
+            </div>
+            <div class="button-row">
+              <a class="nav-chip" href="/tools.html">1. Run Security Tools</a>
+              <a class="nav-chip" href="/dashboard.html">2. View Dashboard</a>
+              <a class="nav-chip" href="/learning.html">3. Learn Daily</a>
+              <a class="nav-chip" href="/assistant.html">4. Ask the AI Assistant</a>
+            </div>
+            <p id="home-session-status" class="message">No verified session yet. Use the quick login below to explore the product.</p>
+          </article>
+        </section>
+
+        <section class="grid-section">
+          <div class="section-header">
+            <span class="eyebrow">Platform architecture</span>
+            <h2>A real ecosystem, not a single dashboard page</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>Home</h3>
+              <p>Explains exactly what the platform does in plain language within a few seconds.</p>
             </article>
-            <article class="highlight-panel">
-              <h3>Why it feels better</h3>
-              <ul>
-                <li>Cleaner layout with accessible typography</li>
-                <li>Simple scores and plain-language advice</li>
-                <li>Practical tools instead of empty dashboards</li>
-                <li>Beginner-friendly learning built into the product</li>
-              </ul>
+            <article class="feature-card">
+              <h3>Tools</h3>
+              <p>Dedicated pages for phishing checks, password analysis, scam detection, and device safety.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Dashboard</h3>
+              <p>Shows score, recent scans, account context, practical recommendations, and admin monitoring.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Learning Hub</h3>
+              <p>Builds retention through daily challenges, micro-lessons, and awareness practice.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Trust Pages</h3>
+              <p>About, privacy, pricing, and contact pages make the platform feel transparent and real.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Threat News</h3>
+              <p>Creates long-term SEO, relevance, and student engagement around current scam patterns.</p>
             </article>
           </div>
         </section>
 
-        <section id="tools" class="tools-strip">
-          <div class="section-heading">
-            <span class="eyebrow">Daily Protection</span>
-            <h2>Useful tools students come back to</h2>
-          </div>
-
-          <div class="tools-grid">
-            <article class="tool-preview">
-              <h3>Link Scanner</h3>
-              <p>Check suspicious links for warning signs like no HTTPS, fake domains, typos, and bait words.</p>
-            </article>
-            <article class="tool-preview">
-              <h3>Password Check</h3>
-              <p>Test password quality, generate better passphrases, and get advice you can actually follow.</p>
-            </article>
-            <article class="tool-preview">
-              <h3>Scam Detector</h3>
-              <p>Paste internship emails, social DMs, or WhatsApp texts to see social-engineering signals.</p>
-            </article>
-            <article class="tool-preview">
-              <h3>Device Checkup</h3>
-              <p>Review browser safety, session context, and habits that affect your personal safety score.</p>
-            </article>
-          </div>
-        </section>
-
-        <section id="login-panel" class="entry-panel">
-          <div class="entry-card">
-            <div class="section-heading">
-              <span class="eyebrow">Demo Access</span>
-              <h2>Login and unlock the student safety dashboard</h2>
+        <section class="split-section">
+          <article class="panel">
+            <div class="section-header">
+              <span class="eyebrow">Quick Demo Access</span>
+              <h2>Login and verify OTP</h2>
             </div>
-
-            <div class="credential-pills">
-              <span>Admin: <strong>admin / Admin@123</strong></span>
-              <span>Student: <strong>employee / Employee@123</strong></span>
-              <span>Guest: <strong>guest / Guest@123</strong></span>
+            <div class="pill-row">
+              <span class="pill">Admin: admin / Admin@123</span>
+              <span class="pill">Student: employee / Employee@123</span>
+              <span class="pill">Guest: guest / Guest@123</span>
             </div>
+            <form id="login-form" class="stack">
+              <label>
+                Username
+                <input id="username" name="username" placeholder="employee" required />
+              </label>
+              <label>
+                Password
+                <input id="password" name="password" type="password" placeholder="Employee@123" required />
+              </label>
+              <button class="primary" type="submit">Generate OTP</button>
+            </form>
+            <p id="login-message" class="message"></p>
+          </article>
 
-            <div class="entry-grid">
-              <article class="entry-step">
-                <h3>1. Sign in</h3>
-                <form id="login-form" class="stack">
-                  <label>
-                    Username
-                    <input id="username" name="username" placeholder="employee" required />
-                  </label>
-                  <label>
-                    Password
-                    <input id="password" name="password" type="password" placeholder="Employee@123" required />
-                  </label>
-                  <button type="submit">Generate OTP</button>
-                </form>
-                <p id="login-message" class="message"></p>
-              </article>
-
-              <article class="entry-step">
-                <h3>2. Verify OTP</h3>
-                <div class="otp-box">
-                  <span>Current Demo OTP</span>
-                  <strong id="otp-display-value">Not generated yet</strong>
-                </div>
-                <form id="otp-form" class="stack">
-                  <label>
-                    Enter OTP
-                    <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
-                  </label>
-                  <button type="submit">Verify and Continue</button>
-                </form>
-                <button id="regenerate-btn" class="ghost-button" type="button">Generate Different OTP</button>
-                <p id="otp-message" class="message"></p>
-              </article>
+          <article class="panel">
+            <div class="section-header">
+              <span class="eyebrow">Step Two</span>
+              <h2>Enter the one-time password</h2>
             </div>
-          </div>
-        </section>
-
-        <section id="app-workspace" class="workspace hidden">
-          <div class="workspace-top">
-            <div>
-              <span class="eyebrow">Student Dashboard</span>
-              <h2 id="workspace-title">Welcome to SecureU</h2>
-              <p id="workspace-subtitle" class="workspace-subtitle">Use the tools below to improve your digital safety.</p>
+            <div class="otp-card">
+              <span>Current Demo OTP</span>
+              <strong id="otp-display-value">Not generated yet</strong>
             </div>
-            <button id="logout-btn" class="ghost-button" type="button">Logout</button>
-          </div>
-
-          <div class="workspace-shell">
-            <aside class="workspace-sidebar">
-              <div class="profile-card">
-                <span class="status-chip">Verified session</span>
-                <h3 id="workspace-user-name">No active user</h3>
-                <p id="workspace-user-role">Login required</p>
-              </div>
-
-              <nav class="workspace-nav" aria-label="Dashboard sections">
-                <button class="workspace-nav-btn active" type="button" data-view="dashboard">Dashboard</button>
-                <button class="workspace-nav-btn" type="button" data-view="links">Link Scanner</button>
-                <button class="workspace-nav-btn" type="button" data-view="passwords">Password Lab</button>
-                <button class="workspace-nav-btn" type="button" data-view="scams">Scam Detector</button>
-                <button class="workspace-nav-btn" type="button" data-view="device">Device Checkup</button>
-                <button class="workspace-nav-btn" type="button" data-view="learn">Learning Mode</button>
-                <button class="workspace-nav-btn admin-only hidden" type="button" data-view="monitor">Admin Monitor</button>
-              </nav>
-
-              <div class="score-card" id="score">
-                <span>Security Score</span>
-                <strong id="workspace-security-score">0</strong>
-                <p id="workspace-score-summary">Login to generate your safety overview.</p>
-              </div>
-            </aside>
-
-            <div class="workspace-stage">
-              <section class="workspace-view active" data-view-panel="dashboard">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Overview</span>
-                    <h3>Your safety dashboard</h3>
-                  </div>
-                  <div class="status-pill" id="session-status">No verified user yet.</div>
-                </div>
-
-                <div class="dashboard-grid">
-                  <article class="metric-panel">
-                    <span>Trust Score</span>
-                    <strong id="trust-score">Pending</strong>
-                    <p>Role, browser, and session context are used to estimate trust.</p>
-                  </article>
-                  <article class="metric-panel">
-                    <span>Policy Status</span>
-                    <strong id="trust-status">Pending</strong>
-                    <p>Shows how much access is granted for the current user session.</p>
-                  </article>
-                  <article class="metric-panel">
-                    <span>Daily Challenge</span>
-                    <strong id="challenge-progress">0/3</strong>
-                    <p>Complete quick learning tasks to improve your security awareness.</p>
-                  </article>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <h3>Account Snapshot</h3>
-                    <div class="data-list">
-                      <div><span>Name</span><strong id="account-name">Pending</strong></div>
-                      <div><span>Role</span><strong id="account-role">Pending</strong></div>
-                      <div><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
-                      <div><span>Browser</span><strong id="browser-name">Pending</strong></div>
-                      <div><span>Operating System</span><strong id="os-name">Pending</strong></div>
-                      <div><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
-                    </div>
-                  </article>
-
-                  <article class="content-panel">
-                    <h3>Recommended Actions</h3>
-                    <ul id="trust-reasons" class="clean-list">
-                      <li>Login and verify OTP to see personalized security guidance.</li>
-                    </ul>
-                  </article>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <h3>Quick Tool Results</h3>
-                    <div class="quick-results">
-                      <div>
-                        <span>Last Link Scan</span>
-                        <strong id="last-link-status">Not scanned yet</strong>
-                      </div>
-                      <div>
-                        <span>Last Password Check</span>
-                        <strong id="last-password-status">Not checked yet</strong>
-                      </div>
-                      <div>
-                        <span>Last Scam Review</span>
-                        <strong id="last-scam-status">Not analyzed yet</strong>
-                      </div>
-                    </div>
-                  </article>
-
-                  <article class="content-panel">
-                    <h3>Account Access Surfaces</h3>
-                    <div class="role-cards" id="role-surfaces">
-                      <article id="admin-section" class="role-card hidden">
-                        <h4>Admin</h4>
-                        <ul id="admin-list" class="clean-list"></ul>
-                      </article>
-                      <article id="employee-section" class="role-card hidden">
-                        <h4>Student</h4>
-                        <ul id="employee-list" class="clean-list"></ul>
-                      </article>
-                      <article id="guest-section" class="role-card hidden">
-                        <h4>Guest</h4>
-                        <ul id="guest-list" class="clean-list"></ul>
-                      </article>
-                    </div>
-                  </article>
-                </div>
-              </section>
-
-              <section class="workspace-view" data-view-panel="links">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Tool 01</span>
-                    <h3>Phishing Link Scanner</h3>
-                  </div>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <form id="link-form" class="stack">
-                      <label>
-                        Paste a URL
-                        <input id="link-input" name="link" type="url" placeholder="https://example.com/internship" required />
-                      </label>
-                      <button type="submit">Scan Link</button>
-                    </form>
-                    <p id="link-message" class="message"></p>
-                  </article>
-
-                  <article class="content-panel result-panel">
-                    <span class="result-label">Risk Result</span>
-                    <strong id="link-risk-label">Waiting for a scan</strong>
-                    <p id="link-risk-score">Risk score: --</p>
-                    <ul id="link-reasons" class="clean-list">
-                      <li>SecureU will explain why a link looks safe, suspicious, or dangerous.</li>
-                    </ul>
-                  </article>
-                </div>
-              </section>
-
-              <section class="workspace-view" data-view-panel="passwords">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Tool 02</span>
-                    <h3>Password Lab</h3>
-                  </div>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <form id="password-form" class="stack">
-                      <label>
-                        Test a Password
-                        <input id="password-check-input" name="password-check" type="text" placeholder="Enter a password" required />
-                      </label>
-                      <button type="submit">Check Strength</button>
-                    </form>
-
-                    <div class="generator-row">
-                      <button id="generate-passphrase-btn" class="ghost-button" type="button">Generate Passphrase</button>
-                      <strong id="generated-passphrase">No passphrase generated yet</strong>
-                    </div>
-                    <p id="password-message" class="message"></p>
-                  </article>
-
-                  <article class="content-panel result-panel">
-                    <span class="result-label">Password Result</span>
-                    <strong id="password-risk-label">Waiting for a check</strong>
-                    <p id="password-risk-score">Strength score: --</p>
-                    <ul id="password-reasons" class="clean-list">
-                      <li>SecureU will rate length, variety, reuse risk, and common-word weakness.</li>
-                    </ul>
-                  </article>
-                </div>
-              </section>
-
-              <section class="workspace-view" data-view-panel="scams">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Tool 03</span>
-                    <h3>AI-Style Scam Detector</h3>
-                  </div>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <form id="scam-form" class="stack">
-                      <label>
-                        Paste a message or email
-                        <textarea
-                          id="scam-input"
-                          name="scam-input"
-                          rows="8"
-                          placeholder="Paste an internship email, social media DM, or suspicious message here"
-                          required
-                        ></textarea>
-                      </label>
-                      <button type="submit">Analyze Message</button>
-                    </form>
-                    <p id="scam-message" class="message"></p>
-                  </article>
-
-                  <article class="content-panel result-panel">
-                    <span class="result-label">Scam Risk</span>
-                    <strong id="scam-risk-label">Waiting for analysis</strong>
-                    <p id="scam-risk-score">Scam probability: --</p>
-                    <ul id="scam-reasons" class="clean-list">
-                      <li>SecureU will look for urgency, manipulation, payment pressure, and suspicious wording.</li>
-                    </ul>
-                  </article>
-                </div>
-              </section>
-
-              <section class="workspace-view" data-view-panel="device">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Tool 04</span>
-                    <h3>Device Security Checkup</h3>
-                  </div>
-                </div>
-
-                <div class="panel-grid two-up">
-                  <article class="content-panel">
-                    <h3>Session Environment</h3>
-                    <div class="data-list">
-                      <div><span>Device Type</span><strong id="device-type">Pending</strong></div>
-                      <div><span>IP Context</span><strong id="ip-address">Pending</strong></div>
-                      <div><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
-                      <div><span>Session Created</span><strong id="session-created">Pending</strong></div>
-                      <div><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
-                    </div>
-                  </article>
-
-                  <article class="content-panel result-panel">
-                    <span class="result-label">Device Score</span>
-                    <strong id="device-score-label">Waiting for session</strong>
-                    <p id="device-risk-score">Safety score: --</p>
-                    <ul id="device-recommendations" class="clean-list">
-                      <li>Login to see beginner-friendly browser and device advice.</li>
-                    </ul>
-                  </article>
-                </div>
-              </section>
-
-              <section id="learn" class="workspace-view" data-view-panel="learn">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Tool 05</span>
-                    <h3>Learning Mode</h3>
-                  </div>
-                </div>
-
-                <div class="learning-grid">
-                  <article class="lesson-card">
-                    <span class="lesson-badge">Daily Challenge</span>
-                    <h4>Spot the red flag</h4>
-                    <p>An internship email asks for your OTP to “confirm your application.” What is the safest response?</p>
-                    <div class="challenge-actions">
-                      <button class="challenge-btn" type="button" data-correct="false">Send OTP quickly</button>
-                      <button class="challenge-btn" type="button" data-correct="true">Do not share OTP and verify the sender</button>
-                      <button class="challenge-btn" type="button" data-correct="false">Reply with bank details</button>
-                    </div>
-                    <p id="challenge-feedback" class="message"></p>
-                  </article>
-
-                  <article class="lesson-card">
-                    <span class="lesson-badge">Quick Lessons</span>
-                    <ul class="clean-list">
-                      <li>Never share OTPs, recovery codes, or one-time links.</li>
-                      <li>Fake domains often look close to real companies but contain extra letters or odd endings.</li>
-                      <li>Public Wi-Fi is safer when you avoid sensitive logins and use HTTPS-only websites.</li>
-                    </ul>
-                  </article>
-
-                  <article class="lesson-card">
-                    <span class="lesson-badge">Progress</span>
-                    <strong id="badge-count">0 badges earned</strong>
-                    <p>Complete checks and challenges to improve your safety score and learning progress.</p>
-                  </article>
-                </div>
-              </section>
-
-              <section class="workspace-view" data-view-panel="monitor">
-                <div class="view-heading">
-                  <div>
-                    <span class="eyebrow">Admin</span>
-                    <h3>Usage Monitor</h3>
-                  </div>
-                </div>
-                <article class="content-panel">
-                  <h3>Who is using the platform</h3>
-                  <div id="admin-activity-list" class="activity-list">
-                    <article class="activity-card empty-state">
-                      <h4>No activity yet</h4>
-                      <p>Recent student and guest login events will appear here for the admin.</p>
-                    </article>
-                  </div>
-                </article>
-              </section>
-            </div>
-          </div>
+            <form id="otp-form" class="stack">
+              <label>
+                Enter OTP
+                <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
+              </label>
+              <button class="primary" type="submit">Verify OTP</button>
+            </form>
+            <button id="regenerate-btn" class="secondary" type="button">Generate Different OTP</button>
+            <p id="otp-message" class="message"></p>
+          </article>
         </section>
       </main>
-    </div>
 
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU</strong>
+            <p class="muted">Practical digital safety for students, creators, and beginners.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/pricing.html">Pricing</a>
+            <a href="/privacy.html">Privacy & Security</a>
+            <a href="/contact.html">Contact</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
     <script src="/script.js"></script>
   </body>
 </html>

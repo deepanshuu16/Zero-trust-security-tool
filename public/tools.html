@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Security Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="page-dark">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a class="active" href="/tools.html">Security Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/assistant.html">AI Assistant</a>
+          <a href="/learning.html">Learning Hub</a>
+          <a href="/news.html">Threat News</a>
+          <a href="/about.html">About</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Core toolkit</span>
+            <h1>Dedicated tools for everyday online safety.</h1>
+            <p>Instead of hiding everything in dashboard widgets, SecureU gives each student-focused safety tool its own space.</p>
+          </article>
+          <aside class="scan-card">
+            <span class="pill success">What this page solves</span>
+            <p>Paste a link, test a password, or analyze a suspicious message. These are the practical actions students actually need.</p>
+          </aside>
+        </section>
+
+        <section class="grid-section">
+          <div class="section-header">
+            <span class="eyebrow">Tool Pages</span>
+            <h2>Use one tool at a time with clearer results</h2>
+          </div>
+
+          <div class="tools-grid">
+            <article class="tool-card">
+              <h3>Phishing Checker</h3>
+              <form id="link-form" class="stack">
+                <label>
+                  Paste a URL
+                  <input id="link-input" type="url" placeholder="https://example.com/internship" required />
+                </label>
+                <button class="primary" type="submit">Scan Link</button>
+              </form>
+              <p id="link-message" class="message"></p>
+            </article>
+
+            <article class="tool-card result-box">
+              <span class="pill">Link Result</span>
+              <strong id="link-risk-label">Waiting for a scan</strong>
+              <p id="link-risk-score">Risk score: --</p>
+              <ul id="link-reasons" class="clean-list">
+                <li>SecureU will explain why a link looks safe, suspicious, or dangerous.</li>
+              </ul>
+            </article>
+
+            <article class="tool-card">
+              <h3>Password Analyzer</h3>
+              <form id="password-form" class="stack">
+                <label>
+                  Test a password
+                  <input id="password-check-input" type="text" placeholder="Enter a password" required />
+                </label>
+                <button class="primary" type="submit">Analyze Password</button>
+              </form>
+              <div class="button-row">
+                <button id="generate-passphrase-btn" class="secondary" type="button">Generate Passphrase</button>
+              </div>
+              <div class="otp-card">
+                <span>Suggested passphrase</span>
+                <strong id="generated-passphrase">No passphrase generated yet</strong>
+              </div>
+              <p id="password-message" class="message"></p>
+            </article>
+
+            <article class="tool-card result-box">
+              <span class="pill">Password Result</span>
+              <strong id="password-risk-label">Waiting for analysis</strong>
+              <p id="password-risk-score">Strength score: --</p>
+              <ul id="password-reasons" class="clean-list">
+                <li>SecureU will rate length, variety, reuse risk, and common-password weakness.</li>
+              </ul>
+            </article>
+
+            <article class="tool-card">
+              <h3>AI Scam Detector</h3>
+              <form id="scam-form" class="stack">
+                <label>
+                  Paste a message or email
+                  <textarea id="scam-input" rows="7" placeholder="Paste a suspicious internship email, DM, or chat message" required></textarea>
+                </label>
+                <button class="primary" type="submit">Analyze Message</button>
+              </form>
+              <p id="scam-message" class="message"></p>
+            </article>
+
+            <article class="tool-card result-box">
+              <span class="pill">Scam Result</span>
+              <strong id="scam-risk-label">Waiting for analysis</strong>
+              <p id="scam-risk-score">Scam probability: --</p>
+              <ul id="scam-reasons" class="clean-list">
+                <li>SecureU will look for urgency, manipulation, payment pressure, and suspicious language.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU</strong>
+            <p class="muted">Dedicated tools create better product structure, clearer value, and stronger retention.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/privacy.html">Privacy & Security</a>
+            <a href="/contact.html">Contact</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

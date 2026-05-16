@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Learning Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Security Tools</a>
+          <a href="/dashboard.html">Dashboard</a>
+          <a href="/assistant.html">AI Assistant</a>
+          <a class="active" href="/learning.html">Learning Hub</a>
+          <a href="/news.html">Threat News</a>
+          <a href="/about.html">About</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Retention through education</span>
+            <h1>Learn cybersecurity with small, useful lessons.</h1>
+            <p>Practice scam spotting, phishing awareness, public Wi-Fi caution, and password hygiene without technical overload.</p>
+          </article>
+          <aside class="scan-card">
+            <span class="pill success">What keeps students engaged</span>
+            <p>Daily challenges, short lessons, and simple wins create stronger habits than a one-time dashboard visit.</p>
+          </aside>
+        </section>
+
+        <section class="learning-grid">
+          <article class="lesson-card">
+            <span class="pill">Daily Challenge</span>
+            <h3>Spot the red flag</h3>
+            <p>An internship email asks for your OTP to “confirm your seat.” What is the safest action?</p>
+            <div class="challenge-options">
+              <button class="secondary challenge-btn" type="button" data-correct="false">Share the OTP quickly</button>
+              <button class="secondary challenge-btn" type="button" data-correct="true">Refuse and verify the sender another way</button>
+              <button class="secondary challenge-btn" type="button" data-correct="false">Send account details too</button>
+            </div>
+            <p id="challenge-feedback" class="message"></p>
+          </article>
+
+          <article class="lesson-card">
+            <span class="pill">Quick Lessons</span>
+            <ul class="clean-list">
+              <li>Never share OTPs, recovery codes, or one-time sign-in links.</li>
+              <li>Fake websites often use extra letters, odd TLDs, or misleading subdomains.</li>
+              <li>Public Wi-Fi is safer when you avoid sensitive logins and stick to HTTPS websites.</li>
+            </ul>
+          </article>
+
+          <article class="lesson-card">
+            <span class="pill">Why this matters</span>
+            <p>Learning Hub increases retention, helps with presentations, and turns SecureU into a platform instead of just a scan page.</p>
+          </article>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Learning Hub</strong>
+            <p class="muted">Micro-learning keeps the platform useful even when users are not actively dealing with scams.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/dashboard.html">Open Dashboard</a>
+            <a href="/tools.html">Run Security Tools</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>

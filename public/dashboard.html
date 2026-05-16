@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark">SU</span>
+          <span class="brand-copy"><strong>SecureU</strong><small>Student Security Platform</small></span>
+        </a>
+        <nav class="site-nav">
+          <a href="/index.html">Home</a>
+          <a href="/tools.html">Security Tools</a>
+          <a class="active" href="/dashboard.html">Dashboard</a>
+          <a href="/assistant.html">AI Assistant</a>
+          <a href="/learning.html">Learning Hub</a>
+          <a href="/news.html">Threat News</a>
+          <a href="/about.html">About</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="page-hero">
+          <article class="hero-card">
+            <span class="eyebrow">Personalized overview</span>
+            <h1>A dashboard with real context, not fake metrics.</h1>
+            <p>See your security score, recent scans, role-based access, and practical next steps after using the platform tools.</p>
+          </article>
+          <aside class="scan-card">
+            <span class="pill">Dashboard promise</span>
+            <p>Only meaningful signals are shown here: verified session details, tool results, and actionable recommendations.</p>
+            <button id="logout-btn" class="secondary" type="button">Logout</button>
+          </aside>
+        </section>
+
+        <section id="dashboard-shell" class="dashboard-shell">
+          <aside class="dashboard-sidebar">
+            <div class="dashboard-card">
+              <span class="pill">Session</span>
+              <strong id="sidebar-session-status">No verified session</strong>
+            </div>
+
+            <div class="dashboard-card score-badge">
+              <span class="pill success">Security Score</span>
+              <strong id="sidebar-security-score">0</strong>
+              <p id="sidebar-score-summary">Login from the home page to generate a real dashboard.</p>
+            </div>
+
+            <div class="dashboard-card">
+              <span class="pill">Views</span>
+              <div class="dashboard-nav">
+                <button class="secondary active" type="button" data-dashboard-view="overview">Overview</button>
+                <button class="secondary" type="button" data-dashboard-view="recent">Recent Scans</button>
+                <button class="secondary" type="button" data-dashboard-view="tips">Recommendations</button>
+                <button class="secondary" type="button" data-dashboard-view="admin">Admin Monitor</button>
+              </div>
+            </div>
+          </aside>
+
+          <div>
+            <section class="dashboard-view active" data-dashboard-panel="overview">
+              <div class="dashboard-grid">
+                <article class="dashboard-card dashboard-metric">
+                  <span class="pill">Status</span>
+                  <strong id="dashboard-session-status">Please verify OTP from the home page first.</strong>
+                </article>
+                <article class="dashboard-card dashboard-metric">
+                  <span class="pill">Recent Role Access</span>
+                  <strong id="dashboard-role">Pending</strong>
+                </article>
+                <article class="dashboard-card dashboard-metric">
+                  <span class="pill">Trust Level</span>
+                  <strong id="dashboard-trust">Pending</strong>
+                </article>
+              </div>
+
+              <div class="recent-grid">
+                <article class="dashboard-card">
+                  <h3>Account Context</h3>
+                  <div class="data-list">
+                    <div class="data-row"><span>Name</span><strong id="dashboard-name">Pending</strong></div>
+                    <div class="data-row"><span>Browser</span><strong id="dashboard-browser">Pending</strong></div>
+                    <div class="data-row"><span>Device</span><strong id="dashboard-device">Pending</strong></div>
+                    <div class="data-row"><span>Zone</span><strong id="dashboard-zone">Pending</strong></div>
+                    <div class="data-row"><span>OTP Requests</span><strong id="dashboard-otp-count">0</strong></div>
+                  </div>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Role Access Surface</h3>
+                  <ul id="dashboard-role-list" class="clean-list">
+                    <li>Verify a user session to see role-specific access guidance.</li>
+                  </ul>
+                </article>
+
+                <article class="dashboard-card">
+                  <h3>Security Progress</h3>
+                  <div class="data-list">
+                    <div class="data-row"><span>Link Checks</span><strong id="recent-link-result">No scans yet</strong></div>
+                    <div class="data-row"><span>Password Checks</span><strong id="recent-password-result">No scans yet</strong></div>
+                    <div class="data-row"><span>Scam Reviews</span><strong id="recent-scam-result">No scans yet</strong></div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="dashboard-view" data-dashboard-panel="recent">
+              <article class="dashboard-card">
+                <h3>Recent scan summaries</h3>
+                <div class="recent-list">
+                  <div class="recent-item"><span>Last Link Scan</span><strong id="recent-link-result-duplicate">No scans yet</strong></div>
+                  <div class="recent-item"><span>Last Password Check</span><strong id="recent-password-result-duplicate">No scans yet</strong></div>
+                  <div class="recent-item"><span>Last Scam Review</span><strong id="recent-scam-result-duplicate">No scans yet</strong></div>
+                </div>
+              </article>
+            </section>
+
+            <section class="dashboard-view" data-dashboard-panel="tips">
+              <article class="dashboard-card">
+                <h3>Personalized recommendations</h3>
+                <ul id="dashboard-tips" class="clean-list">
+                  <li>Start with a quick login from the home page.</li>
+                  <li>Use the tools page to scan a suspicious link or message.</li>
+                  <li>Return here for personalized recommendations.</li>
+                </ul>
+              </article>
+            </section>
+
+            <section class="dashboard-view" data-dashboard-panel="admin">
+              <article class="dashboard-card">
+                <h3>Admin monitor</h3>
+                <div id="admin-feed" class="admin-feed">
+                  <div class="feed-item"><strong>No activity yet</strong><span>Admin data appears after verified usage.</span></div>
+                </div>
+              </article>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer-band">
+        <div class="footer-row">
+          <div>
+            <strong>SecureU Dashboard</strong>
+            <p class="muted">Useful metrics, recent scans, and recommendations without fake analytics.</p>
+          </div>
+          <nav class="footer-nav">
+            <a href="/tools.html">Run Tools</a>
+            <a href="/learning.html">Go to Learning Hub</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+    <script src="/script.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const sync = (sourceId, targetId) => {
+          const source = document.getElementById(sourceId);
+          const target = document.getElementById(targetId);
+          if (source && target) {
+            const observer = new MutationObserver(() => {
+              target.textContent = source.textContent;
+            });
+            target.textContent = source.textContent;
+            observer.observe(source, { childList: true, subtree: true, characterData: true });
+          }
+        };
+        sync("recent-link-result", "recent-link-result-duplicate");
+        sync("recent-password-result", "recent-password-result-duplicate");
+        sync("recent-scam-result", "recent-scam-result-duplicate");
+      });
+    </script>
+  </body>
+</html>
