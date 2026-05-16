@@ -1,315 +1,778 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+require("dotenv").config();
+
 const crypto = require("crypto");
+const path = require("path");
+const bcrypt = require("bcryptjs");
+const compression = require("compression");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const csrf = require("csurf");
+const express = require("express");
+const mongoSanitize = require("express-mongo-sanitize");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const hpp = require("hpp");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
+const { createClient } = require("redis");
+const twilio = require("twilio");
+const xss = require("xss-clean");
 
 const PORT = process.env.PORT || 3000;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const JWT_SECRET = process.env.JWT_SECRET || "development-only-change-this-secret";
+const OTP_SECRET = process.env.OTP_SECRET || "development-only-change-this-otp-secret";
+const OTP_EXPIRES_SECONDS = Number(process.env.OTP_EXPIRES_SECONDS || 300);
+const OTP_RESEND_SECONDS = Number(process.env.OTP_RESEND_SECONDS || 60);
+const SESSION_EXPIRES_SECONDS = Number(process.env.SESSION_EXPIRES_SECONDS || 86400);
+const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL || `http://localhost:${PORT}`;
 
-const users = {
-  admin: {
-    username: "admin",
-    password: "Admin@123",
-    role: "admin",
-    name: "Primary Administrator"
-  },
-  employee: {
-    username: "employee",
-    password: "Employee@123",
-    role: "employee",
-    name: "Operations Employee"
-  },
-  guest: {
-    username: "guest",
-    password: "Guest@123",
-    role: "guest",
-    name: "Visitor Guest"
-  }
-};
+const app = express();
+let infrastructureReady = null;
+const memoryOtpStore = new Map();
+const memorySessions = new Map();
+
+let redisClient = null;
+let mailer = null;
+let whatsAppClient = null;
 
 const roleContent = {
   admin: {
     title: "Admin Control Center",
-    items: [
-      "Approve or block sensitive access requests",
-      "Review live OTP issuance metrics",
-      "Audit role-based policy decisions"
-    ]
+    items: ["Approve sensitive access requests", "Review OTP request analytics", "Audit device sessions"]
   },
   employee: {
     title: "Employee Workspace",
-    items: [
-      "View assigned internal resources",
-      "Confirm device trust before access",
-      "Request temporary elevated permissions"
-    ]
+    items: ["View assigned internal resources", "Confirm device trust", "Request temporary elevated permissions"]
+  },
+  analyst: {
+    title: "Security Analyst Console",
+    items: ["Review alerts", "Investigate login history", "Monitor risky devices"]
   },
   guest: {
     title: "Guest Access Portal",
-    items: [
-      "Use time-limited visitor access",
-      "Enter shared meeting resources only",
-      "Stay isolated from internal admin systems"
-    ]
+    items: ["Use time-limited visitor access", "Stay isolated from sensitive systems", "Complete awareness checks"]
   }
 };
 
-const sessions = new Map();
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true, maxlength: 80 },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    phone: { type: String, trim: true },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ["admin", "employee", "analyst", "guest"], default: "employee" },
+    isEmailVerified: { type: Boolean, default: false },
+    isWhatsAppVerified: { type: Boolean, default: false },
+    mfaEnabled: { type: Boolean, default: true },
+    failedLoginCount: { type: Number, default: 0 },
+    lastLoginAt: Date
+  },
+  { timestamps: true }
+);
 
-function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
-  response.end(JSON.stringify(payload));
+const loginEventSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true },
+    email: String,
+    status: { type: String, enum: ["success", "failed", "otp_sent", "otp_verified", "logout", "reset"], default: "success" },
+    channel: String,
+    ip: String,
+    userAgent: String,
+    deviceId: String,
+    detail: String
+  },
+  { timestamps: true }
+);
+
+const securityAlertSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true },
+    level: { type: String, enum: ["info", "warning", "critical"], default: "info" },
+    title: String,
+    detail: String,
+    ip: String,
+    userAgent: String
+  },
+  { timestamps: true }
+);
+
+const sessionSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true },
+    tokenId: { type: String, unique: true, index: true },
+    deviceId: String,
+    ip: String,
+    userAgent: String,
+    lastSeenAt: Date,
+    expiresAt: Date,
+    revokedAt: Date
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+const LoginEvent = mongoose.models.LoginEvent || mongoose.model("LoginEvent", loginEventSchema);
+const SecurityAlert = mongoose.models.SecurityAlert || mongoose.model("SecurityAlert", securityAlertSchema);
+const Session = mongoose.models.Session || mongoose.model("Session", sessionSchema);
+
+function requireEnv(name) {
+  if (!process.env[name] && IS_PRODUCTION) {
+    console.warn(`Missing production environment variable: ${name}`);
+  }
 }
 
-function parseBody(request) {
-  return new Promise((resolve, reject) => {
-    let data = "";
-    request.on("data", (chunk) => {
-      data += chunk;
-      if (data.length > 1e6) {
-        reject(new Error("Request body too large"));
-      }
-    });
-    request.on("end", () => {
-      if (!data) {
-        resolve({});
-        return;
-      }
-      try {
-        resolve(JSON.parse(data));
-      } catch (error) {
-        reject(new Error("Invalid JSON body"));
-      }
-    });
-    request.on("error", reject);
-  });
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
 }
 
-function parseCookies(request) {
-  const cookieHeader = request.headers.cookie || "";
-  return cookieHeader.split(";").reduce((accumulator, item) => {
-    const [key, ...rest] = item.trim().split("=");
-    if (!key) {
-      return accumulator;
-    }
-    accumulator[key] = decodeURIComponent(rest.join("="));
-    return accumulator;
-  }, {});
+function normalizeChannel(channel) {
+  return channel === "whatsapp" ? "whatsapp" : "email";
 }
 
-function createSession(user) {
-  const sessionId = crypto.randomUUID();
-  const session = {
-    sessionId,
-    username: user.username,
+function publicUser(user) {
+  return {
+    id: user._id,
     name: user.name,
+    email: user.email,
+    phone: user.phone,
     role: user.role,
-    otpVerified: false,
-    otp: null,
-    otpIssuedAt: null,
-    otpUsageCount: 0
+    isEmailVerified: user.isEmailVerified,
+    isWhatsAppVerified: user.isWhatsAppVerified,
+    mfaEnabled: user.mfaEnabled
   };
-
-  sessions.set(sessionId, session);
-  return session;
 }
 
-function getSession(request) {
-  const cookies = parseCookies(request);
-  const sessionId = cookies.sid;
-  if (!sessionId) {
+function hashOtp(otp) {
+  return crypto.createHmac("sha256", OTP_SECRET).update(String(otp)).digest("hex");
+}
+
+function generateOtp() {
+  return crypto.randomInt(100000, 1000000).toString();
+}
+
+function getClientIp(request) {
+  return request.headers["x-forwarded-for"]?.split(",")[0]?.trim() || request.socket.remoteAddress || "unknown";
+}
+
+function getDeviceId(request, response) {
+  const existing = request.cookies.device_id;
+  if (existing) return existing;
+  const deviceId = crypto.randomUUID();
+  response.cookie("device_id", deviceId, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: IS_PRODUCTION,
+    maxAge: 1000 * 60 * 60 * 24 * 365
+  });
+  return deviceId;
+}
+
+function otpKey(userId, purpose) {
+  return `otp:${purpose}:${userId}`;
+}
+
+function resendKey(userId, purpose) {
+  return `otp-resend:${purpose}:${userId}`;
+}
+
+function resetKey(token) {
+  return `reset:${token}`;
+}
+
+async function cacheSet(key, value, ttlSeconds) {
+  const payload = JSON.stringify(value);
+  if (redisClient?.isOpen) {
+    await redisClient.set(key, payload, { EX: ttlSeconds });
+    return;
+  }
+  memoryOtpStore.set(key, { payload, expiresAt: Date.now() + ttlSeconds * 1000 });
+}
+
+async function cacheGet(key) {
+  if (redisClient?.isOpen) {
+    const value = await redisClient.get(key);
+    return value ? JSON.parse(value) : null;
+  }
+  const item = memoryOtpStore.get(key);
+  if (!item) return null;
+  if (item.expiresAt < Date.now()) {
+    memoryOtpStore.delete(key);
     return null;
   }
-  return sessions.get(sessionId) || null;
+  return JSON.parse(item.payload);
 }
 
-function generateOtp(previousOtp) {
-  let nextOtp = "";
-  do {
-    nextOtp = crypto.randomInt(100000, 1000000).toString();
-  } while (nextOtp === previousOtp);
-  return nextOtp;
-}
-
-function issueOtp(session) {
-  const otp = generateOtp(session.otp);
-  session.otp = otp;
-  session.otpVerified = false;
-  session.otpIssuedAt = new Date().toISOString();
-  session.otpUsageCount += 1;
-  return otp;
-}
-
-function requireSession(request, response) {
-  const session = getSession(request);
-  if (!session) {
-    sendJson(response, 401, { error: "Sign in first." });
-    return null;
+async function cacheDelete(key) {
+  if (redisClient?.isOpen) {
+    await redisClient.del(key);
+    return;
   }
-  return session;
+  memoryOtpStore.delete(key);
 }
 
-function requireVerifiedSession(request, response) {
-  const session = requireSession(request, response);
-  if (!session) {
-    return null;
+async function trackEvent(request, user, status, detail, channel) {
+  const event = {
+    userId: user?._id,
+    email: user?.email || request.body?.email,
+    status,
+    channel,
+    ip: getClientIp(request),
+    userAgent: request.headers["user-agent"] || "unknown",
+    deviceId: request.cookies.device_id,
+    detail
+  };
+  if (mongoose.connection.readyState === 1) {
+    await LoginEvent.create(event);
   }
-  if (!session.otpVerified) {
-    sendJson(response, 403, { error: "OTP verification required." });
-    return null;
-  }
-  return session;
 }
 
-function serveFile(response, filePath) {
-  fs.readFile(filePath, (error, data) => {
-    if (error) {
-      sendJson(response, 404, { error: "File not found." });
-      return;
-    }
-
-    const extension = path.extname(filePath);
-    const contentTypes = {
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css; charset=utf-8",
-      ".js": "application/javascript; charset=utf-8"
-    };
-
-    response.writeHead(200, { "Content-Type": contentTypes[extension] || "text/plain; charset=utf-8" });
-    response.end(data);
+async function createAlert(request, user, level, title, detail) {
+  if (mongoose.connection.readyState !== 1) return;
+  await SecurityAlert.create({
+    userId: user?._id,
+    level,
+    title,
+    detail,
+    ip: getClientIp(request),
+    userAgent: request.headers["user-agent"] || "unknown"
   });
 }
 
-async function handleApi(request, response) {
-  if (request.method === "POST" && request.url === "/api/login") {
-    const body = await parseBody(request);
-    const user = users[body.username];
-
-    if (!user || user.password !== body.password) {
-      sendJson(response, 401, { error: "Invalid credentials." });
-      return;
-    }
-
-    const session = createSession(user);
-    const otp = issueOtp(session);
-
-    response.writeHead(200, {
-      "Content-Type": "application/json; charset=utf-8",
-      "Set-Cookie": `sid=${session.sessionId}; HttpOnly; SameSite=Strict; Path=/`
-    });
-    response.end(JSON.stringify({
-      message: "Login accepted. Verify the fresh OTP to continue.",
-      otp,
-      role: session.role,
-      name: session.name
-    }));
-    return;
-  }
-
-  if (request.method === "POST" && request.url === "/api/otp/regenerate") {
-    const session = requireSession(request, response);
-    if (!session) {
-      return;
-    }
-
-    const otp = issueOtp(session);
-    sendJson(response, 200, {
-      message: "A different OTP has been generated.",
-      otp,
-      issuedAt: session.otpIssuedAt,
-      otpUsageCount: session.otpUsageCount
-    });
-    return;
-  }
-
-  if (request.method === "POST" && request.url === "/api/otp/verify") {
-    const session = requireSession(request, response);
-    if (!session) {
-      return;
-    }
-
-    const body = await parseBody(request);
-    if (!session.otp || body.otp !== session.otp) {
-      sendJson(response, 401, { error: "Incorrect OTP." });
-      return;
-    }
-
-    session.otpVerified = true;
-    session.otp = null;
-
-    sendJson(response, 200, {
-      message: "OTP verified. Access granted by role.",
-      user: {
-        username: session.username,
-        name: session.name,
-        role: session.role
-      }
-    });
-    return;
-  }
-
-  if (request.method === "POST" && request.url === "/api/logout") {
-    const session = getSession(request);
-    if (session) {
-      sessions.delete(session.sessionId);
-    }
-
-    response.writeHead(200, {
-      "Content-Type": "application/json; charset=utf-8",
-      "Set-Cookie": "sid=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0"
-    });
-    response.end(JSON.stringify({ message: "Signed out." }));
-    return;
-  }
-
-  if (request.method === "GET" && request.url === "/api/session") {
-    const session = getSession(request);
-    sendJson(response, 200, {
-      authenticated: Boolean(session),
-      otpVerified: Boolean(session && session.otpVerified),
-      user: session
-        ? {
-            username: session.username,
-            name: session.name,
-            role: session.role
-          }
-        : null
-    });
-    return;
-  }
-
-  if (request.method === "GET" && request.url === "/api/access") {
-    const session = requireVerifiedSession(request, response);
-    if (!session) {
-      return;
-    }
-
-    sendJson(response, 200, {
-      message: "Access evaluated with zero-trust checks.",
-      role: session.role,
-      section: roleContent[session.role]
-    });
-    return;
-  }
-
-  sendJson(response, 404, { error: "Endpoint not found." });
+function buildEmailTemplate({ name, otp, purpose }) {
+  const label = purpose === "reset" ? "Password Reset" : purpose === "signup" ? "Account Verification" : "Login Verification";
+  return `
+    <div style="margin:0;padding:32px;background:#0B1120;color:#E5F6FF;font-family:Inter,Arial,sans-serif">
+      <div style="max-width:560px;margin:auto;border:1px solid rgba(0,245,212,.28);border-radius:24px;background:rgba(15,23,42,.86);overflow:hidden">
+        <div style="padding:28px;background:linear-gradient(135deg,#00F5D4,#3B82F6,#7C3AED)">
+          <h1 style="margin:0;color:white;font-size:28px">SecureU ${label}</h1>
+        </div>
+        <div style="padding:32px">
+          <p style="color:#CBD5E1;font-size:16px">Hi ${name || "there"}, use this one-time passcode to continue your secure session.</p>
+          <div style="margin:28px 0;padding:20px;border-radius:18px;background:#050816;text-align:center;border:1px solid rgba(0,245,212,.28)">
+            <strong style="font-size:36px;letter-spacing:8px;color:#00F5D4">${otp}</strong>
+          </div>
+          <p style="color:#94A3B8">This OTP expires in 5 minutes. Never share it with anyone, including SecureU support.</p>
+          <p style="color:#64748B;font-size:13px">If you did not request this code, reset your password and review active sessions immediately.</p>
+        </div>
+      </div>
+    </div>`;
 }
 
-const server = http.createServer(async (request, response) => {
-  try {
-    if (request.url.startsWith("/api/")) {
-      await handleApi(request, response);
-      return;
-    }
+async function sendEmailOtp(user, otp, purpose) {
+  if (!mailer) {
+    console.log(`[dev-email] ${purpose} OTP for ${user.email}: ${otp}`);
+    return { provider: "console" };
+  }
+  await mailer.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: user.email,
+    subject: `SecureU ${purpose} OTP`,
+    html: buildEmailTemplate({ name: user.name, otp, purpose })
+  });
+  return { provider: "email" };
+}
 
-    const publicDir = path.join(__dirname, "public");
-    const requestedPath = request.url === "/" ? "/index.html" : request.url;
-    const safePath = path.normalize(requestedPath).replace(/^(\.\.[/\\])+/, "");
-    serveFile(response, path.join(publicDir, safePath));
+async function sendWhatsAppOtp(user, otp, purpose) {
+  const message = `SecureU ${purpose} OTP: ${otp}. Valid for 5 minutes. Do not share this code.`;
+  if (!whatsAppClient || !user.phone) {
+    console.log(`[dev-whatsapp] ${purpose} OTP for ${user.phone || user.email}: ${otp}`);
+    return { provider: "console" };
+  }
+  try {
+    await whatsAppClient.messages.create({
+      from: process.env.TWILIO_WHATSAPP_FROM,
+      to: `whatsapp:${user.phone}`,
+      body: message
+    });
+    return { provider: "whatsapp" };
   } catch (error) {
-    sendJson(response, 500, { error: error.message || "Internal server error." });
+    if (process.env.TWILIO_SMS_FROM && user.phone) {
+      await whatsAppClient.messages.create({
+        from: process.env.TWILIO_SMS_FROM,
+        to: user.phone,
+        body: message
+      });
+      return { provider: "sms-fallback" };
+    }
+    throw error;
+  }
+}
+
+async function issueOtp({ request, response, user, purpose, channel }) {
+  const resendLock = await cacheGet(resendKey(user._id, purpose));
+  if (resendLock) {
+    response.status(429);
+    throw new Error(`Please wait ${resendLock.waitSeconds || OTP_RESEND_SECONDS} seconds before requesting another OTP.`);
+  }
+
+  const otp = generateOtp();
+  await cacheSet(
+    otpKey(user._id, purpose),
+    {
+      hash: hashOtp(otp),
+      channel,
+      purpose,
+      attempts: 0,
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + OTP_EXPIRES_SECONDS * 1000
+    },
+    OTP_EXPIRES_SECONDS
+  );
+  await cacheSet(resendKey(user._id, purpose), { waitSeconds: OTP_RESEND_SECONDS }, OTP_RESEND_SECONDS);
+
+  const delivery = channel === "whatsapp" ? await sendWhatsAppOtp(user, otp, purpose) : await sendEmailOtp(user, otp, purpose);
+  await trackEvent(request, user, "otp_sent", `${purpose} OTP sent using ${delivery.provider}.`, channel);
+
+  return {
+    message: `OTP sent through ${delivery.provider}.`,
+    expiresIn: OTP_EXPIRES_SECONDS,
+    resendAfter: OTP_RESEND_SECONDS,
+    channel,
+    purpose,
+    user: { email: user.email, phone: user.phone ? maskPhone(user.phone) : null }
+  };
+}
+
+function maskPhone(phone) {
+  const value = String(phone);
+  return value.length <= 4 ? "****" : `${"*".repeat(Math.max(0, value.length - 4))}${value.slice(-4)}`;
+}
+
+async function verifyOtp({ request, user, purpose, otp }) {
+  const key = otpKey(user._id, purpose);
+  const entry = await cacheGet(key);
+  if (!entry) {
+    await createAlert(request, user, "warning", "Expired OTP attempt", `Expired or missing OTP used for ${purpose}.`);
+    throw Object.assign(new Error("Invalid or expired OTP."), { statusCode: 401 });
+  }
+  if (entry.attempts >= 5) {
+    await cacheDelete(key);
+    await createAlert(request, user, "critical", "OTP brute-force blocked", `Too many OTP attempts for ${purpose}.`);
+    throw Object.assign(new Error("Too many OTP attempts. Request a new code."), { statusCode: 429 });
+  }
+  if (entry.hash !== hashOtp(otp)) {
+    entry.attempts += 1;
+    await cacheSet(key, entry, Math.max(1, Math.floor((entry.expiresAt - Date.now()) / 1000)));
+    throw Object.assign(new Error("Incorrect OTP."), { statusCode: 401 });
+  }
+  await cacheDelete(key);
+  return entry;
+}
+
+function signJwt(user, tokenId) {
+  return jwt.sign(
+    {
+      sub: String(user._id),
+      email: user.email,
+      role: user.role,
+      tokenId
+    },
+    JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || "15m", issuer: "secureu-zero-trust" }
+  );
+}
+
+async function createSession(request, response, user) {
+  const tokenId = crypto.randomUUID();
+  const deviceId = getDeviceId(request, response);
+  const session = {
+    userId: user._id,
+    tokenId,
+    deviceId,
+    ip: getClientIp(request),
+    userAgent: request.headers["user-agent"] || "unknown",
+    lastSeenAt: new Date(),
+    expiresAt: new Date(Date.now() + SESSION_EXPIRES_SECONDS * 1000)
+  };
+  if (mongoose.connection.readyState === 1) {
+    await Session.create(session);
+  } else {
+    memorySessions.set(tokenId, session);
+  }
+  const token = signJwt(user, tokenId);
+  response.cookie("auth_token", token, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: IS_PRODUCTION,
+    maxAge: SESSION_EXPIRES_SECONDS * 1000
+  });
+  return { tokenId, token };
+}
+
+async function requireAuth(request, response, next) {
+  try {
+    const token = request.cookies.auth_token || request.headers.authorization?.replace(/^Bearer\s+/i, "");
+    if (!token) return response.status(401).json({ error: "Authentication required." });
+    const payload = jwt.verify(token, JWT_SECRET, { issuer: "secureu-zero-trust" });
+    const user = await User.findById(payload.sub).select("-passwordHash");
+    if (!user) return response.status(401).json({ error: "Invalid session." });
+
+    let activeSession = null;
+    if (mongoose.connection.readyState === 1) {
+      activeSession = await Session.findOne({ tokenId: payload.tokenId, revokedAt: null, expiresAt: { $gt: new Date() } });
+      if (activeSession) {
+        activeSession.lastSeenAt = new Date();
+        await activeSession.save();
+      }
+    } else {
+      activeSession = memorySessions.get(payload.tokenId);
+    }
+    if (!activeSession) return response.status(401).json({ error: "Session expired or revoked." });
+
+    request.user = user;
+    request.auth = payload;
+    request.sessionRecord = activeSession;
+    next();
+  } catch {
+    response.status(401).json({ error: "Invalid or expired token." });
+  }
+}
+
+function asyncHandler(handler) {
+  return (request, response, next) => Promise.resolve(handler(request, response, next)).catch(next);
+}
+
+async function connectInfrastructure() {
+  requireEnv("MONGODB_URI");
+  requireEnv("JWT_SECRET");
+  requireEnv("OTP_SECRET");
+
+  if (process.env.MONGODB_URI) {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("MongoDB connected.");
+  } else {
+    console.warn("MONGODB_URI not set. Auth data will not persist across restarts.");
+  }
+
+  if (process.env.REDIS_URL) {
+    redisClient = createClient({ url: process.env.REDIS_URL });
+    redisClient.on("error", (error) => console.warn(`Redis error: ${error.message}`));
+    await redisClient.connect();
+    console.log("Redis connected.");
+  } else {
+    console.warn("REDIS_URL not set. OTP/session cache is using memory fallback.");
+  }
+
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    mailer = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: Number(process.env.SMTP_PORT) === 465,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+  }
+
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+    whatsAppClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  }
+}
+
+app.set("trust proxy", 1);
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+        frameAncestors: ["'none'"]
+      }
+    }
+  })
+);
+app.use((request, response, next) => {
+  if (IS_PRODUCTION && request.headers["x-forwarded-proto"] && request.headers["x-forwarded-proto"] !== "https") {
+    return response.redirect(301, `https://${request.headers.host}${request.originalUrl}`);
+  }
+  next();
+});
+app.use(compression());
+app.use(express.json({ limit: "32kb" }));
+app.use(express.urlencoded({ extended: false, limit: "32kb" }));
+app.use(cookieParser());
+app.use(mongoSanitize());
+app.use(xss());
+app.use(hpp());
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || PUBLIC_APP_URL).split(",").map((origin) => origin.trim());
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Origin not allowed."));
+    },
+    credentials: true
+  })
+);
+
+app.use("/api", async (request, response, next) => {
+  try {
+    if (!infrastructureReady) infrastructureReady = connectInfrastructure();
+    await infrastructureReady;
+    next();
+  } catch (error) {
+    next(error);
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`Zero trust security tool running on http://localhost:${PORT}`);
+const csrfProtection = csrf({
+  cookie: {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: IS_PRODUCTION
+  }
 });
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many authentication attempts. Try again later." }
+});
+
+const otpLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 6,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many OTP requests. Slow down and try again." }
+});
+
+app.get("/api/csrf-token", csrfProtection, (request, response) => {
+  response.json({ csrfToken: request.csrfToken() });
+});
+
+app.post(
+  "/api/auth/signup",
+  authLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { name, email, phone, password, channel = "email" } = request.body;
+    const normalizedEmail = normalizeEmail(email);
+    if (!name || !normalizedEmail || !password || password.length < 8) {
+      return response.status(400).json({ error: "Name, valid email, and password of at least 8 characters are required." });
+    }
+    const existing = await User.findOne({ email: normalizedEmail });
+    if (existing) return response.status(409).json({ error: "An account already exists for this email." });
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await User.create({ name, email: normalizedEmail, phone, passwordHash, role: "employee" });
+    const payload = await issueOtp({ request, response, user, purpose: "signup", channel: normalizeChannel(channel) });
+    response.status(201).json(payload);
+  })
+);
+
+app.post(
+  "/api/auth/login",
+  authLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { email, password, channel = "email" } = request.body;
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user || !(await bcrypt.compare(String(password || ""), user.passwordHash))) {
+      await trackEvent(request, user, "failed", "Invalid email or password.", normalizeChannel(channel));
+      if (user) {
+        user.failedLoginCount += 1;
+        await user.save();
+        if (user.failedLoginCount >= 5) {
+          await createAlert(request, user, "critical", "Brute-force pattern detected", "Multiple failed password attempts detected.");
+        }
+      }
+      return response.status(401).json({ error: "Invalid credentials." });
+    }
+    const payload = await issueOtp({ request, response, user, purpose: "login", channel: normalizeChannel(channel) });
+    response.json(payload);
+  })
+);
+
+app.post(
+  "/api/auth/otp/resend",
+  otpLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { email, purpose = "login", channel = "email" } = request.body;
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) return response.status(404).json({ error: "Account not found." });
+    const payload = await issueOtp({ request, response, user, purpose, channel: normalizeChannel(channel) });
+    response.json(payload);
+  })
+);
+
+app.post(
+  "/api/auth/otp/verify",
+  otpLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { email, otp, purpose = "login" } = request.body;
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) return response.status(404).json({ error: "Account not found." });
+    const entry = await verifyOtp({ request, user, purpose, otp });
+
+    if (purpose === "signup") {
+      if (entry.channel === "whatsapp") user.isWhatsAppVerified = true;
+      else user.isEmailVerified = true;
+    }
+    user.failedLoginCount = 0;
+    user.lastLoginAt = new Date();
+    await user.save();
+    await trackEvent(request, user, "otp_verified", `${purpose} OTP verified.`, entry.channel);
+
+    if (purpose === "reset") {
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      await cacheSet(resetKey(resetToken), { userId: String(user._id) }, 10 * 60);
+      return response.json({ message: "OTP verified. Continue to reset password.", resetToken, redirectTo: "/reset-password.html" });
+    }
+
+    const session = await createSession(request, response, user);
+    response.json({
+      message: "OTP verified. Secure session established.",
+      user: publicUser(user),
+      token: session.token,
+      redirectTo: "/dashboard.html"
+    });
+  })
+);
+
+app.post(
+  "/api/auth/forgot-password",
+  authLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { email, channel = "email" } = request.body;
+    const user = await User.findOne({ email: normalizeEmail(email) });
+    if (!user) {
+      return response.json({ message: "If the account exists, a reset OTP has been sent.", expiresIn: OTP_EXPIRES_SECONDS, resendAfter: OTP_RESEND_SECONDS });
+    }
+    const payload = await issueOtp({ request, response, user, purpose: "reset", channel: normalizeChannel(channel) });
+    response.json(payload);
+  })
+);
+
+app.post(
+  "/api/auth/reset-password",
+  authLimiter,
+  csrfProtection,
+  asyncHandler(async (request, response) => {
+    const { resetToken, password } = request.body;
+    if (!resetToken || !password || password.length < 8) return response.status(400).json({ error: "Reset token and stronger password are required." });
+    const reset = await cacheGet(resetKey(resetToken));
+    if (!reset) return response.status(401).json({ error: "Reset token expired. Request a new OTP." });
+    const user = await User.findById(reset.userId);
+    if (!user) return response.status(404).json({ error: "Account not found." });
+    user.passwordHash = await bcrypt.hash(password, 12);
+    user.failedLoginCount = 0;
+    await user.save();
+    await cacheDelete(resetKey(resetToken));
+    await trackEvent(request, user, "reset", "Password reset completed.", "email");
+    await createAlert(request, user, "info", "Password changed", "Account password was reset after OTP verification.");
+    response.json({ message: "Password reset complete. You can sign in now.", redirectTo: "/login.html" });
+  })
+);
+
+app.post(
+  "/api/auth/logout",
+  csrfProtection,
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    if (mongoose.connection.readyState === 1) {
+      await Session.updateOne({ tokenId: request.auth.tokenId }, { revokedAt: new Date() });
+    } else {
+      memorySessions.delete(request.auth.tokenId);
+    }
+    await trackEvent(request, request.user, "logout", "User signed out.", "session");
+    response.clearCookie("auth_token");
+    response.json({ message: "Signed out." });
+  })
+);
+
+app.get(
+  "/api/auth/me",
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    response.json({ user: publicUser(request.user), session: request.sessionRecord });
+  })
+);
+
+app.get(
+  "/api/security/dashboard",
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    if (mongoose.connection.readyState !== 1) {
+      return response.json({
+        loginHistory: [],
+        activeSessions: Array.from(memorySessions.values()).filter((session) => String(session.userId) === String(request.user._id)),
+        securityAlerts: [],
+        otpAnalytics: { totalOtpRequests: 0, emailRequests: 0, whatsAppRequests: 0 }
+      });
+    }
+    const [loginHistory, activeSessions, securityAlerts, otpEvents] = await Promise.all([
+      LoginEvent.find({ userId: request.user._id }).sort({ createdAt: -1 }).limit(20),
+      Session.find({ userId: request.user._id, revokedAt: null, expiresAt: { $gt: new Date() } }).sort({ lastSeenAt: -1 }).limit(20),
+      SecurityAlert.find({ userId: request.user._id }).sort({ createdAt: -1 }).limit(20),
+      LoginEvent.find({ userId: request.user._id, status: "otp_sent" })
+    ]);
+    response.json({
+      loginHistory,
+      activeSessions,
+      securityAlerts,
+      otpAnalytics: {
+        totalOtpRequests: otpEvents.length,
+        emailRequests: otpEvents.filter((event) => event.channel === "email").length,
+        whatsAppRequests: otpEvents.filter((event) => event.channel === "whatsapp").length
+      }
+    });
+  })
+);
+
+// Compatibility routes for the original demo endpoints.
+app.get("/api/session", requireAuth, (request, response) => {
+  response.json({ authenticated: true, otpVerified: true, user: publicUser(request.user) });
+});
+
+app.get("/api/access", requireAuth, (request, response) => {
+  response.json({
+    message: "Access evaluated with zero-trust checks.",
+    role: request.user.role,
+    section: roleContent[request.user.role] || roleContent.employee
+  });
+});
+
+app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
+app.get("*", (request, response) => {
+  response.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.use((error, request, response, next) => {
+  if (error.code === "EBADCSRFTOKEN") {
+    return response.status(403).json({ error: "Invalid CSRF token. Refresh and try again." });
+  }
+  const statusCode = error.statusCode || response.statusCode || 500;
+  response.status(statusCode >= 400 ? statusCode : 500).json({ error: error.message || "Internal server error." });
+});
+
+if (require.main === module) {
+  infrastructureReady = connectInfrastructure();
+  infrastructureReady
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`SecureU Zero Trust server running on ${PUBLIC_APP_URL}`);
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to start server:", error);
+      process.exit(1);
+    });
+} else {
+  infrastructureReady = connectInfrastructure();
+}
+
+module.exports = app;

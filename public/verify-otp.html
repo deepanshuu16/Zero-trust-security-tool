@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Verify OTP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/auth.css" />
+  </head>
+  <body class="auth-body">
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <main class="auth-shell compact">
+      <section class="auth-card otp-panel">
+        <span class="eyebrow">MFA Challenge</span>
+        <h2>Verify OTP</h2>
+        <p class="auth-copy">Enter the 6-digit code sent to <strong data-auth-email>your account</strong> through <strong data-auth-channel>email</strong>.</p>
+        <form id="auth-otp-form" class="auth-form">
+          <input id="otp" name="otp" type="hidden" />
+          <div class="otp-grid" data-otp-status>
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+            <input class="otp-box" inputmode="numeric" maxlength="1" />
+          </div>
+          <button class="button-primary" type="submit"><span>Validate secure token</span></button>
+        </form>
+        <div class="timer-row">
+          <span>Resend available in <strong data-resend-timer>60s</strong></span>
+          <button class="button-secondary" type="button" data-resend-otp>Resend OTP</button>
+        </div>
+        <p data-auth-message class="auth-message"></p>
+      </section>
+    </main>
+    <script src="/auth.js"></script>
+  </body>
+</html>

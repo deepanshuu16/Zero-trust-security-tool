@@ -890,6 +890,22 @@ function renderCharts(state = readState()) {
   drawBarChart(document.getElementById("dashboard-device-chart"), [78, 88, 71, 93, 84, 97, 89, 94], "#00ffb2");
 }
 
+async function renderAuthenticatedSecurityDashboard() {
+  const loginTarget = document.getElementById("api-login-history");
+  if (!loginTarget) return;
+  try {
+    const response = await fetch("/api/security/dashboard", { credentials: "include" });
+    if (!response.ok) return;
+    const data = await response.json();
+    setText("api-login-history", String(data.loginHistory?.length || 0));
+    setText("api-active-sessions", String(data.activeSessions?.length || 0));
+    setText("api-security-alerts", String(data.securityAlerts?.length || 0));
+    setText("api-otp-requests", String(data.otpAnalytics?.totalOtpRequests || 0));
+  } catch {
+    setText("api-login-history", "Unavailable");
+  }
+}
+
 function initCyberGlobe() {
   const canvas = document.getElementById("cyber-globe");
   if (!canvas) return;
@@ -1349,6 +1365,7 @@ function renderAll() {
   renderSettingsPage(state);
   renderScorePage(state);
   renderCharts(state);
+  renderAuthenticatedSecurityDashboard();
 }
 
 window.addEventListener("storage", renderAll);

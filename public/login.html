@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureU | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/auth.css" />
+  </head>
+  <body class="auth-body">
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <main class="auth-shell">
+      <section class="auth-visual">
+        <a class="brand" href="/index.html"><span class="brand-mark">ZT</span><span class="brand-copy"><strong>SecureU</strong><small>Zero Trust Access</small></span></a>
+        <div class="shield-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h1>Authenticate every login with adaptive MFA.</h1>
+        <p>Secure sessions begin with password validation, then move through email or WhatsApp OTP before the dashboard unlocks.</p>
+      </section>
+      <section class="auth-card">
+        <span class="eyebrow">Secure Login</span>
+        <h2>Welcome back</h2>
+        <form id="auth-login-form" class="auth-form">
+          <label>Email<input name="email" type="email" placeholder="you@company.com" autocomplete="email" required /></label>
+          <label>Password<input name="password" type="password" placeholder="Enter password" autocomplete="current-password" required /></label>
+          <div class="channel-switch">
+            <label><input type="radio" name="channel" value="email" checked /> Email OTP</label>
+            <label><input type="radio" name="channel" value="whatsapp" /> WhatsApp OTP</label>
+          </div>
+          <button class="button-primary" type="submit"><span>Send OTP</span></button>
+        </form>
+        <p data-auth-message class="auth-message"></p>
+        <div class="auth-links">
+          <a href="/forgot-password.html">Forgot password?</a>
+          <a href="/signup.html">Create account</a>
+        </div>
+      </section>
+    </main>
+    <script src="/auth.js"></script>
+  </body>
+</html>
