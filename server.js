@@ -123,6 +123,24 @@ function requireEnv(name) {
   }
 }
 
+async function seedInitialUser() {
+  if (mongoose.connection.readyState !== 1 || !process.env.SEED_USER_EMAIL || !process.env.SEED_USER_PASSWORD) return;
+  const email = normalizeEmail(process.env.SEED_USER_EMAIL);
+  const existing = await User.findOne({ email });
+  if (existing) return;
+  await User.create({
+    name: process.env.SEED_USER_NAME || "SecureU User",
+    email,
+    phone: process.env.SEED_USER_PHONE || "",
+    passwordHash: await bcrypt.hash(process.env.SEED_USER_PASSWORD, 12),
+    role: process.env.SEED_USER_ROLE || "admin",
+    isEmailVerified: true,
+    isWhatsAppVerified: Boolean(process.env.SEED_USER_PHONE),
+    mfaEnabled: true
+  });
+  console.log(`Seeded initial SecureU user: ${email}`);
+}
+
 function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
 }
@@ -470,6 +488,8 @@ async function connectInfrastructure() {
   if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
     whatsAppClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
   }
+
+  await seedInitialUser();
 }
 
 app.set("trust proxy", 1);

@@ -66,3 +66,15 @@ Important production values:
 5. Confirm that `/api/csrf-token` returns a token and auth pages can submit forms.
 
 For local development without SMTP or Twilio credentials, OTP values are logged to the server console. Production should always configure real providers.
+
+## Private Seed User
+
+To create one initial admin account without placing credentials in source code, set these in Vercel Environment Variables:
+
+- `SEED_USER_NAME`
+- `SEED_USER_EMAIL`
+- `SEED_USER_PHONE`
+- `SEED_USER_PASSWORD`
+- `SEED_USER_ROLE`
+
+The server hashes `SEED_USER_PASSWORD` with bcrypt and creates the user only if the email does not already exist.
