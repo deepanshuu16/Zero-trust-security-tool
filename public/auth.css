@@ -238,6 +238,24 @@
   color: #00f5d4;
 }
 
+.demo-otp {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 159, 28, 0.3);
+  border-radius: 16px;
+  background: rgba(255, 159, 28, 0.09);
+  color: #ffd79a;
+}
+
+.demo-otp strong {
+  color: #00f5d4;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.16em;
+}
+
 .shield-orbit {
   position: absolute;
   right: 8%;

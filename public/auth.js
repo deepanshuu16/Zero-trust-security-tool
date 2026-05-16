@@ -136,7 +136,7 @@ function initLogin() {
           channel: selectedChannel()
         }
       });
-      saveAuthState({ email: data.get("email"), purpose: "login", channel: result.channel, resendAfter: result.resendAfter });
+      saveAuthState({ email: data.get("email"), purpose: "login", channel: result.channel, resendAfter: result.resendAfter, demoOtp: result.demoOtp });
       window.location.href = "/verify-otp.html";
     } catch (error) {
       showMessage("error", error.message);
@@ -165,7 +165,7 @@ function initSignup() {
           channel: selectedChannel()
         }
       });
-      saveAuthState({ email: data.get("email"), purpose: "signup", channel: result.channel, resendAfter: result.resendAfter });
+      saveAuthState({ email: data.get("email"), purpose: "signup", channel: result.channel, resendAfter: result.resendAfter, demoOtp: result.demoOtp });
       window.location.href = "/verify-otp.html";
     } catch (error) {
       showMessage("error", error.message);
@@ -188,7 +188,7 @@ function initForgotPassword() {
         method: "POST",
         body: { email: data.get("email"), channel: selectedChannel() }
       });
-      saveAuthState({ email: data.get("email"), purpose: "reset", channel: result.channel || selectedChannel(), resendAfter: result.resendAfter });
+      saveAuthState({ email: data.get("email"), purpose: "reset", channel: result.channel || selectedChannel(), resendAfter: result.resendAfter, demoOtp: result.demoOtp });
       window.location.href = "/verify-otp.html";
     } catch (error) {
       showMessage("error", error.message);
@@ -207,6 +207,12 @@ function initVerifyOtp() {
   });
   document.querySelectorAll("[data-auth-channel]").forEach((item) => {
     item.textContent = state.channel || "email";
+  });
+  document.querySelectorAll("[data-demo-otp]").forEach((item) => {
+    if (state.demoOtp) {
+      item.textContent = state.demoOtp;
+      item.closest(".demo-otp")?.classList.remove("hidden");
+    }
   });
   startResendTimer(Number(state.resendAfter || 60));
 
@@ -250,6 +256,13 @@ function initVerifyOtp() {
           channel: state.channel || "email"
         }
       });
+      if (result.demoOtp) {
+        saveAuthState({ demoOtp: result.demoOtp });
+        document.querySelectorAll("[data-demo-otp]").forEach((item) => {
+          item.textContent = result.demoOtp;
+          item.closest(".demo-otp")?.classList.remove("hidden");
+        });
+      }
       showMessage("success", result.message);
       startResendTimer(result.resendAfter || 60);
     } catch (error) {

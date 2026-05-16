@@ -30,6 +30,7 @@ const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL || `http://localhost:${PORT}`;
 
 const app = express();
 let infrastructureReady = null;
+const memoryUsers = new Map();
 const memoryOtpStore = new Map();
 const memorySessions = new Map();
 
@@ -124,11 +125,11 @@ function requireEnv(name) {
 }
 
 async function seedInitialUser() {
-  if (mongoose.connection.readyState !== 1 || !process.env.SEED_USER_EMAIL || !process.env.SEED_USER_PASSWORD) return;
+  if (!process.env.SEED_USER_EMAIL || !process.env.SEED_USER_PASSWORD) return;
   const email = normalizeEmail(process.env.SEED_USER_EMAIL);
-  const existing = await User.findOne({ email });
+  const existing = await findUserByEmail(email);
   if (existing) return;
-  await User.create({
+  await createUser({
     name: process.env.SEED_USER_NAME || "SecureU User",
     email,
     phone: process.env.SEED_USER_PHONE || "",
@@ -139,6 +140,47 @@ async function seedInitialUser() {
     mfaEnabled: true
   });
   console.log(`Seeded initial SecureU user: ${email}`);
+}
+
+function createMemoryUser(data) {
+  const user = {
+    _id: crypto.randomUUID(),
+    name: data.name,
+    email: normalizeEmail(data.email),
+    phone: data.phone || "",
+    passwordHash: data.passwordHash,
+    role: data.role || "employee",
+    isEmailVerified: Boolean(data.isEmailVerified),
+    isWhatsAppVerified: Boolean(data.isWhatsAppVerified),
+    mfaEnabled: data.mfaEnabled !== false,
+    failedLoginCount: data.failedLoginCount || 0,
+    lastLoginAt: data.lastLoginAt || null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    async save() {
+      this.updatedAt = new Date();
+      memoryUsers.set(this.email, this);
+      return this;
+    }
+  };
+  memoryUsers.set(user.email, user);
+  return user;
+}
+
+async function findUserByEmail(email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (mongoose.connection.readyState === 1) return User.findOne({ email: normalizedEmail });
+  return memoryUsers.get(normalizedEmail) || null;
+}
+
+async function findUserById(id) {
+  if (mongoose.connection.readyState === 1) return User.findById(id).select("-passwordHash");
+  return Array.from(memoryUsers.values()).find((user) => String(user._id) === String(id)) || null;
+}
+
+async function createUser(data) {
+  if (mongoose.connection.readyState === 1) return User.create(data);
+  return createMemoryUser(data);
 }
 
 function normalizeEmail(email) {
@@ -281,7 +323,7 @@ function buildEmailTemplate({ name, otp, purpose }) {
 async function sendEmailOtp(user, otp, purpose) {
   if (!mailer) {
     console.log(`[dev-email] ${purpose} OTP for ${user.email}: ${otp}`);
-    return { provider: "console" };
+    return { provider: "demo-email", demoOtp: otp };
   }
   await mailer.sendMail({
     from: process.env.EMAIL_FROM,
@@ -296,7 +338,7 @@ async function sendWhatsAppOtp(user, otp, purpose) {
   const message = `SecureU ${purpose} OTP: ${otp}. Valid for 5 minutes. Do not share this code.`;
   if (!whatsAppClient || !user.phone) {
     console.log(`[dev-whatsapp] ${purpose} OTP for ${user.phone || user.email}: ${otp}`);
-    return { provider: "console" };
+    return { provider: "demo-whatsapp", demoOtp: otp };
   }
   try {
     await whatsAppClient.messages.create({
@@ -349,6 +391,7 @@ async function issueOtp({ request, response, user, purpose, channel }) {
     resendAfter: OTP_RESEND_SECONDS,
     channel,
     purpose,
+    demoOtp: delivery.demoOtp,
     user: { email: user.email, phone: user.phone ? maskPhone(user.phone) : null }
   };
 }
@@ -424,7 +467,7 @@ async function requireAuth(request, response, next) {
     const token = request.cookies.auth_token || request.headers.authorization?.replace(/^Bearer\s+/i, "");
     if (!token) return response.status(401).json({ error: "Authentication required." });
     const payload = jwt.verify(token, JWT_SECRET, { issuer: "secureu-zero-trust" });
-    const user = await User.findById(payload.sub).select("-passwordHash");
+    const user = await findUserById(payload.sub);
     if (!user) return response.status(401).json({ error: "Invalid session." });
 
     let activeSession = null;
@@ -581,11 +624,11 @@ app.post(
     if (!name || !normalizedEmail || !password || password.length < 8) {
       return response.status(400).json({ error: "Name, valid email, and password of at least 8 characters are required." });
     }
-    const existing = await User.findOne({ email: normalizedEmail });
+    const existing = await findUserByEmail(normalizedEmail);
     if (existing) return response.status(409).json({ error: "An account already exists for this email." });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email: normalizedEmail, phone, passwordHash, role: "employee" });
+    const user = await createUser({ name, email: normalizedEmail, phone, passwordHash, role: "employee" });
     const payload = await issueOtp({ request, response, user, purpose: "signup", channel: normalizeChannel(channel) });
     response.status(201).json(payload);
   })
@@ -597,7 +640,7 @@ app.post(
   csrfProtection,
   asyncHandler(async (request, response) => {
     const { email, password, channel = "email" } = request.body;
-    const user = await User.findOne({ email: normalizeEmail(email) });
+    const user = await findUserByEmail(email);
     if (!user || !(await bcrypt.compare(String(password || ""), user.passwordHash))) {
       await trackEvent(request, user, "failed", "Invalid email or password.", normalizeChannel(channel));
       if (user) {
@@ -620,7 +663,7 @@ app.post(
   csrfProtection,
   asyncHandler(async (request, response) => {
     const { email, purpose = "login", channel = "email" } = request.body;
-    const user = await User.findOne({ email: normalizeEmail(email) });
+    const user = await findUserByEmail(email);
     if (!user) return response.status(404).json({ error: "Account not found." });
     const payload = await issueOtp({ request, response, user, purpose, channel: normalizeChannel(channel) });
     response.json(payload);
@@ -633,7 +676,7 @@ app.post(
   csrfProtection,
   asyncHandler(async (request, response) => {
     const { email, otp, purpose = "login" } = request.body;
-    const user = await User.findOne({ email: normalizeEmail(email) });
+    const user = await findUserByEmail(email);
     if (!user) return response.status(404).json({ error: "Account not found." });
     const entry = await verifyOtp({ request, user, purpose, otp });
 
@@ -668,7 +711,7 @@ app.post(
   csrfProtection,
   asyncHandler(async (request, response) => {
     const { email, channel = "email" } = request.body;
-    const user = await User.findOne({ email: normalizeEmail(email) });
+    const user = await findUserByEmail(email);
     if (!user) {
       return response.json({ message: "If the account exists, a reset OTP has been sent.", expiresIn: OTP_EXPIRES_SECONDS, resendAfter: OTP_RESEND_SECONDS });
     }
@@ -686,7 +729,7 @@ app.post(
     if (!resetToken || !password || password.length < 8) return response.status(400).json({ error: "Reset token and stronger password are required." });
     const reset = await cacheGet(resetKey(resetToken));
     if (!reset) return response.status(401).json({ error: "Reset token expired. Request a new OTP." });
-    const user = await User.findById(reset.userId);
+    const user = await findUserById(reset.userId);
     if (!user) return response.status(404).json({ error: "Account not found." });
     user.passwordHash = await bcrypt.hash(password, 12);
     user.failedLoginCount = 0;
