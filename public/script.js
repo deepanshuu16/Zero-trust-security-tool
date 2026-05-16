@@ -1,164 +1,157 @@
-const STORAGE_KEY = "securevault-zero-trust-demo";
+const STORAGE_KEY = "secureu-student-safety-platform";
+
+const users = {
+  admin: { username: "admin", password: "Admin@123", role: "admin", name: "Campus Admin" },
+  employee: { username: "employee", password: "Employee@123", role: "student", name: "Student Member" },
+  guest: { username: "guest", password: "Guest@123", role: "guest", name: "Guest Visitor" }
+};
+
+const roleContent = {
+  admin: [
+    "Review overall student activity and suspicious behavior trends",
+    "See how guests and students are using the security tools",
+    "Monitor awareness progress and repeat-risk patterns"
+  ],
+  student: [
+    "Use link scanning before applying to internships or contests",
+    "Check passwords and improve security habits with plain-language guidance",
+    "Practice awareness challenges and increase your safety score"
+  ],
+  guest: [
+    "Explore safe browsing and scam awareness basics",
+    "Run beginner checks without access to admin-only monitoring",
+    "Receive limited guidance in a least-privilege environment"
+  ]
+};
+
+const phishingKeywords = ["login", "verify", "urgent", "gift", "claim", "bonus", "wallet", "bank", "scholarship", "internship"];
+const suspiciousTlds = [".xyz", ".top", ".click", ".live", ".info"];
+const shorteners = ["bit.ly", "tinyurl.com", "t.co", "rb.gy", "goo.gl"];
+const commonPasswordBits = ["password", "qwerty", "123456", "admin", "student", "welcome"];
+const scamSignals = [
+  { pattern: /urgent|immediately|right now|asap/i, reason: "The message uses urgency to push a quick decision.", weight: 22 },
+  { pattern: /otp|verification code|one-time password/i, reason: "It asks for an OTP or verification code, which should never be shared.", weight: 35 },
+  { pattern: /gift card|payment|transfer|send money|processing fee/i, reason: "It requests money or payment in a suspicious way.", weight: 30 },
+  { pattern: /click here|open this link|download now/i, reason: "It pushes you toward a link or download without context.", weight: 18 },
+  { pattern: /congratulations|selected|final chance|limited offer/i, reason: "It uses bait language to trigger excitement or fear of missing out.", weight: 16 },
+  { pattern: /password|bank|account suspended|kyc/i, reason: "It asks for sensitive account details or identity confirmation.", weight: 28 }
+];
+
+const challengeButtons = Array.from(document.querySelectorAll(".challenge-btn"));
+const workspaceNavButtons = Array.from(document.querySelectorAll(".workspace-nav-btn"));
+const workspaceViews = Array.from(document.querySelectorAll(".workspace-view"));
+const adminOnlyButtons = Array.from(document.querySelectorAll(".admin-only"));
 
 const loginForm = document.getElementById("login-form");
 const otpForm = document.getElementById("otp-form");
-const logoutBtn = document.getElementById("logout-btn");
 const regenerateBtn = document.getElementById("regenerate-btn");
-
-const simulateBruteforceBtn = document.getElementById("simulate-bruteforce");
-const simulateTokenTheftBtn = document.getElementById("simulate-token-theft");
-const simulateLocationBtn = document.getElementById("simulate-location");
-const clearIncidentsBtn = document.getElementById("clear-incidents");
-
-const workspaceRoot = document.getElementById("app-workspace");
-const workspaceUserName = document.getElementById("workspace-user-name");
-const workspaceUserRole = document.getElementById("workspace-user-role");
-const workspaceTrustScore = document.getElementById("workspace-trust-score");
-const workspaceDocCount = document.getElementById("workspace-doc-count");
-const vaultQuickStatus = document.getElementById("vault-quick-status");
-const appIdentityStatus = document.getElementById("app-identity-status");
-const appPolicyMode = document.getElementById("app-policy-mode");
-const appNetworkZone = document.getElementById("app-network-zone");
-const vaultBanner = document.getElementById("vault-banner");
-const vaultSecretPanel = document.getElementById("vault-secret-panel");
-const vaultSecretText = document.getElementById("vault-secret-text");
-const vaultSetForm = document.getElementById("vault-set-form");
-const vaultUnlockForm = document.getElementById("vault-unlock-form");
-const vaultLockBtn = document.getElementById("vault-lock-btn");
-const vaultSetMessage = document.getElementById("vault-set-message");
-const vaultUnlockMessage = document.getElementById("vault-unlock-message");
-const documentForm = document.getElementById("document-form");
-const documentInput = document.getElementById("document-input");
-const documentNote = document.getElementById("document-note");
-const documentMessage = document.getElementById("document-message");
-const documentList = document.getElementById("document-list");
-const workspaceNavButtons = Array.from(document.querySelectorAll(".workspace-nav-btn"));
-const workspaceViews = Array.from(document.querySelectorAll(".workspace-view"));
-const adminOnlyNavButtons = Array.from(document.querySelectorAll(".admin-only"));
+const logoutBtn = document.getElementById("logout-btn");
+const linkForm = document.getElementById("link-form");
+const passwordForm = document.getElementById("password-form");
+const scamForm = document.getElementById("scam-form");
+const generatePassphraseBtn = document.getElementById("generate-passphrase-btn");
 
 const loginMessage = document.getElementById("login-message");
 const otpMessage = document.getElementById("otp-message");
-const simMessage = document.getElementById("sim-message");
-const otpValue = document.getElementById("otp-value");
+const linkMessage = document.getElementById("link-message");
+const passwordMessage = document.getElementById("password-message");
+const scamMessage = document.getElementById("scam-message");
+const challengeFeedback = document.getElementById("challenge-feedback");
+
 const otpDisplayValue = document.getElementById("otp-display-value");
 const sessionStatus = document.getElementById("session-status");
 const trustScore = document.getElementById("trust-score");
-const ipAddress = document.getElementById("ip-address");
+const trustStatus = document.getElementById("trust-status");
+const trustReasons = document.getElementById("trust-reasons");
 const networkZone = document.getElementById("network-zone");
-const deviceType = document.getElementById("device-type");
 const browserName = document.getElementById("browser-name");
 const osName = document.getElementById("os-name");
-const trustStatus = document.getElementById("trust-status");
+const deviceType = document.getElementById("device-type");
+const ipAddress = document.getElementById("ip-address");
 const policyDecision = document.getElementById("policy-decision");
 const sessionCreated = document.getElementById("session-created");
 const lastSeen = document.getElementById("last-seen");
 const otpUsage = document.getElementById("otp-usage");
-const trustReasons = document.getElementById("trust-reasons");
-const adminMonitor = document.getElementById("admin-monitor");
+
+const workspaceRoot = document.getElementById("app-workspace");
+const workspaceUserName = document.getElementById("workspace-user-name");
+const workspaceUserRole = document.getElementById("workspace-user-role");
+const workspaceSecurityScore = document.getElementById("workspace-security-score");
+const workspaceScoreSummary = document.getElementById("workspace-score-summary");
+const workspaceTitle = document.getElementById("workspace-title");
+const workspaceSubtitle = document.getElementById("workspace-subtitle");
+const heroSecurityScore = document.getElementById("hero-security-score");
+const accountName = document.getElementById("account-name");
+const accountRole = document.getElementById("account-role");
+const challengeProgress = document.getElementById("challenge-progress");
+const badgeCount = document.getElementById("badge-count");
+
+const lastLinkStatus = document.getElementById("last-link-status");
+const lastPasswordStatus = document.getElementById("last-password-status");
+const lastScamStatus = document.getElementById("last-scam-status");
+
+const linkRiskLabel = document.getElementById("link-risk-label");
+const linkRiskScore = document.getElementById("link-risk-score");
+const linkReasons = document.getElementById("link-reasons");
+
+const passwordRiskLabel = document.getElementById("password-risk-label");
+const passwordRiskScore = document.getElementById("password-risk-score");
+const passwordReasons = document.getElementById("password-reasons");
+const generatedPassphrase = document.getElementById("generated-passphrase");
+
+const scamRiskLabel = document.getElementById("scam-risk-label");
+const scamRiskScore = document.getElementById("scam-risk-score");
+const scamReasons = document.getElementById("scam-reasons");
+
+const deviceScoreLabel = document.getElementById("device-score-label");
+const deviceRiskScore = document.getElementById("device-risk-score");
+const deviceRecommendations = document.getElementById("device-recommendations");
+
 const adminActivityList = document.getElementById("admin-activity-list");
-const alertFeed = document.getElementById("alert-feed");
-const securityPostureScore = document.getElementById("security-posture-score");
-const identityBar = document.getElementById("identity-bar");
-const monitoringBar = document.getElementById("monitoring-bar");
-const resistanceBar = document.getElementById("resistance-bar");
-const kpiActiveSessions = document.getElementById("kpi-active-sessions");
-const kpiSuspiciousEvents = document.getElementById("kpi-suspicious-events");
-const kpiBlockedActions = document.getElementById("kpi-blocked-actions");
-const kpiRiskLevel = document.getElementById("kpi-risk-level");
-const cursorGlow = document.getElementById("cursor-glow");
 
 const sections = {
   admin: document.getElementById("admin-section"),
-  employee: document.getElementById("employee-section"),
+  student: document.getElementById("employee-section"),
   guest: document.getElementById("guest-section")
 };
 
-const lists = {
+const sectionLists = {
   admin: document.getElementById("admin-list"),
-  employee: document.getElementById("employee-list"),
+  student: document.getElementById("employee-list"),
   guest: document.getElementById("guest-list")
 };
 
-const users = {
-  admin: {
-    username: "admin",
-    password: "Admin@123",
-    role: "admin",
-    name: "Primary Administrator"
-  },
-  employee: {
-    username: "employee",
-    password: "Employee@123",
-    role: "employee",
-    name: "Operations Employee"
-  },
-  guest: {
-    username: "guest",
-    password: "Guest@123",
-    role: "guest",
-    name: "Visitor Guest"
-  }
-};
-
-const roleContent = {
-  admin: {
-    items: [
-      "Approve or block high-risk access requests",
-      "Review live OTP issuance metrics and attack activity",
-      "Monitor guest and employee sessions with policy visibility",
-      "Enforce least-privilege decisions across all roles"
-    ]
-  },
-  employee: {
-    items: [
-      "Access internal tools only after continuous verification",
-      "Confirm device trust before opening sensitive resources",
-      "Request temporary elevation under monitored conditions",
-      "Stay restricted from administrative control surfaces"
-    ]
-  },
-  guest: {
-    items: [
-      "Use time-limited isolated access with minimal privileges",
-      "Enter approved shared resources only",
-      "Trigger stronger monitoring on suspicious behavior",
-      "Remain blocked from internal administrative systems"
-    ]
-  }
-};
-
-let activeWorkspaceView = "overview";
+let activeView = "dashboard";
 
 function defaultState() {
   return {
     session: null,
     events: [],
-    incidents: [],
-    userData: {}
-  };
-}
-
-function normalizeState(rawState) {
-  const baseState = defaultState();
-  const nextState = rawState && typeof rawState === "object" ? rawState : {};
-  return {
-    session: nextState.session || baseState.session,
-    events: Array.isArray(nextState.events) ? nextState.events : baseState.events,
-    incidents: Array.isArray(nextState.incidents) ? nextState.incidents : baseState.incidents,
-    userData: nextState.userData && typeof nextState.userData === "object" ? nextState.userData : baseState.userData
+    challengeSolved: false,
+    toolHistory: {
+      link: null,
+      password: null,
+      scam: null
+    }
   };
 }
 
 function readState() {
   try {
-    return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return {
+      ...defaultState(),
+      ...parsed,
+      toolHistory: { ...defaultState().toolHistory, ...(parsed?.toolHistory || {}) },
+      events: Array.isArray(parsed?.events) ? parsed.events : []
+    };
   } catch {
     return defaultState();
   }
 }
 
-function writeState(nextState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeState(nextState)));
+function writeState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 function nowIso() {
@@ -169,60 +162,33 @@ function formatTimestamp(value) {
   if (!value) {
     return "Pending";
   }
-
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleString();
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 }
 
 function summarizeOS(agent) {
   const ua = agent.toLowerCase();
-  if (ua.includes("windows")) {
-    return "Windows";
-  }
-  if (ua.includes("mac os") || ua.includes("macintosh")) {
-    return "macOS";
-  }
-  if (ua.includes("android")) {
-    return "Android";
-  }
-  if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("ios")) {
-    return "iOS";
-  }
-  if (ua.includes("linux")) {
-    return "Linux";
-  }
+  if (ua.includes("windows")) return "Windows";
+  if (ua.includes("mac os") || ua.includes("macintosh")) return "macOS";
+  if (ua.includes("android")) return "Android";
+  if (ua.includes("iphone") || ua.includes("ipad")) return "iOS";
+  if (ua.includes("linux")) return "Linux";
   return "Unknown OS";
 }
 
 function summarizeBrowser(agent) {
   const ua = agent.toLowerCase();
-  if (ua.includes("edg/")) {
-    return "Microsoft Edge";
-  }
-  if (ua.includes("chrome/") && !ua.includes("edg/")) {
-    return "Google Chrome";
-  }
-  if (ua.includes("firefox/")) {
-    return "Mozilla Firefox";
-  }
-  if (ua.includes("safari/") && !ua.includes("chrome/")) {
-    return "Safari";
-  }
+  if (ua.includes("edg/")) return "Microsoft Edge";
+  if (ua.includes("chrome/") && !ua.includes("edg/")) return "Google Chrome";
+  if (ua.includes("firefox/")) return "Mozilla Firefox";
+  if (ua.includes("safari/") && !ua.includes("chrome/")) return "Safari";
   return "Unknown Browser";
 }
 
 function summarizeDevice(agent) {
   const ua = agent.toLowerCase();
-  if (ua.includes("ipad") || ua.includes("tablet")) {
-    return "Tablet";
-  }
-  if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) {
-    return "Mobile Device";
-  }
+  if (ua.includes("ipad") || ua.includes("tablet")) return "Tablet";
+  if (ua.includes("mobile") || ua.includes("android") || ua.includes("iphone")) return "Mobile";
   return "Desktop";
 }
 
@@ -234,311 +200,115 @@ function generateOtp(previousOtp) {
   return otp;
 }
 
-function buildTrustContext(user) {
+function buildTrustContext(role) {
   const userAgent = navigator.userAgent || "Unknown Agent";
-  const device = summarizeDevice(userAgent);
   const browser = summarizeBrowser(userAgent);
-  const operatingSystem = summarizeOS(userAgent);
+  const os = summarizeOS(userAgent);
+  const device = summarizeDevice(userAgent);
 
-  let score = 58;
+  let score = 68;
   const reasons = [
-    "Continuous verification checks role, device, and browser context",
-    "Assume-breach posture limits access based on session risk",
-    "Public web session is treated as untrusted until proven otherwise"
+    "This demo uses browser, device type, and role to estimate a simple trust score.",
+    "Verified sessions are treated more safely than anonymous visitors."
   ];
 
   if (device === "Desktop") {
-    score += 10;
-    reasons.push("Desktop device profile is considered lower risk");
+    score += 8;
+    reasons.push("Desktop sessions are treated as slightly lower risk for study and work tasks.");
   } else {
-    reasons.push("Non-desktop device requires closer review");
+    score -= 4;
+    reasons.push("Mobile access is convenient but needs more caution for sensitive actions.");
   }
 
-  if (user.role === "admin") {
-    score -= 5;
-    reasons.push("Admin sessions require stricter scrutiny");
-  } else if (user.role === "employee") {
-    score += 5;
-    reasons.push("Employee role matches standard internal access policy");
+  if (role === "admin") {
+    score -= 6;
+    reasons.push("Admin-level visibility requires stronger verification and closer monitoring.");
+  } else if (role === "student") {
+    score += 4;
+    reasons.push("Student mode unlocks practical tools with limited platform risk.");
   } else {
     score -= 8;
-    reasons.push("Guest role remains restricted by Zero Trust policy");
+    reasons.push("Guest sessions stay in a limited-access path for safety.");
   }
 
-  score = Math.max(0, Math.min(100, score));
+  let status = "Guided Access";
+  let decision = "Basic tools available with continued monitoring.";
 
-  let status = "Restricted";
-  let policy = "Access limited to the minimum required role scope.";
-  if (score >= 75) {
+  if (score >= 78) {
     status = "Trusted";
-    policy = "Full role access granted after OTP verification.";
-  } else if (score >= 60) {
-    status = "Elevated Review";
-    policy = "Access granted with additional monitoring.";
+    decision = "Full role access available inside the student dashboard.";
+  } else if (score < 62) {
+    status = "Restricted";
+    decision = "Only limited features should be used until trust improves.";
   }
 
   return {
-    ipAddress: "Browser-side live demo",
-    userAgent,
-    deviceType: device,
-    browser,
-    operatingSystem,
-    networkZone: "Public Web Session",
-    score,
+    score: Math.max(0, Math.min(100, score)),
     status,
-    policyDecision: policy,
+    decision,
+    browser,
+    os,
+    device,
+    networkZone: "Public Web Session",
+    ipAddress: "Browser-side demo context",
     reasons
   };
 }
 
 function buildSession(user, previousSession) {
-  const timestamp = nowIso();
-  const trust = buildTrustContext(user);
+  const createdAt = nowIso();
   return {
     username: user.username,
     name: user.name,
     role: user.role,
+    otp: generateOtp(previousSession?.otp || null),
     otpVerified: false,
-    otp: generateOtp(previousSession ? previousSession.otp : null),
-    createdAt: timestamp,
-    lastSeenAt: timestamp,
-    otpIssuedAt: timestamp,
+    createdAt,
+    lastSeenAt: createdAt,
     otpUsageCount: previousSession ? previousSession.otpUsageCount + 1 : 1,
-    trust
+    trust: buildTrustContext(user.role)
   };
 }
 
-function getUserStore(state, username) {
-  if (!state.userData[username]) {
-    state.userData[username] = {
-      documents: [],
-      vaultKey: null,
-      vaultUnlocked: false
-    };
-  }
-  if (!Array.isArray(state.userData[username].documents)) {
-    state.userData[username].documents = [];
-  }
-  if (!Object.prototype.hasOwnProperty.call(state.userData[username], "vaultKey")) {
-    state.userData[username].vaultKey = null;
-  }
-  if (!Object.prototype.hasOwnProperty.call(state.userData[username], "vaultUnlocked")) {
-    state.userData[username].vaultUnlocked = false;
-  }
-  return state.userData[username];
-}
-
-function recordEvent(state, session, eventType, extra = {}) {
+function recordEvent(state, session, type) {
   state.events.unshift({
     timestamp: nowIso(),
-    eventType,
+    type,
     username: session.username,
     name: session.name,
     role: session.role,
-    ipAddress: session.trust.ipAddress,
-    deviceType: session.trust.deviceType,
-    browser: session.trust.browser,
-    trustStatus: session.trust.status,
     trustScore: session.trust.score,
-    ...extra
+    browser: session.trust.browser,
+    device: session.trust.device
   });
-  state.events = state.events.slice(0, 60);
+  state.events = state.events.slice(0, 20);
 }
 
-function recordIncident(state, incident) {
-  state.incidents.unshift({
-    id: `${incident.type}-${Date.now()}`,
-    timestamp: nowIso(),
-    severity: incident.severity,
-    type: incident.type,
-    title: incident.title,
-    description: incident.description,
-    blocked: incident.blocked
-  });
-  state.incidents = state.incidents.slice(0, 20);
-}
-
-function setWorkspaceView(viewName) {
-  activeWorkspaceView = viewName;
-
+function setView(name) {
+  activeView = name;
   workspaceNavButtons.forEach((button) => {
-    const isActive = button.dataset.view === viewName;
-    button.classList.toggle("active", isActive);
+    button.classList.toggle("active", button.dataset.view === name);
   });
-
   workspaceViews.forEach((panel) => {
-    panel.classList.toggle("active", panel.dataset.viewPanel === viewName);
+    panel.classList.toggle("active", panel.dataset.viewPanel === name);
   });
 }
 
-function updateWorkspaceHeader(session, state) {
-  if (!session || !session.otpVerified) {
-    workspaceUserName.textContent = "No active user";
-    workspaceUserRole.textContent = "Login required";
-    workspaceTrustScore.textContent = "Pending";
-    workspaceDocCount.textContent = "0";
-    vaultQuickStatus.textContent = "Locked";
-    appIdentityStatus.textContent = "Pending";
-    appPolicyMode.textContent = "Pending";
-    appNetworkZone.textContent = "Pending";
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  workspaceUserName.textContent = session.name;
-  workspaceUserRole.textContent = `${session.role.toUpperCase()} workspace`;
-  workspaceTrustScore.textContent = `${session.trust.score}/100`;
-  workspaceDocCount.textContent = String(userStore.documents.length);
-  vaultQuickStatus.textContent = userStore.vaultUnlocked ? "Unlocked" : userStore.vaultKey ? "Locked" : "Not set";
-  appIdentityStatus.textContent = session.trust.status;
-  appPolicyMode.textContent = session.trust.policyDecision;
-  appNetworkZone.textContent = session.trust.networkZone;
-}
-
-function renderDocuments(session, state) {
-  documentList.innerHTML = "";
-
-  if (!session || !session.otpVerified) {
-    documentList.innerHTML = `
-      <article class="document-card empty-state">
-        <h3>Login required</h3>
-        <p>Verify a user session to work with uploaded files.</p>
-      </article>
-    `;
-    return;
-  }
-
-  if (session.role === "guest") {
-    documentList.innerHTML = `
-      <article class="document-card empty-state">
-        <h3>Guest restrictions active</h3>
-        <p>Guest accounts cannot upload work files in this least-privilege demo flow.</p>
-      </article>
-    `;
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  if (!userStore.documents.length) {
-    documentList.innerHTML = `
-      <article class="document-card empty-state">
-        <h3>No documents yet</h3>
-        <p>Uploaded files will appear here for the signed-in employee or admin.</p>
-      </article>
-    `;
-    return;
-  }
-
-  userStore.documents.forEach((documentEntry) => {
-    const card = document.createElement("article");
-    card.className = "document-card";
-    card.innerHTML = `
-      <div class="document-topline">
-        <strong>${documentEntry.fileName}</strong>
-        <span>${documentEntry.fileSize}</span>
-      </div>
-      <p>${documentEntry.note || "No note added for this upload."}</p>
-      <div class="document-meta">
-        <span>Owner: ${documentEntry.ownerRole}</span>
-        <span>${formatTimestamp(documentEntry.uploadedAt)}</span>
-      </div>
-    `;
-    documentList.appendChild(card);
-  });
-}
-
-function renderVault(session, state) {
-  if (!session || !session.otpVerified) {
-    vaultBanner.textContent = "Set your private vault key";
-    vaultQuickStatus.textContent = "Locked";
-    vaultSecretPanel.classList.add("hidden");
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  if (!userStore.vaultKey) {
-    vaultBanner.textContent = "Set your private vault key";
-  } else if (userStore.vaultUnlocked) {
-    vaultBanner.textContent = "Vault unlocked";
-  } else {
-    vaultBanner.textContent = "Vault ready to unlock";
-  }
-
-  vaultQuickStatus.textContent = userStore.vaultUnlocked ? "Unlocked" : userStore.vaultKey ? "Locked" : "Not set";
-  vaultSecretText.textContent = `${session.name} can use this vault space for browser-local confidential notes and protected demo content.`;
-  vaultSecretPanel.classList.toggle("hidden", !userStore.vaultUnlocked);
-}
-
-function resetTelemetry() {
-  trustScore.textContent = "Pending";
-  ipAddress.textContent = "Pending";
-  networkZone.textContent = "Pending";
-  deviceType.textContent = "Pending";
-  browserName.textContent = "Pending";
-  osName.textContent = "Pending";
-  trustStatus.textContent = "Pending";
-  policyDecision.textContent = "Pending";
-  sessionCreated.textContent = "Pending";
-  lastSeen.textContent = "Pending";
-  otpUsage.textContent = "0";
-  trustReasons.innerHTML = "<li>Session analysis will appear here after login.</li>";
-}
-
-function renderTelemetry(session) {
-  if (!session || !session.trust) {
-    resetTelemetry();
-    return;
-  }
-
-  trustScore.textContent = `${session.trust.score}/100`;
-  ipAddress.textContent = session.trust.ipAddress;
-  networkZone.textContent = session.trust.networkZone;
-  deviceType.textContent = session.trust.deviceType;
-  browserName.textContent = session.trust.browser;
-  osName.textContent = session.trust.operatingSystem;
-  trustStatus.textContent = session.trust.status;
-  policyDecision.textContent = session.trust.policyDecision;
-  sessionCreated.textContent = formatTimestamp(session.createdAt);
-  lastSeen.textContent = formatTimestamp(session.lastSeenAt);
-  otpUsage.textContent = String(session.otpUsageCount);
-  trustReasons.innerHTML = "";
-
-  session.trust.reasons.forEach((reason) => {
-    const li = document.createElement("li");
-    li.textContent = reason;
-    trustReasons.appendChild(li);
-  });
-}
-
-function clearRoleSections() {
+function resetRoleSections() {
   Object.values(sections).forEach((section) => section.classList.add("hidden"));
-  Object.values(lists).forEach((list) => {
+  Object.values(sectionLists).forEach((list) => {
     list.innerHTML = "";
   });
 }
 
-function resetAdminMonitor() {
-  adminActivityList.innerHTML = `
-    <article class="activity-card empty-state">
-      <h3>No activity yet</h3>
-      <p>Recent employee and guest login events will appear here for the admin.</p>
-    </article>
-  `;
-}
-
 function renderRoleSections(role) {
-  clearRoleSections();
-  const visibleRoles = role === "admin" ? ["admin", "employee", "guest"] : [role];
-
-  visibleRoles.forEach((visibleRole) => {
-    const section = sections[visibleRole];
-    const list = lists[visibleRole];
-    const content = roleContent[visibleRole];
-    if (!section || !list || !content) {
-      return;
-    }
-
-    content.items.forEach((item) => {
+  resetRoleSections();
+  const visible = role === "admin" ? ["admin", "student", "guest"] : [role];
+  visible.forEach((roleKey) => {
+    const section = sections[roleKey];
+    const list = sectionLists[roleKey];
+    if (!section || !list) return;
+    roleContent[roleKey].forEach((item) => {
       const li = document.createElement("li");
       li.textContent = item;
       list.appendChild(li);
@@ -547,193 +317,354 @@ function renderRoleSections(role) {
   });
 }
 
-function renderAdminActivity(events) {
-  const relevantEvents = events.filter((event) => event.role !== "admin");
-  adminActivityList.innerHTML = "";
-
-  if (!relevantEvents.length) {
-    resetAdminMonitor();
+function renderAdminMonitor(events) {
+  const visibleEvents = events.filter((event) => event.role !== "admin");
+  if (!visibleEvents.length) {
+    adminActivityList.innerHTML = `
+      <article class="activity-card empty-state">
+        <h4>No activity yet</h4>
+        <p>Recent student and guest login events will appear here for the admin.</p>
+      </article>
+    `;
     return;
   }
 
-  relevantEvents.forEach((event) => {
+  adminActivityList.innerHTML = "";
+  visibleEvents.forEach((event) => {
     const card = document.createElement("article");
-    card.className = `activity-card activity-${event.role}`;
+    card.className = "activity-card";
     card.innerHTML = `
-      <div class="activity-topline">
-        <span class="activity-badge">${event.role}</span>
-        <span class="activity-time">${formatTimestamp(event.timestamp)}</span>
-      </div>
-      <h3>${event.name}</h3>
-      <p>${event.username} completed ${event.eventType === "otp-verified" ? "OTP verification" : "login initiation"}.</p>
-      <div class="activity-meta">
-        <span>Source: ${event.ipAddress}</span>
-        <span>${event.deviceType}</span>
-        <span>${event.browser}</span>
-        <span>${event.trustStatus} ${event.trustScore}/100</span>
-      </div>
+      <h4>${event.name}</h4>
+      <p>${event.role} completed ${event.type === "otp-verified" ? "OTP verification" : "login initiation"}.</p>
+      <p>${formatTimestamp(event.timestamp)} | ${event.browser} | ${event.device} | Trust ${event.trustScore}/100</p>
     `;
     adminActivityList.appendChild(card);
   });
 }
 
-function renderAlertFeed(state) {
-  const feedItems = [];
-
-  state.incidents.forEach((incident) => {
-    feedItems.push({
-      severity: incident.severity,
-      title: incident.title,
-      description: `${incident.description} - ${formatTimestamp(incident.timestamp)}`
-    });
-  });
-
-  if (state.session) {
-    feedItems.push({
-      severity: "info",
-      title: `${state.session.name} session ${state.session.otpVerified ? "verified" : "awaiting OTP"}`,
-      description: `${state.session.role} access evaluated with trust status ${state.session.trust.status}.`
-    });
-  }
-
-  if (!feedItems.length) {
-    feedItems.push({
-      severity: "info",
-      title: "System ready",
-      description: "No incidents yet. Use the attack simulator below or sign in to generate activity."
-    });
-  }
-
-  alertFeed.innerHTML = "";
-  feedItems.slice(0, 6).forEach((item) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = `alert-item ${item.severity}`;
-    wrapper.innerHTML = `
-      <span class="alert-status"></span>
-      <div>
-        <strong>${item.title}</strong>
-        <p>${item.description}</p>
-      </div>
-    `;
-    alertFeed.appendChild(wrapper);
+function updateList(target, items) {
+  target.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    target.appendChild(li);
   });
 }
 
-function renderKpis(state) {
-  const activeSessions = state.session && state.session.otpVerified ? 1 : 0;
-  const suspiciousEvents = state.incidents.length;
-  const blockedActions = state.incidents.filter((incident) => incident.blocked).length;
-  const riskLevel = suspiciousEvents >= 3 ? "Critical" : suspiciousEvents >= 2 ? "High" : suspiciousEvents >= 1 ? "Elevated" : "Low";
-
-  kpiActiveSessions.textContent = String(activeSessions);
-  kpiSuspiciousEvents.textContent = String(suspiciousEvents);
-  kpiBlockedActions.textContent = String(blockedActions);
-  kpiRiskLevel.textContent = riskLevel;
-
-  let posture = 92;
-  posture -= suspiciousEvents * 9;
-  posture -= blockedActions * 4;
-  posture = Math.max(42, posture);
-
-  securityPostureScore.textContent = String(posture);
-  identityBar.style.width = `${Math.max(40, posture)}%`;
-  monitoringBar.style.width = `${Math.max(35, 84 - suspiciousEvents * 9)}%`;
-  resistanceBar.style.width = `${Math.max(30, 78 - blockedActions * 8)}%`;
+function scoreSummary(score) {
+  if (score >= 85) return "Excellent. You are following strong personal security habits.";
+  if (score >= 70) return "Good. A few improvements can make your digital routine much safer.";
+  if (score >= 55) return "Fair. You are protected in some areas, but you still have clear weak points.";
+  return "Needs attention. Review passwords, suspicious messages, and browsing habits soon.";
 }
 
-function renderWorkspace(state) {
+function calculateWorkspaceScore(state) {
   const session = state.session;
-  const verified = Boolean(session && session.otpVerified);
-  workspaceRoot.classList.toggle("hidden", !verified);
-
-  if (!verified) {
-    updateWorkspaceHeader(null, state);
-    renderDocuments(null, state);
-    renderVault(null, state);
-    adminOnlyNavButtons.forEach((button) => button.classList.add("hidden"));
-    setWorkspaceView("overview");
-    return;
+  if (!session || !session.otpVerified) {
+    return 0;
   }
 
-  updateWorkspaceHeader(session, state);
-  renderVault(session, state);
-  renderDocuments(session, state);
-  renderRoleSections(session.role);
-
-  if (session.role === "admin") {
-    adminOnlyNavButtons.forEach((button) => button.classList.remove("hidden"));
-    renderAdminActivity(state.events);
-  } else {
-    adminOnlyNavButtons.forEach((button) => button.classList.add("hidden"));
-    if (activeWorkspaceView === "monitor") {
-      setWorkspaceView("overview");
-    }
-    resetAdminMonitor();
-  }
+  let score = session.trust.score;
+  if (state.toolHistory.link?.score <= 35) score += 4;
+  if (state.toolHistory.password?.score >= 75) score += 6;
+  if (state.toolHistory.scam?.score <= 30) score += 4;
+  if (state.challengeSolved) score += 8;
+  return Math.max(0, Math.min(100, score));
 }
 
-function renderSession() {
-  const state = readState();
+function renderDashboard(state) {
   const session = state.session;
-
-  renderAlertFeed(state);
-  renderKpis(state);
-
-  if (!session) {
-    otpValue.textContent = "Not generated yet";
-    otpDisplayValue.textContent = "Not generated yet";
+  if (!session || !session.otpVerified) {
+    workspaceRoot.classList.add("hidden");
+    workspaceUserName.textContent = "No active user";
+    workspaceUserRole.textContent = "Login required";
+    workspaceSecurityScore.textContent = "0";
+    workspaceScoreSummary.textContent = "Login to generate your safety overview.";
     sessionStatus.textContent = "No verified user yet.";
-    clearRoleSections();
-    resetTelemetry();
-    resetAdminMonitor();
-    renderWorkspace(state);
+    trustScore.textContent = "Pending";
+    trustStatus.textContent = "Pending";
+    accountName.textContent = "Pending";
+    accountRole.textContent = "Pending";
+    networkZone.textContent = "Pending";
+    browserName.textContent = "Pending";
+    osName.textContent = "Pending";
+    deviceType.textContent = "Pending";
+    ipAddress.textContent = "Pending";
+    policyDecision.textContent = "Pending";
+    sessionCreated.textContent = "Pending";
+    lastSeen.textContent = "Pending";
+    otpUsage.textContent = "0";
+    challengeProgress.textContent = state.challengeSolved ? "1/3" : "0/3";
+    badgeCount.textContent = state.challengeSolved ? "1 badge earned" : "0 badges earned";
+    updateList(trustReasons, ["Login and verify OTP to see personalized security guidance."]);
+    resetRoleSections();
     return;
   }
 
-  otpValue.textContent = session.otpVerified ? "Used" : session.otp;
-  otpDisplayValue.textContent = session.otpVerified ? "Used" : session.otp;
-  renderTelemetry(session);
+  workspaceRoot.classList.remove("hidden");
+  workspaceUserName.textContent = session.name;
+  workspaceUserRole.textContent = `${session.role.toUpperCase()} access`;
+  workspaceTitle.textContent = `Welcome back, ${session.name}`;
+  workspaceSubtitle.textContent = "Use these practical security tools to make safer decisions online.";
 
-  if (!session.otpVerified) {
-    sessionStatus.textContent = `${session.name} signed in as ${session.role}, waiting for OTP verification.`;
-    clearRoleSections();
-    resetAdminMonitor();
-    renderWorkspace(state);
-    return;
+  const overallScore = calculateWorkspaceScore(state);
+  workspaceSecurityScore.textContent = String(overallScore);
+  workspaceScoreSummary.textContent = scoreSummary(overallScore);
+  heroSecurityScore.textContent = String(Math.max(78, overallScore));
+
+  sessionStatus.textContent = `${session.name} is verified and can use the SecureU dashboard.`;
+  trustScore.textContent = `${session.trust.score}/100`;
+  trustStatus.textContent = session.trust.status;
+  accountName.textContent = session.name;
+  accountRole.textContent = session.role;
+  networkZone.textContent = session.trust.networkZone;
+  browserName.textContent = session.trust.browser;
+  osName.textContent = session.trust.os;
+  deviceType.textContent = session.trust.device;
+  ipAddress.textContent = session.trust.ipAddress;
+  policyDecision.textContent = session.trust.decision;
+  sessionCreated.textContent = formatTimestamp(session.createdAt);
+  lastSeen.textContent = formatTimestamp(session.lastSeenAt);
+  otpUsage.textContent = String(session.otpUsageCount);
+  challengeProgress.textContent = state.challengeSolved ? "1/3" : "0/3";
+  badgeCount.textContent = state.challengeSolved ? "1 badge earned" : "0 badges earned";
+
+  const dynamicAdvice = [...session.trust.reasons];
+  if (!state.toolHistory.link) dynamicAdvice.push("Use the link scanner before opening internship, scholarship, or payment URLs.");
+  if (!state.toolHistory.password) dynamicAdvice.push("Run a password check to understand whether your current passwords are too easy to crack.");
+  if (!state.toolHistory.scam) dynamicAdvice.push("Paste a suspicious message into the scam detector before replying or clicking.");
+  updateList(trustReasons, dynamicAdvice);
+
+  lastLinkStatus.textContent = state.toolHistory.link ? `${state.toolHistory.link.label} (${state.toolHistory.link.score}/100)` : "Not scanned yet";
+  lastPasswordStatus.textContent = state.toolHistory.password
+    ? `${state.toolHistory.password.label} (${state.toolHistory.password.score}/100)`
+    : "Not checked yet";
+  lastScamStatus.textContent = state.toolHistory.scam ? `${state.toolHistory.scam.label} (${state.toolHistory.scam.score}/100)` : "Not analyzed yet";
+
+  renderRoleSections(session.role);
+  const showAdmin = session.role === "admin";
+  adminOnlyButtons.forEach((button) => button.classList.toggle("hidden", !showAdmin));
+  if (showAdmin) {
+    renderAdminMonitor(state.events);
+  } else if (activeView === "monitor") {
+    setView("dashboard");
   }
 
-  sessionStatus.textContent = `${session.name} is verified and active in the ${session.role} section.`;
-  renderWorkspace(state);
+  renderDeviceCheckup(session, state);
 }
 
-function runSimulation(type) {
-  const state = readState();
-  const definitions = {
-    bruteForce: {
-      severity: "danger",
-      title: "Brute-force campaign detected",
-      description: "Multiple failed credential attempts triggered a rate-limit response and forced step-up verification.",
-      blocked: true
-    },
-    tokenTheft: {
-      severity: "danger",
-      title: "Potential token theft blocked",
-      description: "Session replay attempt was denied after policy mismatch between identity and device context.",
-      blocked: true
-    },
-    unknownLocation: {
-      severity: "warning",
-      title: "Unknown location triggered re-authentication",
-      description: "Policy engine downgraded trust and required additional verification for anomalous context.",
-      blocked: false
-    }
-  };
+function analyzeLink(url) {
+  let risk = 8;
+  const reasons = [];
+  let host = "";
 
-  const incident = definitions[type];
-  recordIncident(state, { type, ...incident });
-  writeState(state);
-  simMessage.textContent = incident.title;
-  renderSession();
+  try {
+    const parsed = new URL(url);
+    host = parsed.hostname.toLowerCase();
+
+    if (parsed.protocol !== "https:") {
+      risk += 24;
+      reasons.push("This link is not using HTTPS, so it should be treated more carefully.");
+    } else {
+      reasons.push("The link uses HTTPS, which is a positive sign but not a full guarantee.");
+    }
+
+    if (shorteners.some((domain) => host.includes(domain))) {
+      risk += 18;
+      reasons.push("The domain looks like a URL shortener, which can hide the real destination.");
+    }
+
+    if (suspiciousTlds.some((tld) => host.endsWith(tld))) {
+      risk += 16;
+      reasons.push("The website uses a TLD that often appears in low-trust campaigns.");
+    }
+
+    if (/\d+\.\d+\.\d+\.\d+/.test(host)) {
+      risk += 26;
+      reasons.push("The link uses a raw IP address instead of a normal domain name.");
+    }
+
+    if (host.split("-").length > 3) {
+      risk += 12;
+      reasons.push("The domain has many hyphens, which can be a sign of a fake or rushed site.");
+    }
+
+    if (host.includes("xn--")) {
+      risk += 24;
+      reasons.push("The domain uses punycode characters, which can be used in lookalike attacks.");
+    }
+
+    if (phishingKeywords.some((word) => url.toLowerCase().includes(word))) {
+      risk += 14;
+      reasons.push("The URL includes bait terms often used in phishing or scam pages.");
+    }
+
+    if (url.length > 90) {
+      risk += 10;
+      reasons.push("The link is unusually long, which can hide suspicious paths or parameters.");
+    }
+  } catch {
+    return {
+      label: "Dangerous",
+      score: 95,
+      reasons: ["The text is not a valid URL, so you should not trust or open it."]
+    };
+  }
+
+  risk = Math.max(0, Math.min(100, risk));
+  let label = "Safe";
+  if (risk >= 65) label = "Dangerous";
+  else if (risk >= 35) label = "Suspicious";
+
+  if (!reasons.length) {
+    reasons.push("No obvious warning signs were found in this URL pattern.");
+  }
+
+  return { label, score: risk, reasons, host };
+}
+
+function analyzePassword(value) {
+  let score = 10;
+  const reasons = [];
+
+  if (value.length >= 14) {
+    score += 35;
+    reasons.push("Good length makes the password much harder to crack.");
+  } else if (value.length >= 10) {
+    score += 20;
+    reasons.push("The length is decent, but a longer passphrase would be safer.");
+  } else {
+    reasons.push("This password is too short and should be replaced with something longer.");
+  }
+
+  if (/[A-Z]/.test(value) && /[a-z]/.test(value)) {
+    score += 12;
+    reasons.push("Mixing uppercase and lowercase letters improves variety.");
+  }
+
+  if (/\d/.test(value)) {
+    score += 10;
+    reasons.push("Adding numbers helps resist simple guessing.");
+  }
+
+  if (/[^a-zA-Z0-9]/.test(value)) {
+    score += 12;
+    reasons.push("Special characters increase the search space for attackers.");
+  }
+
+  if (commonPasswordBits.some((part) => value.toLowerCase().includes(part))) {
+    score -= 28;
+    reasons.push("It includes a very common password pattern or predictable word.");
+  }
+
+  if (/(.)\1{2,}/.test(value)) {
+    score -= 10;
+    reasons.push("Repeated characters make the pattern easier to guess.");
+  }
+
+  if (/^\d+$/.test(value)) {
+    score -= 20;
+    reasons.push("All-number passwords are weak and should be avoided.");
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  let label = "Weak";
+  if (score >= 75) label = "Strong";
+  else if (score >= 45) label = "Okay";
+
+  return { label, score, reasons };
+}
+
+function analyzeScam(text) {
+  let risk = 8;
+  const reasons = [];
+  scamSignals.forEach((signal) => {
+    if (signal.pattern.test(text)) {
+      risk += signal.weight;
+      reasons.push(signal.reason);
+    }
+  });
+
+  if (/(gmail\.com|yahoo\.com|outlook\.com)/i.test(text) && /company|official|hr team/i.test(text)) {
+    risk += 12;
+    reasons.push("The message claims authority but may be relying on a generic email context.");
+  }
+
+  if (text.length < 25) {
+    risk += 6;
+    reasons.push("Very short messages can hide context and encourage impulsive clicks.");
+  }
+
+  risk = Math.max(0, Math.min(100, risk));
+  let label = "Likely Safe";
+  if (risk >= 70) label = "High Scam Risk";
+  else if (risk >= 40) label = "Suspicious";
+
+  if (!reasons.length) {
+    reasons.push("No major scam language was detected in this message sample.");
+  }
+
+  return { label, score: risk, reasons };
+}
+
+function generatePassphrase() {
+  const wordsA = ["campus", "shield", "quiet", "orbit", "river", "signal", "cobalt", "sunrise"];
+  const wordsB = ["panda", "harbor", "ember", "matrix", "window", "rocket", "garden", "cipher"];
+  const wordsC = ["notes", "bridge", "planet", "studio", "marble", "forest", "anchor", "socket"];
+  const number = Math.floor(100 + Math.random() * 900);
+  return `${wordsA[Math.floor(Math.random() * wordsA.length)]}-${wordsB[Math.floor(Math.random() * wordsB.length)]}-${wordsC[Math.floor(Math.random() * wordsC.length)]}-${number}`;
+}
+
+function renderDeviceCheckup(session, state) {
+  if (!session || !session.otpVerified) {
+    deviceScoreLabel.textContent = "Waiting for session";
+    deviceRiskScore.textContent = "Safety score: --";
+    updateList(deviceRecommendations, ["Login to see beginner-friendly browser and device advice."]);
+    return;
+  }
+
+  let score = session.trust.score;
+  const advice = [];
+
+  if (navigator.cookieEnabled) {
+    advice.push("Cookies are enabled. Be careful on shared devices and log out after important sessions.");
+  } else {
+    score += 4;
+    advice.push("Cookie restrictions are helping with privacy, but some sites may behave differently.");
+  }
+
+  if (navigator.doNotTrack === "1") {
+    score += 4;
+    advice.push("Do Not Track is enabled, which is a small privacy-positive signal.");
+  } else {
+    advice.push("Consider enabling privacy protections in your browser to reduce unnecessary tracking.");
+  }
+
+  if (window.isSecureContext) {
+    score += 4;
+    advice.push("This site is running in a secure browser context.");
+  } else {
+    score -= 8;
+    advice.push("Avoid entering sensitive information on insecure browser contexts.");
+  }
+
+  if (!navigator.onLine) {
+    score -= 10;
+    advice.push("Your browser reports that you are offline, so some checks may not reflect your real environment.");
+  } else {
+    advice.push("You are online, so be extra careful on public Wi-Fi and shared networks.");
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  deviceScoreLabel.textContent = score >= 75 ? "Healthy Device Posture" : score >= 55 ? "Needs Small Improvements" : "Needs Attention";
+  deviceRiskScore.textContent = `Safety score: ${score}/100`;
+  updateList(deviceRecommendations, advice);
+}
+
+function renderToolResult(targetLabel, targetScore, targetReasons, result, prefix) {
+  targetLabel.textContent = result.label;
+  targetScore.textContent = `${prefix}: ${result.score}/100`;
+  updateList(targetReasons, result.reasons);
 }
 
 loginForm.addEventListener("submit", (event) => {
@@ -741,41 +672,41 @@ loginForm.addEventListener("submit", (event) => {
   loginMessage.textContent = "";
   otpMessage.textContent = "";
 
-  const formData = new FormData(loginForm);
-  const payload = Object.fromEntries(formData.entries());
-  const user = users[payload.username];
+  const data = new FormData(loginForm);
+  const username = data.get("username");
+  const password = data.get("password");
+  const user = users[username];
 
-  if (!user || user.password !== payload.password) {
+  if (!user || user.password !== password) {
     loginMessage.textContent = "Invalid credentials.";
     return;
   }
 
   const state = readState();
-  const session = buildSession(user, state.session && state.session.username === user.username ? state.session : null);
-  getUserStore(state, session.username);
-  state.session = session;
-  recordEvent(state, session, "login-issued");
+  const previous = state.session && state.session.username === user.username ? state.session : null;
+  state.session = buildSession(user, previous);
+  recordEvent(state, state.session, "login-issued");
   writeState(state);
 
-  loginMessage.textContent = `Login accepted. Verify the fresh OTP to continue. Signed in as ${session.role}.`;
-  setWorkspaceView("overview");
-  renderSession();
+  otpDisplayValue.textContent = state.session.otp;
+  loginMessage.textContent = `Login accepted. OTP generated for ${state.session.role}.`;
+  setView("dashboard");
+  renderDashboard(state);
 });
 
 otpForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  otpMessage.textContent = "";
-
   const state = readState();
   const session = state.session;
-  const otpInput = document.getElementById("otp-input");
+  otpMessage.textContent = "";
 
   if (!session) {
     otpMessage.textContent = "Sign in first.";
     return;
   }
 
-  if (otpInput.value !== session.otp) {
+  const otpInput = document.getElementById("otp-input").value;
+  if (otpInput !== session.otp) {
     otpMessage.textContent = "Incorrect OTP.";
     return;
   }
@@ -787,16 +718,17 @@ otpForm.addEventListener("submit", (event) => {
   recordEvent(state, session, "otp-verified");
   writeState(state);
 
-  otpMessage.textContent = "OTP verified. Access granted by role.";
-  otpInput.value = "";
-  setWorkspaceView("overview");
-  renderSession();
+  otpDisplayValue.textContent = "Used";
+  otpMessage.textContent = "OTP verified. Student dashboard unlocked.";
+  otpForm.reset();
+  setView("dashboard");
+  renderDashboard(state);
 });
 
 regenerateBtn.addEventListener("click", () => {
-  otpMessage.textContent = "";
   const state = readState();
   const session = state.session;
+  otpMessage.textContent = "";
 
   if (!session) {
     otpMessage.textContent = "Sign in first.";
@@ -805,194 +737,96 @@ regenerateBtn.addEventListener("click", () => {
 
   session.otp = generateOtp(session.otp);
   session.otpVerified = false;
-  session.otpIssuedAt = nowIso();
-  session.lastSeenAt = session.otpIssuedAt;
+  session.lastSeenAt = nowIso();
   session.otpUsageCount += 1;
   state.session = session;
   writeState(state);
 
+  otpDisplayValue.textContent = session.otp;
   otpMessage.textContent = `A different OTP has been generated. Request count: ${session.otpUsageCount}.`;
-  renderSession();
+  renderDashboard(state);
 });
 
 logoutBtn.addEventListener("click", () => {
   const state = readState();
-  if (state.session) {
-    const userStore = getUserStore(state, state.session.username);
-    userStore.vaultUnlocked = false;
-  }
   state.session = null;
   writeState(state);
   loginMessage.textContent = "";
   otpMessage.textContent = "";
-  vaultSetMessage.textContent = "";
-  vaultUnlockMessage.textContent = "";
-  documentMessage.textContent = "";
-  setWorkspaceView("overview");
-  renderSession();
-});
-
-simulateBruteforceBtn.addEventListener("click", () => {
-  runSimulation("bruteForce");
-});
-
-simulateTokenTheftBtn.addEventListener("click", () => {
-  runSimulation("tokenTheft");
-});
-
-simulateLocationBtn.addEventListener("click", () => {
-  runSimulation("unknownLocation");
-});
-
-clearIncidentsBtn.addEventListener("click", () => {
-  const state = readState();
-  state.incidents = [];
-  writeState(state);
-  simMessage.textContent = "Attack simulations cleared.";
-  renderSession();
+  renderDashboard(state);
 });
 
 workspaceNavButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    if (button.classList.contains("hidden")) {
-      return;
-    }
-    setWorkspaceView(button.dataset.view);
+    if (button.classList.contains("hidden")) return;
+    setView(button.dataset.view);
   });
 });
 
-vaultSetForm.addEventListener("submit", (event) => {
+linkForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  vaultSetMessage.textContent = "";
   const state = readState();
-  const session = state.session;
-
-  if (!session || !session.otpVerified) {
-    vaultSetMessage.textContent = "Verify a session first.";
-    return;
-  }
-
-  const keyValue = document.getElementById("vault-key-input").value.trim();
-  if (!keyValue) {
-    vaultSetMessage.textContent = "Enter a private key.";
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  userStore.vaultKey = keyValue;
-  userStore.vaultUnlocked = false;
+  const value = document.getElementById("link-input").value.trim();
+  const result = analyzeLink(value);
+  state.toolHistory.link = result;
   writeState(state);
 
-  vaultSetMessage.textContent = "Vault key saved for this user in browser storage.";
-  vaultUnlockMessage.textContent = "";
-  vaultSetForm.reset();
-  renderSession();
+  renderToolResult(linkRiskLabel, linkRiskScore, linkReasons, result, "Risk score");
+  lastLinkStatus.textContent = `${result.label} (${result.score}/100)`;
+  linkMessage.textContent = `Scan complete for ${result.host || "the supplied link"}.`;
+  renderDashboard(readState());
 });
 
-vaultUnlockForm.addEventListener("submit", (event) => {
+passwordForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  vaultUnlockMessage.textContent = "";
   const state = readState();
-  const session = state.session;
+  const value = document.getElementById("password-check-input").value;
+  const result = analyzePassword(value);
+  state.toolHistory.password = result;
+  writeState(state);
 
-  if (!session || !session.otpVerified) {
-    vaultUnlockMessage.textContent = "Verify a session first.";
-    return;
-  }
+  renderToolResult(passwordRiskLabel, passwordRiskScore, passwordReasons, result, "Strength score");
+  lastPasswordStatus.textContent = `${result.label} (${result.score}/100)`;
+  passwordMessage.textContent = "Password check completed.";
+  renderDashboard(readState());
+});
 
-  const userStore = getUserStore(state, session.username);
-  if (!userStore.vaultKey) {
-    vaultUnlockMessage.textContent = "Set a vault key before unlocking.";
-    return;
-  }
+generatePassphraseBtn.addEventListener("click", () => {
+  const passphrase = generatePassphrase();
+  generatedPassphrase.textContent = passphrase;
+  passwordMessage.textContent = "Passphrase generated. You can use it as inspiration for a safer login.";
+});
 
-  const unlockValue = document.getElementById("vault-unlock-input").value;
-  if (unlockValue !== userStore.vaultKey) {
-    userStore.vaultUnlocked = false;
+scamForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const state = readState();
+  const value = document.getElementById("scam-input").value.trim();
+  const result = analyzeScam(value);
+  state.toolHistory.scam = result;
+  writeState(state);
+
+  renderToolResult(scamRiskLabel, scamRiskScore, scamReasons, result, "Scam probability");
+  lastScamStatus.textContent = `${result.label} (${result.score}/100)`;
+  scamMessage.textContent = "Message analysis completed.";
+  renderDashboard(readState());
+});
+
+challengeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const correct = button.dataset.correct === "true";
+    const state = readState();
+    state.challengeSolved = correct;
     writeState(state);
-    vaultUnlockMessage.textContent = "Incorrect vault key.";
-    renderSession();
-    return;
-  }
-
-  userStore.vaultUnlocked = true;
-  writeState(state);
-  vaultUnlockMessage.textContent = "Vault unlocked successfully.";
-  vaultUnlockForm.reset();
-  renderSession();
-});
-
-vaultLockBtn.addEventListener("click", () => {
-  const state = readState();
-  const session = state.session;
-  if (!session || !session.otpVerified) {
-    vaultUnlockMessage.textContent = "Verify a session first.";
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  userStore.vaultUnlocked = false;
-  writeState(state);
-  vaultUnlockMessage.textContent = "Vault locked.";
-  renderSession();
-});
-
-documentForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  documentMessage.textContent = "";
-  const state = readState();
-  const session = state.session;
-
-  if (!session || !session.otpVerified) {
-    documentMessage.textContent = "Verify a session first.";
-    return;
-  }
-
-  if (session.role === "guest") {
-    documentMessage.textContent = "Guests cannot upload documents in this workspace.";
-    return;
-  }
-
-  const file = documentInput.files && documentInput.files[0];
-  if (!file) {
-    documentMessage.textContent = "Choose a file to add.";
-    return;
-  }
-
-  const userStore = getUserStore(state, session.username);
-  userStore.documents.unshift({
-    fileName: file.name,
-    fileSize: `${Math.max(1, Math.round(file.size / 1024))} KB`,
-    note: documentNote.value.trim(),
-    uploadedAt: nowIso(),
-    ownerRole: session.role
+    challengeFeedback.textContent = correct
+      ? "Correct. OTPs should never be shared, even when a message looks official."
+      : "Not quite. The safest move is to never share an OTP and verify the sender another way.";
+    renderDashboard(readState());
   });
-  userStore.documents = userStore.documents.slice(0, 12);
-  writeState(state);
-
-  documentMessage.textContent = `${file.name} added to the document hub.`;
-  documentForm.reset();
-  renderSession();
-});
-
-window.addEventListener("mousemove", (event) => {
-  if (!cursorGlow) {
-    return;
-  }
-
-  cursorGlow.style.opacity = "1";
-  cursorGlow.style.left = `${event.clientX}px`;
-  cursorGlow.style.top = `${event.clientY}px`;
-});
-
-window.addEventListener("mouseleave", () => {
-  if (cursorGlow) {
-    cursorGlow.style.opacity = "0";
-  }
 });
 
 window.addEventListener("storage", () => {
-  renderSession();
+  renderDashboard(readState());
 });
 
-renderSession();
+setView("dashboard");
+renderDashboard(readState());

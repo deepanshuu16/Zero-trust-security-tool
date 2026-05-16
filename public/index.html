@@ -3,758 +3,522 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SecureVault Zero Trust</title>
+    <title>SecureU Student Safety Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div id="cursor-glow" class="cursor-glow"></div>
-    <div class="background-orb orb-left"></div>
-    <div class="background-orb orb-right"></div>
-    <div class="background-grid"></div>
-
     <div class="page-shell">
       <header class="topbar">
-        <div class="brand">
-          <div class="brand-mark">SV</div>
-          <div>
-            <p class="brand-name">SecureVault Zero Trust</p>
-            <p class="brand-subtitle">Continuous verification for identities, devices, and sessions</p>
-          </div>
-        </div>
-        <div class="topbar-actions">
-          <a class="topbar-link" href="#operations">SOC View</a>
-          <a class="topbar-link" href="#architecture">Architecture</a>
-          <div class="topbar-pill">Live Threat Simulation</div>
-        </div>
+        <a class="brand" href="#top">
+          <span class="brand-mark">SU</span>
+          <span>
+            <strong>SecureU</strong>
+            <small>Student Security Platform</small>
+          </span>
+        </a>
+
+        <nav class="topbar-nav" aria-label="Primary">
+          <a href="#tools">Tools</a>
+          <a href="#score">Security Score</a>
+          <a href="#learn">Learning</a>
+          <a href="#login-panel">Login</a>
+        </nav>
       </header>
 
-      <section class="hero">
-        <div class="hero-copy-block">
-          <p class="eyebrow">Black Ops Zero Trust</p>
-          <h1>Secure data access with a Zero Trust control plane that feels like a real security product</h1>
-          <p class="hero-copy">
-            SecureVault combines adaptive OTP verification, least-privilege role access, device-aware trust scoring,
-            admin monitoring, and attack simulation into a polished Zero Trust demo you can present with confidence.
-          </p>
+      <main>
+        <section id="top" class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">Digital Safety for Students</span>
+            <h1>One simple place to check scams, links, passwords, devices, and online safety.</h1>
+            <p class="hero-text">
+              SecureU turns a technical cybersecurity demo into a practical student companion. It helps students spot phishing,
+              understand risky messages, improve password hygiene, and build safer online habits without feeling overwhelmed.
+            </p>
 
-          <div class="hero-actions">
-            <a class="hero-link" href="#login-form">Start Secure Login</a>
-            <a class="hero-link secondary-link" href="#simulator">Launch Attack Simulation</a>
-          </div>
+            <div class="hero-actions">
+              <a class="primary-action" href="#login-panel">Open Student Dashboard</a>
+              <a class="secondary-action" href="#tools">Explore Tools</a>
+            </div>
 
-          <div class="hero-trust-row">
-            <div class="live-pill">
-              <span class="live-dot"></span>
-              Threat telemetry streaming
-            </div>
-            <div class="live-pill alt-pill">Terminal-grade policy engine</div>
-            <div class="live-pill alt-pill">Continuous trust scoring</div>
-          </div>
-
-          <div class="hero-metrics">
-            <article class="metric-card">
-              <span class="metric-label">Verification</span>
-              <strong>OTP + Context</strong>
-              <p>Every session is re-evaluated using role, device, and browser signals.</p>
-            </article>
-            <article class="metric-card">
-              <span class="metric-label">Access Model</span>
-              <strong>Least Privilege</strong>
-              <p>Admin, employee, and guest zones stay isolated by role and policy intent.</p>
-            </article>
-            <article class="metric-card">
-              <span class="metric-label">Operations</span>
-              <strong>SOC Dashboard</strong>
-              <p>Monitor login attempts, suspicious events, policy decisions, and trust posture.</p>
-            </article>
-            <article class="metric-card">
-              <span class="metric-label">Simulation</span>
-              <strong>Attack Lab</strong>
-              <p>Trigger brute-force, token theft, and unusual-location scenarios for demos.</p>
-            </article>
-          </div>
-        </div>
-
-        <aside class="hero-aside">
-          <div class="hero-visual-panel">
-            <div class="floating-icon icon-lock">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 10V8a5 5 0 0 1 10 0v2" />
-                <rect x="5" y="10" width="14" height="10" rx="2" />
-                <circle cx="12" cy="15" r="1.5" />
-              </svg>
-            </div>
-            <div class="floating-icon icon-shield">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" />
-              </svg>
-            </div>
-            <div class="floating-icon icon-user">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="8" r="3.5" />
-                <path d="M5 19a7 7 0 0 1 14 0" />
-              </svg>
-            </div>
-            <div class="visual-screen">
-              <div class="visual-header">
-                <span></span><span></span><span></span>
+            <div class="hero-points">
+              <div class="hero-point">
+                <strong>Useful every day</strong>
+                <span>Check suspicious links, messages, and passwords before they become a problem.</span>
               </div>
-              <div class="visual-grid">
-                <div class="visual-card">
-                  <span>Threat Score</span>
-                  <strong>14%</strong>
-                </div>
-                <div class="visual-card">
-                  <span>Secure Sessions</span>
-                  <strong>98</strong>
-                </div>
-                <div class="visual-graph">
-                  <div class="graph-line graph-line-one"></div>
-                  <div class="graph-line graph-line-two"></div>
-                </div>
-                <div class="visual-list">
-                  <div><span></span><p>Policy match confirmed</p></div>
-                  <div><span></span><p>OTP re-check completed</p></div>
-                  <div><span></span><p>Guest scope isolated</p></div>
-                </div>
+              <div class="hero-point">
+                <strong>Easy to understand</strong>
+                <span>Scores, reasons, and simple advice instead of technical jargon.</span>
+              </div>
+              <div class="hero-point">
+                <strong>Built for students</strong>
+                <span>Made for college life, internships, shared Wi-Fi, social media, and scam awareness.</span>
               </div>
             </div>
           </div>
 
-          <div class="aside-panel trust-panel hero-health">
-            <div class="panel-heading">
-              <p class="eyebrow muted">Live Posture</p>
-              <h2>Security Health Console</h2>
+          <aside class="hero-panel">
+            <div class="hero-score-card">
+              <span class="card-label">Today’s Safety Snapshot</span>
+              <strong id="hero-security-score">82</strong>
+              <p>Good foundation. Review your device and password habits to push your score higher.</p>
             </div>
-            <div class="posture-score">
-              <span>Security Score</span>
-              <strong id="security-posture-score">92</strong>
-            </div>
-            <div class="health-bars">
-              <div class="health-row">
-                <span>Identity Assurance</span>
-                <div class="bar"><div id="identity-bar" class="bar-fill"></div></div>
-              </div>
-              <div class="health-row">
-                <span>Session Monitoring</span>
-                <div class="bar"><div id="monitoring-bar" class="bar-fill warning"></div></div>
-              </div>
-              <div class="health-row">
-                <span>Attack Resistance</span>
-                <div class="bar"><div id="resistance-bar" class="bar-fill danger"></div></div>
-              </div>
-            </div>
-          </div>
 
-          <div class="aside-panel credential-panel">
-            <div class="panel-heading">
-              <p class="eyebrow muted">Demo Identities</p>
-              <h2>Credential Vault</h2>
+            <div class="hero-mini-grid">
+              <article class="mini-card">
+                <span>Phishing Scanner</span>
+                <strong>Paste a link</strong>
+                <p>Instant risk hints for fake internship and shopping URLs.</p>
+              </article>
+              <article class="mini-card">
+                <span>Scam Detector</span>
+                <strong>Check a message</strong>
+                <p>Analyze urgency, pressure, and social engineering red flags.</p>
+              </article>
+              <article class="mini-card">
+                <span>Password Lab</span>
+                <strong>Build safer logins</strong>
+                <p>Understand strength, crack resistance, and better passphrases.</p>
+              </article>
+              <article class="mini-card">
+                <span>Learning Mode</span>
+                <strong>Practice in minutes</strong>
+                <p>Daily challenges and quick lessons made for beginners.</p>
+              </article>
             </div>
-            <div class="credential-list">
-              <div class="credential-row">
-                <span>Admin</span>
-                <strong>admin / Admin@123</strong>
-              </div>
-              <div class="credential-row">
-                <span>Employee</span>
-                <strong>employee / Employee@123</strong>
-              </div>
-              <div class="credential-row">
-                <span>Guest</span>
-                <strong>guest / Guest@123</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="aside-panel status-panel">
-            <div class="trust-grid">
-              <div>
-                <span class="trust-label">OTP Status</span>
-                <strong id="otp-value">Not generated yet</strong>
-              </div>
-              <div>
-                <span class="trust-label">Session Status</span>
-                <strong id="session-status">No verified user yet.</strong>
-              </div>
-              <div>
-                <span class="trust-label">Trust Score</span>
-                <strong id="trust-score">Pending</strong>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <main class="workspace">
-        <section class="panel feature-highlight-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Why It Pops</p>
-            <h2>Premium visuals with cybersecurity storytelling</h2>
-          </div>
-          <div class="feature-highlight-grid">
-            <article class="feature-highlight-card">
-              <div class="feature-icon-wrap cyan">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16v12H4z" />
-                  <path d="M8 10h8M8 14h5" />
-                </svg>
-              </div>
-              <div>
-                <h3>Visual hierarchy</h3>
-              <p>High-contrast panels, glow accents, and terminal framing make the interface hit harder immediately.</p>
-              </div>
-            </article>
-            <article class="feature-highlight-card">
-              <div class="feature-icon-wrap purple">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" />
-                </svg>
-              </div>
-              <div>
-                <h3>Security feel</h3>
-              <p>Shields, locks, monitoring bars, and alert cards make the site feel like a live red-team aware SOC console.</p>
-              </div>
-            </article>
-            <article class="feature-highlight-card">
-              <div class="feature-icon-wrap green">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 12h5l2-5 3 10 2-5h2" />
-                </svg>
-              </div>
-              <div>
-                <h3>Smooth motion</h3>
-              <p>Floating icon drift, scan-line glow, animated graphs, and cursor aura keep the interface alive.</p>
-              </div>
-            </article>
-          </div>
+          </aside>
         </section>
 
-        <section id="operations" class="panel operations-panel">
-          <div class="section-header">
-            <div class="section-title">
-              <p class="eyebrow muted">SOC Dashboard</p>
-              <h2>Operational security view</h2>
-            </div>
-            <div class="panel-chip">Continuous verification enabled</div>
-          </div>
+        <section class="highlights">
+          <article class="highlight-card">
+            <span class="highlight-badge">Core Mission</span>
+            <h2>A cybersecurity companion students can actually use.</h2>
+            <p>
+              This platform focuses on practical protection instead of enterprise-only jargon. It brings together scanning,
+              awareness, and personal security checkups in one place.
+            </p>
+          </article>
 
-          <div class="kpi-grid">
-            <article class="kpi-card">
-              <span class="metric-label">Active Sessions</span>
-              <strong id="kpi-active-sessions">0</strong>
-              <p>Current verified identities in this demo environment.</p>
-            </article>
-            <article class="kpi-card">
-              <span class="metric-label">Suspicious Events</span>
-              <strong id="kpi-suspicious-events">0</strong>
-              <p>Behavior or attack simulations that require analyst review.</p>
-            </article>
-            <article class="kpi-card">
-              <span class="metric-label">Blocked Actions</span>
-              <strong id="kpi-blocked-actions">0</strong>
-              <p>Denied operations triggered by Zero Trust controls.</p>
-            </article>
-            <article class="kpi-card">
-              <span class="metric-label">Risk Level</span>
-              <strong id="kpi-risk-level">Low</strong>
-              <p>Dynamic environment severity based on active incidents.</p>
-            </article>
-          </div>
-
-          <div class="operations-grid">
-            <article class="telemetry-card terminal-card">
-              <div class="terminal-header">
-                <span></span><span></span><span></span>
-              </div>
-              <h3>Live Alert Feed</h3>
-              <div id="alert-feed" class="alert-feed">
-                <div class="alert-item info">
-                  <span class="alert-status"></span>
-                  <div>
-                    <strong>System ready</strong>
-                    <p>No incidents yet. Use the attack simulator below or sign in to generate activity.</p>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article id="simulator" class="telemetry-card">
-              <h3>Attack Simulation Lab</h3>
-              <p class="card-copy">
-                Demonstrate how the platform reacts to common Zero Trust scenarios such as brute force, token theft, and
-                unusual session context.
-              </p>
-              <div class="sim-actions">
-                <button id="simulate-bruteforce" type="button">Simulate Brute Force</button>
-                <button id="simulate-token-theft" type="button">Simulate Token Theft</button>
-                <button id="simulate-location" type="button">Simulate Unknown Location</button>
-                <button id="clear-incidents" class="secondary" type="button">Clear Simulations</button>
-              </div>
-              <div id="sim-message" class="message"></div>
-            </article>
-          </div>
-        </section>
-
-        <section class="panel preview-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Dashboard Preview</p>
-            <h2>Layered visuals for a more impressive product demo</h2>
-          </div>
-          <div class="preview-grid">
-            <article class="preview-copy">
-              <p>
-                The interface now combines a premium SaaS landing page with a cybersecurity operations center look. Each
-                block uses stronger contrast, richer glow, and more cinematic layering to avoid the flat student-project
-                feel.
-              </p>
-              <ul class="insight-list">
-                <li>Animated status pills and floating trust icons</li>
-                <li>Gradient cards with dashboard-style micro charts</li>
-                <li>Alert-driven color language for risk and response</li>
-                <li>Responsive sections that still feel premium on mobile</li>
+          <div class="highlight-grid">
+            <article class="highlight-panel">
+              <h3>What it solves</h3>
+              <ul>
+                <li>Fake internship and scholarship links</li>
+                <li>Weak or reused passwords</li>
+                <li>Scam messages and phishing attempts</li>
+                <li>Unsafe browsing habits and shared network risks</li>
               </ul>
             </article>
-            <div class="preview-mockup">
-              <div class="mockup-sidebar">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div class="mockup-main">
-                <div class="mockup-top">
-                  <div class="mockup-chip bright"></div>
-                  <div class="mockup-chip"></div>
-                  <div class="mockup-chip"></div>
-                </div>
-                <div class="mockup-row">
-                  <div class="mockup-box tall"></div>
-                  <div class="mockup-box"></div>
-                  <div class="mockup-box"></div>
-                </div>
-                <div class="mockup-chart">
-                  <div class="mock-bar"></div>
-                  <div class="mock-bar short"></div>
-                  <div class="mock-bar tall"></div>
-                  <div class="mock-bar mid"></div>
-                  <div class="mock-bar short"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel workflow-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Access Workflow</p>
-            <h2>Identity verification pipeline</h2>
-          </div>
-
-          <div class="workflow-grid">
-            <article class="step-card">
-              <div class="step-number">01</div>
-              <h3>Sign In</h3>
-              <p>Authenticate the selected identity before session creation.</p>
-              <form id="login-form" class="stack">
-                <label>
-                  Username
-                  <input id="username" name="username" placeholder="admin" required />
-                </label>
-                <label>
-                  Password
-                  <input id="password" name="password" type="password" placeholder="Admin@123" required />
-                </label>
-                <button type="submit">Login and Generate OTP</button>
-              </form>
-              <p id="login-message" class="message"></p>
-            </article>
-
-            <article class="step-card">
-              <div class="step-number">02</div>
-              <h3>Verify OTP</h3>
-              <p>Confirm session trust with a fresh one-time code before access.</p>
-              <div class="otp-display">
-                <span>Current Demo OTP</span>
-                <strong id="otp-display-value">Not generated yet</strong>
-              </div>
-              <form id="otp-form" class="stack">
-                <label>
-                  Enter OTP
-                  <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
-                </label>
-                <button type="submit">Verify OTP</button>
-              </form>
-              <button id="regenerate-btn" class="secondary" type="button">Generate a Different OTP</button>
-              <p id="otp-message" class="message"></p>
+            <article class="highlight-panel">
+              <h3>Why it feels better</h3>
+              <ul>
+                <li>Cleaner layout with accessible typography</li>
+                <li>Simple scores and plain-language advice</li>
+                <li>Practical tools instead of empty dashboards</li>
+                <li>Beginner-friendly learning built into the product</li>
+              </ul>
             </article>
           </div>
         </section>
 
-        <section id="app-workspace" class="panel app-workspace hidden">
-          <div class="section-header">
-            <div class="section-title">
-              <p class="eyebrow muted">Verified Workspace</p>
-              <h2>Multi-view control center</h2>
+        <section id="tools" class="tools-strip">
+          <div class="section-heading">
+            <span class="eyebrow">Daily Protection</span>
+            <h2>Useful tools students come back to</h2>
+          </div>
+
+          <div class="tools-grid">
+            <article class="tool-preview">
+              <h3>Link Scanner</h3>
+              <p>Check suspicious links for warning signs like no HTTPS, fake domains, typos, and bait words.</p>
+            </article>
+            <article class="tool-preview">
+              <h3>Password Check</h3>
+              <p>Test password quality, generate better passphrases, and get advice you can actually follow.</p>
+            </article>
+            <article class="tool-preview">
+              <h3>Scam Detector</h3>
+              <p>Paste internship emails, social DMs, or WhatsApp texts to see social-engineering signals.</p>
+            </article>
+            <article class="tool-preview">
+              <h3>Device Checkup</h3>
+              <p>Review browser safety, session context, and habits that affect your personal safety score.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="login-panel" class="entry-panel">
+          <div class="entry-card">
+            <div class="section-heading">
+              <span class="eyebrow">Demo Access</span>
+              <h2>Login and unlock the student safety dashboard</h2>
             </div>
-            <button id="logout-btn" class="secondary" type="button">Logout</button>
+
+            <div class="credential-pills">
+              <span>Admin: <strong>admin / Admin@123</strong></span>
+              <span>Student: <strong>employee / Employee@123</strong></span>
+              <span>Guest: <strong>guest / Guest@123</strong></span>
+            </div>
+
+            <div class="entry-grid">
+              <article class="entry-step">
+                <h3>1. Sign in</h3>
+                <form id="login-form" class="stack">
+                  <label>
+                    Username
+                    <input id="username" name="username" placeholder="employee" required />
+                  </label>
+                  <label>
+                    Password
+                    <input id="password" name="password" type="password" placeholder="Employee@123" required />
+                  </label>
+                  <button type="submit">Generate OTP</button>
+                </form>
+                <p id="login-message" class="message"></p>
+              </article>
+
+              <article class="entry-step">
+                <h3>2. Verify OTP</h3>
+                <div class="otp-box">
+                  <span>Current Demo OTP</span>
+                  <strong id="otp-display-value">Not generated yet</strong>
+                </div>
+                <form id="otp-form" class="stack">
+                  <label>
+                    Enter OTP
+                    <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
+                  </label>
+                  <button type="submit">Verify and Continue</button>
+                </form>
+                <button id="regenerate-btn" class="ghost-button" type="button">Generate Different OTP</button>
+                <p id="otp-message" class="message"></p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="app-workspace" class="workspace hidden">
+          <div class="workspace-top">
+            <div>
+              <span class="eyebrow">Student Dashboard</span>
+              <h2 id="workspace-title">Welcome to SecureU</h2>
+              <p id="workspace-subtitle" class="workspace-subtitle">Use the tools below to improve your digital safety.</p>
+            </div>
+            <button id="logout-btn" class="ghost-button" type="button">Logout</button>
           </div>
 
           <div class="workspace-shell">
             <aside class="workspace-sidebar">
-              <div class="workspace-user-card">
-                <span class="workspace-badge">Verified Session</span>
+              <div class="profile-card">
+                <span class="status-chip">Verified session</span>
                 <h3 id="workspace-user-name">No active user</h3>
                 <p id="workspace-user-role">Login required</p>
               </div>
 
-              <div class="workspace-nav">
-                <button class="workspace-nav-btn active" type="button" data-view="overview">Overview</button>
-                <button class="workspace-nav-btn" type="button" data-view="vault">Secret Vault</button>
-                <button class="workspace-nav-btn" type="button" data-view="documents">Document Hub</button>
-                <button class="workspace-nav-btn" type="button" data-view="access">Role Access</button>
+              <nav class="workspace-nav" aria-label="Dashboard sections">
+                <button class="workspace-nav-btn active" type="button" data-view="dashboard">Dashboard</button>
+                <button class="workspace-nav-btn" type="button" data-view="links">Link Scanner</button>
+                <button class="workspace-nav-btn" type="button" data-view="passwords">Password Lab</button>
+                <button class="workspace-nav-btn" type="button" data-view="scams">Scam Detector</button>
+                <button class="workspace-nav-btn" type="button" data-view="device">Device Checkup</button>
+                <button class="workspace-nav-btn" type="button" data-view="learn">Learning Mode</button>
                 <button class="workspace-nav-btn admin-only hidden" type="button" data-view="monitor">Admin Monitor</button>
-              </div>
+              </nav>
 
-              <div class="workspace-mini-status">
-                <div>
-                  <span class="trust-label">Trust Score</span>
-                  <strong id="workspace-trust-score">Pending</strong>
-                </div>
-                <div>
-                  <span class="trust-label">Vault State</span>
-                  <strong id="vault-quick-status">Locked</strong>
-                </div>
-                <div>
-                  <span class="trust-label">Stored Files</span>
-                  <strong id="workspace-doc-count">0</strong>
-                </div>
+              <div class="score-card" id="score">
+                <span>Security Score</span>
+                <strong id="workspace-security-score">0</strong>
+                <p id="workspace-score-summary">Login to generate your safety overview.</p>
               </div>
             </aside>
 
             <div class="workspace-stage">
-              <section class="workspace-view active" data-view-panel="overview">
-                <div class="view-header">
+              <section class="workspace-view active" data-view-panel="dashboard">
+                <div class="view-heading">
                   <div>
-                    <p class="eyebrow muted">Slide 01</p>
-                    <h3>Operational Overview</h3>
+                    <span class="eyebrow">Overview</span>
+                    <h3>Your safety dashboard</h3>
                   </div>
-                  <div class="panel-chip">Live zero trust posture</div>
+                  <div class="status-pill" id="session-status">No verified user yet.</div>
                 </div>
 
-                <div class="app-kpi-grid">
-                  <article class="app-kpi-card">
-                    <span>Identity Status</span>
-                    <strong id="app-identity-status">Pending</strong>
-                    <p>Whether the active user is verified and trusted.</p>
+                <div class="dashboard-grid">
+                  <article class="metric-panel">
+                    <span>Trust Score</span>
+                    <strong id="trust-score">Pending</strong>
+                    <p>Role, browser, and session context are used to estimate trust.</p>
                   </article>
-                  <article class="app-kpi-card">
-                    <span>Policy Mode</span>
-                    <strong id="app-policy-mode">Pending</strong>
-                    <p>Current authorization outcome for this session.</p>
+                  <article class="metric-panel">
+                    <span>Policy Status</span>
+                    <strong id="trust-status">Pending</strong>
+                    <p>Shows how much access is granted for the current user session.</p>
                   </article>
-                  <article class="app-kpi-card">
-                    <span>Network Zone</span>
-                    <strong id="app-network-zone">Pending</strong>
-                    <p>Context classification of this browser session.</p>
+                  <article class="metric-panel">
+                    <span>Daily Challenge</span>
+                    <strong id="challenge-progress">0/3</strong>
+                    <p>Complete quick learning tasks to improve your security awareness.</p>
                   </article>
                 </div>
 
-                <div class="overview-grid">
-                  <article class="telemetry-card">
-                    <h3>Session Telemetry</h3>
-                    <div class="telemetry-list">
-                      <div class="telemetry-row"><span>IP Address</span><strong id="ip-address">Pending</strong></div>
-                      <div class="telemetry-row"><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
-                      <div class="telemetry-row"><span>Device Type</span><strong id="device-type">Pending</strong></div>
-                      <div class="telemetry-row"><span>Browser</span><strong id="browser-name">Pending</strong></div>
-                      <div class="telemetry-row"><span>Operating System</span><strong id="os-name">Pending</strong></div>
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <h3>Account Snapshot</h3>
+                    <div class="data-list">
+                      <div><span>Name</span><strong id="account-name">Pending</strong></div>
+                      <div><span>Role</span><strong id="account-role">Pending</strong></div>
+                      <div><span>Network Zone</span><strong id="network-zone">Pending</strong></div>
+                      <div><span>Browser</span><strong id="browser-name">Pending</strong></div>
+                      <div><span>Operating System</span><strong id="os-name">Pending</strong></div>
+                      <div><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
                     </div>
                   </article>
 
-                  <article class="telemetry-card">
-                    <h3>Policy Evaluation</h3>
-                    <div class="telemetry-list">
-                      <div class="telemetry-row"><span>Trust Status</span><strong id="trust-status">Pending</strong></div>
-                      <div class="telemetry-row"><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
-                      <div class="telemetry-row"><span>Session Created</span><strong id="session-created">Pending</strong></div>
-                      <div class="telemetry-row"><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
-                      <div class="telemetry-row"><span>OTP Requests</span><strong id="otp-usage">0</strong></div>
-                    </div>
-                  </article>
-
-                  <article class="telemetry-card telemetry-card-wide">
-                    <h3>Trust Reasons</h3>
-                    <ul id="trust-reasons" class="insight-list">
-                      <li>Session analysis will appear here after login.</li>
+                  <article class="content-panel">
+                    <h3>Recommended Actions</h3>
+                    <ul id="trust-reasons" class="clean-list">
+                      <li>Login and verify OTP to see personalized security guidance.</li>
                     </ul>
                   </article>
                 </div>
-              </section>
 
-              <section class="workspace-view" data-view-panel="vault">
-                <div class="view-header">
-                  <div>
-                    <p class="eyebrow muted">Slide 02</p>
-                    <h3>Secret Vault</h3>
-                  </div>
-                  <div id="vault-banner" class="panel-chip">Set your private vault key</div>
-                </div>
-
-                <div class="vault-grid">
-                  <article class="step-card">
-                    <h3>Set Vault Key</h3>
-                    <p>Create a personal key for this browser-based secure vault. Only the exact key unlocks the vault later.</p>
-                    <form id="vault-set-form" class="stack">
-                      <label>
-                        Private Key
-                        <input id="vault-key-input" name="vault-key" type="password" placeholder="Set your vault key" required />
-                      </label>
-                      <button type="submit">Save Vault Key</button>
-                    </form>
-                    <p id="vault-set-message" class="message"></p>
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <h3>Quick Tool Results</h3>
+                    <div class="quick-results">
+                      <div>
+                        <span>Last Link Scan</span>
+                        <strong id="last-link-status">Not scanned yet</strong>
+                      </div>
+                      <div>
+                        <span>Last Password Check</span>
+                        <strong id="last-password-status">Not checked yet</strong>
+                      </div>
+                      <div>
+                        <span>Last Scam Review</span>
+                        <strong id="last-scam-status">Not analyzed yet</strong>
+                      </div>
+                    </div>
                   </article>
 
-                  <article class="step-card">
-                    <h3>Unlock Vault</h3>
-                    <p>Enter the same key to unlock the secret panel and reveal the stored secure note.</p>
-                    <form id="vault-unlock-form" class="stack">
-                      <label>
-                        Enter Key
-                        <input id="vault-unlock-input" name="vault-unlock" type="password" placeholder="Unlock vault" required />
-                      </label>
-                      <button type="submit">Unlock Vault</button>
-                    </form>
-                    <button id="vault-lock-btn" class="secondary" type="button">Lock Vault</button>
-                    <p id="vault-unlock-message" class="message"></p>
-                  </article>
-                </div>
-
-                <article id="vault-secret-panel" class="telemetry-card hidden">
-                  <h3>Vault Secret Note</h3>
-                  <p>This area is only visible when the correct private key is entered.</p>
-                  <div class="vault-secret-box">
-                    <strong>Protected Insight</strong>
-                    <p id="vault-secret-text">This verified user can store key-based secrets inside the SecureVault demo workspace.</p>
-                  </div>
-                </article>
-              </section>
-
-              <section class="workspace-view" data-view-panel="documents">
-                <div class="view-header">
-                  <div>
-                    <p class="eyebrow muted">Slide 03</p>
-                    <h3>Document Hub</h3>
-                  </div>
-                  <div class="panel-chip">Employee work area</div>
-                </div>
-
-                <div class="documents-grid">
-                  <article class="step-card">
-                    <h3>Upload Documents</h3>
-                    <p>Employees and admins can attach work files in this demo. Files are tracked in browser storage for presentation flow.</p>
-                    <form id="document-form" class="stack">
-                      <label>
-                        Select File
-                        <input id="document-input" name="document" type="file" />
-                      </label>
-                      <label>
-                        Work Note
-                        <input id="document-note" name="document-note" placeholder="Describe the upload" />
-                      </label>
-                      <button type="submit">Add to Hub</button>
-                    </form>
-                    <p id="document-message" class="message"></p>
-                  </article>
-
-                  <article class="telemetry-card">
-                    <h3>Stored Documents</h3>
-                    <div id="document-list" class="document-list">
-                      <article class="document-card empty-state">
-                        <h3>No documents yet</h3>
-                        <p>Uploaded files will appear here for the signed-in employee or admin.</p>
+                  <article class="content-panel">
+                    <h3>Account Access Surfaces</h3>
+                    <div class="role-cards" id="role-surfaces">
+                      <article id="admin-section" class="role-card hidden">
+                        <h4>Admin</h4>
+                        <ul id="admin-list" class="clean-list"></ul>
+                      </article>
+                      <article id="employee-section" class="role-card hidden">
+                        <h4>Student</h4>
+                        <ul id="employee-list" class="clean-list"></ul>
+                      </article>
+                      <article id="guest-section" class="role-card hidden">
+                        <h4>Guest</h4>
+                        <ul id="guest-list" class="clean-list"></ul>
                       </article>
                     </div>
                   </article>
                 </div>
               </section>
 
-              <section class="workspace-view" data-view-panel="access">
-                <div class="view-header">
+              <section class="workspace-view" data-view-panel="links">
+                <div class="view-heading">
                   <div>
-                    <p class="eyebrow muted">Slide 04</p>
-                    <h3>Role Access Surfaces</h3>
+                    <span class="eyebrow">Tool 01</span>
+                    <h3>Phishing Link Scanner</h3>
                   </div>
-                  <div class="panel-chip">Least privilege mapped by role</div>
                 </div>
 
-                <div class="role-columns">
-                  <article id="admin-section" class="role-card hidden role-admin">
-                    <div class="role-icon">A</div>
-                    <h3>Admin Section</h3>
-                    <p>Reserved for high-trust management, approvals, and live policy decisions.</p>
-                    <ul id="admin-list"></ul>
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <form id="link-form" class="stack">
+                      <label>
+                        Paste a URL
+                        <input id="link-input" name="link" type="url" placeholder="https://example.com/internship" required />
+                      </label>
+                      <button type="submit">Scan Link</button>
+                    </form>
+                    <p id="link-message" class="message"></p>
                   </article>
 
-                  <article id="employee-section" class="role-card hidden role-employee">
-                    <div class="role-icon">E</div>
-                    <h3>Employee Section</h3>
-                    <p>Provides verified staff members with least-privilege internal access.</p>
-                    <ul id="employee-list"></ul>
+                  <article class="content-panel result-panel">
+                    <span class="result-label">Risk Result</span>
+                    <strong id="link-risk-label">Waiting for a scan</strong>
+                    <p id="link-risk-score">Risk score: --</p>
+                    <ul id="link-reasons" class="clean-list">
+                      <li>SecureU will explain why a link looks safe, suspicious, or dangerous.</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="passwords">
+                <div class="view-heading">
+                  <div>
+                    <span class="eyebrow">Tool 02</span>
+                    <h3>Password Lab</h3>
+                  </div>
+                </div>
+
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <form id="password-form" class="stack">
+                      <label>
+                        Test a Password
+                        <input id="password-check-input" name="password-check" type="text" placeholder="Enter a password" required />
+                      </label>
+                      <button type="submit">Check Strength</button>
+                    </form>
+
+                    <div class="generator-row">
+                      <button id="generate-passphrase-btn" class="ghost-button" type="button">Generate Passphrase</button>
+                      <strong id="generated-passphrase">No passphrase generated yet</strong>
+                    </div>
+                    <p id="password-message" class="message"></p>
                   </article>
 
-                  <article id="guest-section" class="role-card hidden role-guest">
-                    <div class="role-icon">G</div>
-                    <h3>Guest Section</h3>
-                    <p>Delivers isolated, temporary access with stronger restrictions and monitoring.</p>
-                    <ul id="guest-list"></ul>
+                  <article class="content-panel result-panel">
+                    <span class="result-label">Password Result</span>
+                    <strong id="password-risk-label">Waiting for a check</strong>
+                    <p id="password-risk-score">Strength score: --</p>
+                    <ul id="password-reasons" class="clean-list">
+                      <li>SecureU will rate length, variety, reuse risk, and common-word weakness.</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="scams">
+                <div class="view-heading">
+                  <div>
+                    <span class="eyebrow">Tool 03</span>
+                    <h3>AI-Style Scam Detector</h3>
+                  </div>
+                </div>
+
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <form id="scam-form" class="stack">
+                      <label>
+                        Paste a message or email
+                        <textarea
+                          id="scam-input"
+                          name="scam-input"
+                          rows="8"
+                          placeholder="Paste an internship email, social media DM, or suspicious message here"
+                          required
+                        ></textarea>
+                      </label>
+                      <button type="submit">Analyze Message</button>
+                    </form>
+                    <p id="scam-message" class="message"></p>
+                  </article>
+
+                  <article class="content-panel result-panel">
+                    <span class="result-label">Scam Risk</span>
+                    <strong id="scam-risk-label">Waiting for analysis</strong>
+                    <p id="scam-risk-score">Scam probability: --</p>
+                    <ul id="scam-reasons" class="clean-list">
+                      <li>SecureU will look for urgency, manipulation, payment pressure, and suspicious wording.</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-view" data-view-panel="device">
+                <div class="view-heading">
+                  <div>
+                    <span class="eyebrow">Tool 04</span>
+                    <h3>Device Security Checkup</h3>
+                  </div>
+                </div>
+
+                <div class="panel-grid two-up">
+                  <article class="content-panel">
+                    <h3>Session Environment</h3>
+                    <div class="data-list">
+                      <div><span>Device Type</span><strong id="device-type">Pending</strong></div>
+                      <div><span>IP Context</span><strong id="ip-address">Pending</strong></div>
+                      <div><span>Policy Decision</span><strong id="policy-decision">Pending</strong></div>
+                      <div><span>Session Created</span><strong id="session-created">Pending</strong></div>
+                      <div><span>Last Seen</span><strong id="last-seen">Pending</strong></div>
+                    </div>
+                  </article>
+
+                  <article class="content-panel result-panel">
+                    <span class="result-label">Device Score</span>
+                    <strong id="device-score-label">Waiting for session</strong>
+                    <p id="device-risk-score">Safety score: --</p>
+                    <ul id="device-recommendations" class="clean-list">
+                      <li>Login to see beginner-friendly browser and device advice.</li>
+                    </ul>
+                  </article>
+                </div>
+              </section>
+
+              <section id="learn" class="workspace-view" data-view-panel="learn">
+                <div class="view-heading">
+                  <div>
+                    <span class="eyebrow">Tool 05</span>
+                    <h3>Learning Mode</h3>
+                  </div>
+                </div>
+
+                <div class="learning-grid">
+                  <article class="lesson-card">
+                    <span class="lesson-badge">Daily Challenge</span>
+                    <h4>Spot the red flag</h4>
+                    <p>An internship email asks for your OTP to “confirm your application.” What is the safest response?</p>
+                    <div class="challenge-actions">
+                      <button class="challenge-btn" type="button" data-correct="false">Send OTP quickly</button>
+                      <button class="challenge-btn" type="button" data-correct="true">Do not share OTP and verify the sender</button>
+                      <button class="challenge-btn" type="button" data-correct="false">Reply with bank details</button>
+                    </div>
+                    <p id="challenge-feedback" class="message"></p>
+                  </article>
+
+                  <article class="lesson-card">
+                    <span class="lesson-badge">Quick Lessons</span>
+                    <ul class="clean-list">
+                      <li>Never share OTPs, recovery codes, or one-time links.</li>
+                      <li>Fake domains often look close to real companies but contain extra letters or odd endings.</li>
+                      <li>Public Wi-Fi is safer when you avoid sensitive logins and use HTTPS-only websites.</li>
+                    </ul>
+                  </article>
+
+                  <article class="lesson-card">
+                    <span class="lesson-badge">Progress</span>
+                    <strong id="badge-count">0 badges earned</strong>
+                    <p>Complete checks and challenges to improve your safety score and learning progress.</p>
                   </article>
                 </div>
               </section>
 
               <section class="workspace-view" data-view-panel="monitor">
-                <div id="admin-monitor" class="admin-monitor">
-                  <div class="section-title">
-                    <p class="eyebrow muted">Slide 05</p>
-                    <h2>Who is logging in as employee or guest</h2>
-                  </div>
-                  <div id="admin-activity-list" class="activity-list">
-                    <article class="activity-card empty-state">
-                      <h3>No activity yet</h3>
-                      <p>Recent employee and guest login events will appear here for the admin.</p>
-                    </article>
+                <div class="view-heading">
+                  <div>
+                    <span class="eyebrow">Admin</span>
+                    <h3>Usage Monitor</h3>
                   </div>
                 </div>
+                <article class="content-panel">
+                  <h3>Who is using the platform</h3>
+                  <div id="admin-activity-list" class="activity-list">
+                    <article class="activity-card empty-state">
+                      <h4>No activity yet</h4>
+                      <p>Recent student and guest login events will appear here for the admin.</p>
+                    </article>
+                  </div>
+                </article>
               </section>
             </div>
           </div>
         </section>
-
-        <section id="architecture" class="panel architecture-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Zero Trust Architecture</p>
-            <h2>Policy flow and enforcement logic</h2>
-          </div>
-
-          <div class="architecture-grid">
-            <article class="arch-node">
-              <span class="arch-label">Client</span>
-              <h3>User + Device</h3>
-              <p>Identity begins with credentials, OTP verification, and browser or device context.</p>
-            </article>
-            <article class="arch-node">
-              <span class="arch-label">PEP</span>
-              <h3>Policy Enforcement Point</h3>
-              <p>Every access request is checked before users reach protected application surfaces.</p>
-            </article>
-            <article class="arch-node">
-              <span class="arch-label">PDP</span>
-              <h3>Policy Decision Point</h3>
-              <p>Trust score, role, device posture, and simulation alerts determine the decision.</p>
-            </article>
-            <article class="arch-node">
-              <span class="arch-label">Resource</span>
-              <h3>Protected Resource</h3>
-              <p>Admin, employee, and guest areas receive different visibility according to policy.</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="panel model-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Threat Model</p>
-            <h2>Assume breach and limit lateral movement</h2>
-          </div>
-
-          <div class="threat-grid">
-            <article class="threat-card">
-              <h3>Primary Assets</h3>
-              <p>Identity records, privileged access paths, audit history, and protected internal resources.</p>
-            </article>
-            <article class="threat-card">
-              <h3>Likely Attackers</h3>
-              <p>Credential thieves, malicious insiders, bots attempting brute force, and session hijackers.</p>
-            </article>
-            <article class="threat-card">
-              <h3>Entry Points</h3>
-              <p>Login forms, OTP workflow, role elevation requests, and browser session reuse.</p>
-            </article>
-            <article class="threat-card">
-              <h3>Control Strategy</h3>
-              <p>Continuous verification, least privilege, monitoring, event logging, and step-up responses.</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="panel disclaimer-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Demo Scope</p>
-            <h2>What this demo proves and what should come next</h2>
-          </div>
-          <div class="disclaimer-grid">
-            <div>
-              <h3>Implemented here</h3>
-              <ul class="insight-list">
-                <li>Role-based access separation</li>
-                <li>OTP-based step-up verification</li>
-                <li>Device and browser trust scoring</li>
-                <li>Admin monitoring and attack simulation</li>
-              </ul>
-            </div>
-            <div>
-              <h3>Next production upgrades</h3>
-              <ul class="insight-list">
-                <li>Server-side token validation and session storage</li>
-                <li>OAuth or SSO with MFA</li>
-                <li>Real audit logs, rate limiting, and anomaly detection</li>
-                <li>Database-backed RBAC or ABAC policy engine</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel testimonials-panel">
-          <div class="section-title">
-            <p class="eyebrow muted">Presentation Impact</p>
-            <h2>What this style communicates instantly</h2>
-          </div>
-          <div class="testimonial-grid">
-            <article class="testimonial-card">
-              <p>
-                “This looks like a modern cybersecurity SaaS product instead of a plain demo. The alerting and trust
-                visuals make the idea easy to understand fast.”
-              </p>
-              <strong>Design Review</strong>
-            </article>
-            <article class="testimonial-card">
-              <p>
-                “The attack simulation buttons and Zero Trust architecture view give you strong talking points during a
-                viva or project presentation.”
-              </p>
-              <strong>Project Feedback</strong>
-            </article>
-            <article class="testimonial-card">
-              <p>
-                “The stronger gradients, floating icons, and dashboard depth add the wow factor people expect from a
-                security product demo.”
-              </p>
-              <strong>Demo Impression</strong>
-            </article>
-          </div>
-        </section>
       </main>
-
-      <footer class="site-footer">
-        <div>
-          <p class="eyebrow muted">SecureVault</p>
-          <h2>Zero Trust, reimagined as a sharper live demo</h2>
-        </div>
-        <div class="footer-links">
-          <a href="#operations">Operations</a>
-          <a href="#simulator">Simulation</a>
-          <a href="#architecture">Architecture</a>
-        </div>
-      </footer>
     </div>
 
     <script src="/script.js"></script>
