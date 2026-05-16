@@ -137,14 +137,6 @@ function activeVerificationMethods(settings) {
   return methods;
 }
 
-function generateOtp(previousOtp) {
-  let otp = "";
-  do {
-    otp = `${Math.floor(100000 + Math.random() * 900000)}`;
-  } while (otp === previousOtp);
-  return otp;
-}
-
 function analyzeRisk(role, state) {
   const userAgent = navigator.userAgent || "Unknown Agent";
   const browser = summarizeBrowser(userAgent);
@@ -261,7 +253,6 @@ function buildSession(user, previousSession, state) {
     username: user.username,
     name: user.name,
     role: user.role,
-    otp: generateOtp(previousSession?.otp || null),
     otpVerified: false,
     createdAt,
     lastSeenAt: createdAt,
@@ -337,7 +328,6 @@ function ensureContinuousReview(state) {
   const previousScore = state.session.trust.score;
   const refreshed = buildSession(user, state.session, state);
   refreshed.otpVerified = state.session.otpVerified;
-  refreshed.otp = null;
   refreshed.createdAt = state.session.createdAt;
   refreshed.lastSeenAt = nowIso();
   state.session = refreshed;
@@ -597,8 +587,8 @@ function renderDashboardPage(state) {
   const metricDefaults = {
     "sidebar-session-status": "No verified session",
     "sidebar-security-score": "0",
-    "sidebar-score-summary": "Login from the home page to generate a real dashboard.",
-    "dashboard-session-status": "Please verify OTP from the home page first.",
+    "sidebar-score-summary": "Login with secure OTP to generate a real dashboard.",
+    "dashboard-session-status": "Please sign in and verify OTP first.",
     "dashboard-name": "Pending",
     "dashboard-role": "Pending",
     "dashboard-trust": "Pending",
@@ -624,7 +614,7 @@ function renderDashboardPage(state) {
     setText("recent-file-result", state.toolHistory.file ? `${state.toolHistory.file.label} (${state.toolHistory.file.score}/100)` : "No scans yet");
     updateList(document.getElementById("dashboard-role-list"), ["Verify a user session to see role-specific access guidance."]);
     updateList(document.getElementById("dashboard-tips"), [
-      "Start with a quick login from the home page.",
+      "Start with the secure login page.",
       "Use the tools page to scan a suspicious link or message.",
       "Return here for personalized recommendations and risk posture."
     ]);
@@ -1080,107 +1070,7 @@ function initDashboardTabs() {
 }
 
 function initLoginFlow() {
-  const loginForm = document.getElementById("login-form");
-  const otpForm = document.getElementById("otp-form");
-  const regenerateBtn = document.getElementById("regenerate-btn");
   const logoutBtn = document.getElementById("logout-btn");
-  const loginMessage = document.getElementById("login-message");
-  const otpMessage = document.getElementById("otp-message");
-  const otpDisplay = document.getElementById("otp-display-value");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (loginMessage) loginMessage.textContent = "";
-      if (otpMessage) otpMessage.textContent = "";
-
-      const data = new FormData(loginForm);
-      const username = data.get("username");
-      const password = data.get("password");
-      const user = users[username];
-      const state = readState();
-
-      if (!user || user.password !== password) {
-        state.failedAttempts += 1;
-        recordLog(state, "warning", "Failed login attempt", `Rejected credential attempt for username ${username || "unknown"}.`, "auth");
-        writeState(state);
-        if (loginMessage) loginMessage.textContent = "Invalid credentials.";
-        renderAll();
-        return;
-      }
-
-      state.failedAttempts = 0;
-      const previous = state.session && state.session.username === user.username ? state.session : null;
-      state.session = buildSession(user, previous, state);
-      recordEvent(state, state.session, "login-issued", "Primary login accepted");
-      recordLog(state, "info", "Primary identity verified", `${state.session.name} passed password verification and received an OTP challenge.`, "auth");
-      writeState(state);
-
-      if (otpDisplay) otpDisplay.textContent = state.session.otp;
-      if (loginMessage) loginMessage.textContent = `Login accepted. OTP generated for ${state.session.role}.`;
-      renderAll();
-    });
-  }
-
-  if (otpForm) {
-    otpForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const state = readState();
-      const session = state.session;
-      if (otpMessage) otpMessage.textContent = "";
-
-      if (!session) {
-        if (otpMessage) otpMessage.textContent = "Sign in first.";
-        return;
-      }
-
-      const otpValue = document.getElementById("otp-input")?.value;
-      if (otpValue !== session.otp) {
-        recordLog(state, "warning", "OTP verification failed", `A bad OTP was entered for ${session.name}.`, "auth");
-        writeState(state);
-        if (otpMessage) otpMessage.textContent = "Incorrect OTP.";
-        renderAll();
-        return;
-      }
-
-      session.otpVerified = true;
-      session.otp = null;
-      session.lastSeenAt = nowIso();
-      session.nextReviewAt = new Date(Date.now() + 3 * 60 * 1000).toISOString();
-      state.session = session;
-      recordEvent(state, session, "otp-verified", "Step-up verification completed");
-      recordLog(state, "success", "MFA verification completed", `${session.name} completed the ${session.trust.verificationMethods.join(" + ")} flow.`, "auth");
-      writeState(state);
-
-      if (otpDisplay) otpDisplay.textContent = "Used";
-      if (otpMessage) otpMessage.textContent = "OTP verified. You can now use the platform.";
-      otpForm.reset();
-      renderAll();
-    });
-  }
-
-  if (regenerateBtn) {
-    regenerateBtn.addEventListener("click", () => {
-      const state = readState();
-      const session = state.session;
-      if (!session) {
-        if (otpMessage) otpMessage.textContent = "Sign in first.";
-        return;
-      }
-
-      session.otp = generateOtp(session.otp);
-      session.otpVerified = false;
-      session.lastSeenAt = nowIso();
-      session.otpUsageCount += 1;
-      state.session = session;
-      recordLog(state, "info", "New OTP issued", `A replacement OTP was generated for ${session.name}.`, "auth");
-      writeState(state);
-
-      if (otpDisplay) otpDisplay.textContent = session.otp;
-      if (otpMessage) otpMessage.textContent = `A different OTP has been generated. Request count: ${session.otpUsageCount}.`;
-      renderAll();
-    });
-  }
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -1339,7 +1229,6 @@ function initSettingsPage() {
       if (user) {
         const refreshed = buildSession(user, state.session, state);
         refreshed.otpVerified = state.session.otpVerified;
-        refreshed.otp = state.session.otp;
         refreshed.createdAt = state.session.createdAt;
         state.session = refreshed;
       }

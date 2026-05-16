@@ -16,6 +16,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const { createClient } = require("redis");
+const { Resend } = require("resend");
 const twilio = require("twilio");
 const xss = require("xss-clean");
 
@@ -36,6 +37,7 @@ const memorySessions = new Map();
 
 let redisClient = null;
 let mailer = null;
+let resendClient = null;
 let whatsAppClient = null;
 
 const roleContent = {
@@ -321,24 +323,39 @@ function buildEmailTemplate({ name, otp, purpose }) {
 }
 
 async function sendEmailOtp(user, otp, purpose) {
-  if (!mailer) {
-    console.log(`[dev-email] ${purpose} OTP for ${user.email}: ${otp}`);
-    return { provider: "demo-email", demoOtp: otp };
+  if (resendClient) {
+    await resendClient.emails.send({
+      from: process.env.EMAIL_FROM || "SecureU <onboarding@resend.dev>",
+      to: user.email,
+      subject: `SecureU ${purpose} OTP`,
+      html: buildEmailTemplate({ name: user.name, otp, purpose })
+    });
+    return { provider: "resend" };
   }
-  await mailer.sendMail({
-    from: process.env.EMAIL_FROM,
-    to: user.email,
-    subject: `SecureU ${purpose} OTP`,
-    html: buildEmailTemplate({ name: user.name, otp, purpose })
-  });
-  return { provider: "email" };
+  if (mailer) {
+    await mailer.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: user.email,
+      subject: `SecureU ${purpose} OTP`,
+      html: buildEmailTemplate({ name: user.name, otp, purpose })
+    });
+    return { provider: "smtp" };
+  }
+  if (IS_PRODUCTION) {
+    throw Object.assign(new Error("Email OTP service is not configured."), { statusCode: 503 });
+  }
+  console.log(`[dev-email] ${purpose} OTP for ${user.email}: ${otp}`);
+  return { provider: "local-email-log" };
 }
 
 async function sendWhatsAppOtp(user, otp, purpose) {
   const message = `SecureU ${purpose} OTP: ${otp}. Valid for 5 minutes. Do not share this code.`;
-  if (!whatsAppClient || !user.phone) {
+  if (!whatsAppClient) {
+    if (IS_PRODUCTION) {
+      throw Object.assign(new Error("WhatsApp OTP service is not configured."), { statusCode: 503 });
+    }
     console.log(`[dev-whatsapp] ${purpose} OTP for ${user.phone || user.email}: ${otp}`);
-    return { provider: "demo-whatsapp", demoOtp: otp };
+    return { provider: "local-whatsapp-log" };
   }
   try {
     await whatsAppClient.messages.create({
@@ -360,12 +377,29 @@ async function sendWhatsAppOtp(user, otp, purpose) {
   }
 }
 
+function ensureOtpChannelReady(user, channel) {
+  if (channel === "whatsapp") {
+    if (!user.phone) {
+      throw Object.assign(new Error("WhatsApp phone number is required for this account."), { statusCode: 400 });
+    }
+    if (IS_PRODUCTION && (!whatsAppClient || !process.env.TWILIO_WHATSAPP_FROM)) {
+      throw Object.assign(new Error("WhatsApp OTP service is not configured."), { statusCode: 503 });
+    }
+    return;
+  }
+  if (IS_PRODUCTION && !resendClient && !mailer) {
+    throw Object.assign(new Error("Email OTP service is not configured."), { statusCode: 503 });
+  }
+}
+
 async function issueOtp({ request, response, user, purpose, channel }) {
   const resendLock = await cacheGet(resendKey(user._id, purpose));
   if (resendLock) {
     response.status(429);
     throw new Error(`Please wait ${resendLock.waitSeconds || OTP_RESEND_SECONDS} seconds before requesting another OTP.`);
   }
+
+  ensureOtpChannelReady(user, channel);
 
   const otp = generateOtp();
   await cacheSet(
@@ -391,7 +425,6 @@ async function issueOtp({ request, response, user, purpose, channel }) {
     resendAfter: OTP_RESEND_SECONDS,
     channel,
     purpose,
-    demoOtp: delivery.demoOtp,
     user: { email: user.email, phone: user.phone ? maskPhone(user.phone) : null }
   };
 }
@@ -499,6 +532,7 @@ async function connectInfrastructure() {
   requireEnv("MONGODB_URI");
   requireEnv("JWT_SECRET");
   requireEnv("OTP_SECRET");
+  requireEnv("RESEND_API_KEY");
 
   if (process.env.MONGODB_URI) {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -516,7 +550,9 @@ async function connectInfrastructure() {
     console.warn("REDIS_URL not set. OTP/session cache is using memory fallback.");
   }
 
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  if (process.env.RESEND_API_KEY) {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  } else if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     mailer = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
@@ -528,8 +564,9 @@ async function connectInfrastructure() {
     });
   }
 
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    whatsAppClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const twilioSid = process.env.TWILIO_ACCOUNT_SID || process.env.TWILIO_SID;
+  if (twilioSid && process.env.TWILIO_AUTH_TOKEN) {
+    whatsAppClient = twilio(twilioSid, process.env.TWILIO_AUTH_TOKEN);
   }
 
   await seedInitialUser();

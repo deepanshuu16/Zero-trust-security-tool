@@ -1,42 +1,47 @@
 # Zero Trust Security Tool
 
-Small demo project with:
+SecureU zero-trust security platform with:
 
-- `admin`, `employee`, and `guest` user sections
-- role-based access after OTP verification
-- a fresh OTP generated on login
-- a different OTP every time you regenerate it
+- backend-generated OTP verification
+- Resend email delivery
+- Twilio WhatsApp delivery
+- hashed single-use OTP storage with expiry, resend cooldown, rate limits, and attempt caps
+- role-based access after verification
 
 ## Run
 
 ```bash
-python app.py
+npm install
+npm start
 ```
 
 Then open `http://localhost:3000`.
 
-## Demo Users
+## Environment
 
-- `admin` / `Admin@123`
-- `employee` / `Employee@123`
-- `guest` / `Guest@123`
+Copy `.env.example` to `.env` locally or add the values in Vercel Project Settings.
+
+Required production values include:
+
+- `RESEND_API_KEY`
+- `EMAIL_FROM`
+- `TWILIO_ACCOUNT_SID` or `TWILIO_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_WHATSAPP_FROM`
+- `MONGODB_URI`
+- `REDIS_URL`
+- `JWT_SECRET`
+- `OTP_SECRET`
 
 ## Notes
 
-- OTPs are generated with Python's `secrets` module
-- Each verified OTP is single-use and cleared right after success
-- This is a demo project for learning and showcasing zero-trust ideas
+- OTPs are generated only on the backend.
+- OTPs are never returned to the browser or shown on screen.
+- Production fails closed if real email or WhatsApp providers are not configured.
 
 ## Public Deployment
 
-For a 24/7 public website, deploy this app to a cloud host instead of running it only on your computer.
-
-One simple option is Render:
-
-1. Push this project to GitHub
-2. Create a new Render web service from that repo
-3. Render can use the included `render.yaml`
-4. Start command: `python app.py`
+Deploy the Node app to Vercel from the connected GitHub repository. Add the environment variables in Vercel Dashboard -> Project Settings -> Environment Variables before testing login.
 
 Important:
 

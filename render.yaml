@@ -1,7 +1,7 @@
 services:
   - type: web
     name: zero-trust-security-tool
-    runtime: python
+    runtime: node
     plan: free
-    buildCommand: ""
-    startCommand: python app.py
+    buildCommand: npm install
+    startCommand: npm start

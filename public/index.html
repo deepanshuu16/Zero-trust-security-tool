@@ -194,47 +194,27 @@
         <section id="quick-access" class="split-section section-reveal">
           <article class="panel">
             <div class="section-header">
-              <span class="eyebrow">Quick Demo Access</span>
-              <h2>Start a verified session</h2>
+              <span class="eyebrow">Secure Access</span>
+              <h2>Start with real OTP delivery</h2>
             </div>
-            <div class="pill-row">
-              <span class="pill">Admin: admin / Admin@123</span>
-              <span class="pill">Employee: employee / Employee@123</span>
-              <span class="pill">Analyst: analyst / Analyst@123</span>
-              <span class="pill">Guest: guest / Guest@123</span>
+            <p class="section-copy">
+              SecureU now issues OTP codes from the backend and delivers them by email or WhatsApp. Codes are never generated or shown in the browser.
+            </p>
+            <div class="hero-actions">
+              <a class="button-primary" href="/login.html">Login with OTP</a>
+              <a class="button-secondary" href="/signup.html">Create account</a>
             </div>
-            <form id="login-form" class="stack">
-              <label>
-                Username
-                <input id="username" name="username" placeholder="analyst" required />
-              </label>
-              <label>
-                Password
-                <input id="password" name="password" type="password" placeholder="Analyst@123" required />
-              </label>
-              <button class="primary" type="submit">Start Identity Verification</button>
-            </form>
-            <p id="login-message" class="message"></p>
           </article>
 
           <article class="panel">
             <div class="section-header">
-              <span class="eyebrow">Step-up verification</span>
-              <h2>Confirm with OTP</h2>
+              <span class="eyebrow">Trusted Channels</span>
+              <h2>Email and WhatsApp OTP</h2>
             </div>
-            <div class="otp-card">
-              <span>Current Demo OTP</span>
-              <strong id="otp-display-value">Not generated yet</strong>
-            </div>
-            <form id="otp-form" class="stack">
-              <label>
-                Enter OTP
-                <input id="otp-input" name="otp" inputmode="numeric" placeholder="6-digit OTP" required />
-              </label>
-              <button class="primary" type="submit">Verify OTP</button>
-            </form>
-            <button id="regenerate-btn" class="secondary" type="button">Generate Different OTP</button>
-            <p id="otp-message" class="message"></p>
+            <div class="data-row"><span>Email provider</span><strong>Resend</strong></div>
+            <div class="data-row"><span>WhatsApp provider</span><strong>Twilio</strong></div>
+            <div class="data-row"><span>OTP expiry</span><strong>5 minutes</strong></div>
+            <div class="data-row"><span>Attempt limit</span><strong>5 tries</strong></div>
           </article>
         </section>
 

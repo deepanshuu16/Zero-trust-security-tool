@@ -7,7 +7,7 @@
 - Redis for OTP, resend cooldown, and reset-token storage
 - JWT in secure HttpOnly cookies
 - bcrypt password hashing
-- Nodemailer or SendGrid SMTP for email OTP
+- Resend for email OTP, with optional SMTP fallback
 - Twilio WhatsApp API with SMS fallback
 - Helmet, CSRF, rate limiting, XSS protection, input sanitization, HPP protection, HTTPS enforcement
 
@@ -21,8 +21,8 @@ Important production values:
 - `REDIS_URL`
 - `JWT_SECRET`
 - `OTP_SECRET`
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`
-- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`
+- `RESEND_API_KEY`, `EMAIL_FROM`
+- `TWILIO_ACCOUNT_SID` or `TWILIO_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`
 - `TWILIO_SMS_FROM` for SMS fallback
 - `PUBLIC_APP_URL`
 - `ALLOWED_ORIGINS`
@@ -72,7 +72,7 @@ Recommended production CORS allowlist:
 4. Deploy to Vercel from the connected GitHub repository.
 5. Confirm that `/api/csrf-token` returns a token and auth pages can submit forms.
 
-For local development without SMTP or Twilio credentials, OTP values are logged to the server console. Production should always configure real providers.
+For local development without Resend or Twilio credentials, OTP values are logged only to the server console. Production fails closed unless real providers are configured, and OTP values are never returned to the browser.
 
 ## Private Seed User
 
