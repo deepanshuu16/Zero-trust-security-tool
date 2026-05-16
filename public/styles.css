@@ -2,8 +2,10 @@
   --bg: #f5f7fb;
   --surface: #ffffff;
   --surface-alt: #f0f4fb;
+  --surface-strong: #e8effa;
   --surface-dark: #142033;
   --line: #d8e1ee;
+  --line-strong: #c4d2e6;
   --text: #142033;
   --muted: #60728a;
   --primary: #2d6df6;
@@ -11,10 +13,11 @@
   --success: #179b70;
   --warning: #f0a638;
   --danger: #e45858;
-  --radius-lg: 28px;
-  --radius-md: 20px;
-  --radius-sm: 14px;
+  --radius-lg: 30px;
+  --radius-md: 22px;
+  --radius-sm: 16px;
   --shadow: 0 18px 40px rgba(20, 32, 51, 0.08);
+  --shadow-strong: 0 24px 54px rgba(20, 32, 51, 0.12);
 }
 
 * {
@@ -78,9 +81,34 @@ img {
 .dashboard-card,
 .assistant-card,
 .footer-band {
-  background: var(--surface);
-  border: 1px solid var(--line);
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.96));
+  border: 1px solid var(--line-strong);
   box-shadow: var(--shadow);
+}
+
+.site-header::after,
+.hero-card::after,
+.info-card::after,
+.feature-card::after,
+.stat-card::after,
+.scan-card::after,
+.panel::after,
+.tool-card::after,
+.news-card::after,
+.lesson-card::after,
+.pricing-card::after,
+.contact-card::after,
+.trust-card::after,
+.dashboard-card::after,
+.assistant-card::after,
+.footer-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  pointer-events: none;
 }
 
 .site-header {
@@ -93,6 +121,7 @@ img {
   gap: 20px;
   padding: 16px 20px;
   border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
 }
 
 .brand {
@@ -177,6 +206,7 @@ h4 {
 .assistant-card {
   border-radius: var(--radius-lg);
   padding: 26px;
+  box-shadow: var(--shadow-strong);
 }
 
 .hero-card h1 {
@@ -287,6 +317,40 @@ button:hover,
   border-radius: var(--radius-md);
 }
 
+.info-card,
+.feature-card,
+.tool-card,
+.news-card,
+.lesson-card,
+.pricing-card,
+.trust-card,
+.dashboard-card,
+.contact-card,
+.scan-card,
+.stat-card {
+  overflow: hidden;
+}
+
+.info-card::before,
+.feature-card::before,
+.tool-card::before,
+.news-card::before,
+.lesson-card::before,
+.pricing-card::before,
+.trust-card::before,
+.dashboard-card::before,
+.contact-card::before,
+.scan-card::before,
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), rgba(45, 109, 246, 0.12));
+  pointer-events: none;
+}
+
 .stat-card strong,
 .dashboard-metric strong,
 .score-badge strong,
@@ -353,6 +417,40 @@ button:hover,
   margin-top: 20px;
 }
 
+.hero-card,
+.panel,
+.dashboard-card,
+.assistant-card,
+.tool-card,
+.lesson-card,
+.pricing-card,
+.trust-card,
+.contact-card,
+.news-card,
+.scan-card,
+.info-card,
+.feature-card {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.hero-card:hover,
+.panel:hover,
+.dashboard-card:hover,
+.assistant-card:hover,
+.tool-card:hover,
+.lesson-card:hover,
+.pricing-card:hover,
+.trust-card:hover,
+.contact-card:hover,
+.news-card:hover,
+.scan-card:hover,
+.info-card:hover,
+.feature-card:hover {
+  transform: translateY(-2px);
+  border-color: #bfcfe6;
+  box-shadow: 0 28px 58px rgba(20, 32, 51, 0.12);
+}
+
 .stack {
   display: grid;
   gap: 14px;
@@ -395,7 +493,8 @@ textarea:focus {
 .timeline-card {
   padding: 18px;
   border-radius: 18px;
-  background: var(--surface-alt);
+  background: linear-gradient(180deg, var(--surface-alt), #f8fbff);
+  border: 1px solid var(--line);
 }
 
 .dashboard-shell {
@@ -489,6 +588,9 @@ textarea:focus {
   margin-top: 28px;
   padding: 24px;
   border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, rgba(45, 109, 246, 0.06), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.98));
 }
 
 .footer-row {
@@ -541,6 +643,54 @@ textarea:focus {
   background: var(--surface-alt);
   color: var(--muted);
   font-weight: 700;
+  border: 1px solid var(--line);
+}
+
+.architecture-strip,
+.moat-strip,
+.roadmap-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.architecture-card {
+  position: relative;
+  padding: 22px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #ffffff, #f6f9ff);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow);
+}
+
+.architecture-card strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.architecture-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.callout-band {
+  margin-top: 20px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #1c2c48, #142033);
+  color: #f6f9ff;
+  box-shadow: var(--shadow-strong);
+}
+
+.callout-band p,
+.callout-band li {
+  color: rgba(246, 249, 255, 0.78);
+}
+
+.callout-band .eyebrow {
+  color: #9cc0ff;
 }
 
 .hidden {
@@ -563,7 +713,10 @@ textarea:focus {
   .news-grid,
   .learning-grid,
   .pricing-grid,
-  .trust-grid {
+  .trust-grid,
+  .architecture-strip,
+  .moat-strip,
+  .roadmap-strip {
     grid-template-columns: 1fr;
   }
 }
