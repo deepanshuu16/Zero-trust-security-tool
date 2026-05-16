@@ -681,9 +681,12 @@ app.post(
     const existing = await findUserByEmail(normalizedEmail);
     if (existing) return response.status(409).json({ error: "An account already exists for this email." });
 
+    const requestedChannel = normalizeChannel(channel);
+    ensureOtpChannelReady({ phone }, requestedChannel);
+
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await createUser({ name, email: normalizedEmail, phone, passwordHash, role: "employee" });
-    const payload = await issueOtp({ request, response, user, purpose: "signup", channel: normalizeChannel(channel) });
+    const payload = await issueOtp({ request, response, user, purpose: "signup", channel: requestedChannel });
     response.status(201).json(payload);
   })
 );

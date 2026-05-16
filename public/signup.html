@@ -25,12 +25,7 @@
         <form id="auth-signup-form" class="auth-form">
           <label>Full name<input name="name" placeholder="Security Analyst" autocomplete="name" required /></label>
           <label>Email<input name="email" type="email" placeholder="you@company.com" autocomplete="email" required /></label>
-          <label>WhatsApp phone<input name="phone" type="tel" placeholder="+15551234567" autocomplete="tel" /></label>
           <label>Password<input name="password" type="password" placeholder="Minimum 8 characters" autocomplete="new-password" minlength="8" required /></label>
-          <div class="channel-switch">
-            <label><input type="radio" name="channel" value="email" checked /> Email OTP</label>
-            <label><input type="radio" name="channel" value="whatsapp" /> WhatsApp OTP</label>
-          </div>
           <button class="button-primary" type="submit"><span>Create and verify</span></button>
         </form>
         <p data-auth-message class="auth-message"></p>
